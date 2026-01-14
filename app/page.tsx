@@ -12,8 +12,8 @@ export default function Home() {
         <div className="inline-flex justify-center items-center w-20 h-20 bg-blue-600 rounded-3xl shadow-lg shadow-blue-200 mb-4 transform rotate-3">
             <Trophy size={40} className="text-white" />
         </div>
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">MY TENNIS</h1>
-        <p className="text-slate-500 font-medium">우리만의 테니스 리그 매니저</p>
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">L40 Rank </h1>
+        <p className="text-slate-500 font-medium">러브포티 테니스 리그 매니저</p>
       </div>
 
       {/* 2. 메뉴 버튼 영역 */}
@@ -57,7 +57,7 @@ export default function Home() {
       </nav>
 
       <footer className="mt-12 text-center text-xs text-slate-400 font-medium">
-        v1.0.0 MVP by 한PD
+        v1.0.0 L40 by 한PD
       </footer>
     </main>
   );
