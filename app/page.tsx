@@ -57,7 +57,7 @@ export default function Home() {
       </nav>
 
       <footer className="mt-12 text-center text-xs text-slate-400 font-medium">
-        v1.0.0 MVP by Han PD
+        v1.0.0 MVP by 한PD
       </footer>
     </main>
   );
