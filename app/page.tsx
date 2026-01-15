@@ -20,7 +20,7 @@ export default function Home() {
       <nav className="space-y-4 w-full">
         
         {/* 버튼 1: [ + 새 리그 만들기 ] (가장 강조) */}
-        <Link href="/league" className="group block w-full">
+        <Link href="/league/new" className="group block w-full">
             <div className="bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-2xl shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <div className="bg-white/20 p-2 rounded-lg">
