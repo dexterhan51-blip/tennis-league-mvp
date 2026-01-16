@@ -21,14 +21,13 @@ export default function LeaguePage() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [selectedForMatch, setSelectedForMatch] = useState<string[]>([]);
   const [matchDate, setMatchDate] = useState("");
-  const [slotIndex, setSlotIndex] = useState<string | null>(null); // 현재 슬롯 번호
+  const [slotIndex, setSlotIndex] = useState<string | null>(null);
 
   const guestMale: Player = { id: GUEST_M_ID, name: '게스트(남)', gender: 'MALE' };
   const guestFemale: Player = { id: GUEST_F_ID, name: '게스트(여)', gender: 'FEMALE' };
 
   // 1. 데이터 불러오기
   useEffect(() => {
-    // 슬롯 번호 확인
     const currentSlot = localStorage.getItem("current-slot-index");
     setSlotIndex(currentSlot);
 
@@ -46,7 +45,7 @@ export default function LeaguePage() {
     setMatchDate(today);
   }, [router]);
 
-  // 2. 자동 저장 (슬롯 연동)
+  // 2. 자동 저장
   useEffect(() => {
     if (leagueName) {
         const data = {
@@ -55,11 +54,7 @@ export default function LeaguePage() {
             matches: matches,
             savedAt: new Date().toISOString()
         };
-        
-        // (1) 임시 저장소에 저장
         localStorage.setItem("current-league", JSON.stringify(data));
-
-        // (2) ⭐ 원본 슬롯에도 같이 저장 (초기화 방지!)
         if (slotIndex) {
             localStorage.setItem(`league-slot-${slotIndex}`, JSON.stringify(data));
         }
@@ -82,7 +77,6 @@ export default function LeaguePage() {
 
     try {
         let newMatches: Match[] = [];
-        let message = "";
 
         if (type === 'MIXED') {
             const proposedMatches = generateMixedDoublesSchedule(pool, matchDate);
@@ -90,7 +84,6 @@ export default function LeaguePage() {
             if (count === 0) return alert("매칭 가능한 조합이 없습니다.");
             if (!confirm(`총 ${count}개의 게임이 생성됩니다. 진행하시겠습니까?`)) return;
             newMatches = proposedMatches;
-            message = "혼복 풀리그 생성 완료";
         } else if (type === 'DOUBLES') {
             newMatches = generateDoubles(pool, matchDate);
         } else if (type === 'SINGLES') {
@@ -105,7 +98,7 @@ export default function LeaguePage() {
         }
 
         if (newMatches.length > 0) {
-            // ⭐ 순서 변경: 기존 매치 뒤에 새 매치 추가 (1, 2, 3... 순서 유지)
+            // 새 게임 추가
             setMatches([...matches, ...newMatches]);
             setIsMatchViewOpen(false);
             setSelectedForMatch([]);
@@ -114,7 +107,6 @@ export default function LeaguePage() {
   };
 
   const updateScore = (matchId: string, scoreA: number, scoreB: number) => {
-    // 음수 방지 로직
     const safeA = scoreA < 0 ? 0 : scoreA;
     const safeB = scoreB < 0 ? 0 : scoreB;
     setMatches(prev => prev.map(m => m.id === matchId ? { ...m, scoreA: safeA, scoreB: safeB, isFinished: true } : m));
@@ -127,17 +119,15 @@ export default function LeaguePage() {
   };
 
   const handleManualSave = () => {
-    // 강제 저장 시각화
     if (slotIndex) {
         const data = { name: leagueName, players, matches, savedAt: new Date().toISOString() };
         localStorage.setItem(`league-slot-${slotIndex}`, JSON.stringify(data));
-        alert(`SLOT ${slotIndex}에 안전하게 저장되었습니다!`);
+        alert(`SLOT ${slotIndex}에 저장되었습니다!`);
     } else {
         alert("저장되었습니다.");
     }
   };
 
-  // ⭐ 오늘의 게임 종료 & MVP 선정
   const handleFinishDailyGame = () => {
     if(!matchDate) return alert("날짜가 선택되지 않았습니다.");
     const result = calculateDailyMvp(players, matches, matchDate);
@@ -150,14 +140,12 @@ export default function LeaguePage() {
     msg += `\n각 MVP에게 보너스 점수 2점을 부여하고 저장하시겠습니까?`;
 
     if (confirm(msg)) {
-        // 보너스 점수 부여
         const updatedPlayers = players.map(p => {
             let bonus = p.bonusPoints || 0;
             if (result.maleMvp && p.id === result.maleMvp.id) bonus += 2;
             if (result.femaleMvp && p.id === result.femaleMvp.id) bonus += 2;
             return { ...p, bonusPoints: bonus };
         });
-        
         setPlayers(updatedPlayers);
         alert("보너스 점수가 반영되었습니다! 👑");
     }
@@ -170,6 +158,9 @@ export default function LeaguePage() {
         router.push("/");
     }
   };
+
+  // ⭐ 현재 화면에 보여줄 매치만 필터링 (선택된 날짜)
+  const displayedMatches = matches.filter(m => m.date === matchDate);
 
   return (
     <main className="max-w-md mx-auto min-h-screen bg-white pb-32 relative">
@@ -225,10 +216,15 @@ export default function LeaguePage() {
             )}
         </section>
 
-        {/* 매치 리스트 (1, 2, 3... 순서) */}
+        {/* 매치 리스트 (⭐ 선택된 날짜만 필터링됨) */}
         <section className="space-y-4">
-             {/* reverse() 제거하여 위에서부터 1번 게임이 나오도록 함 */}
-             {matches.map((m, idx) => (
+             {displayedMatches.length === 0 && (
+                <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                    <p className="text-sm">오늘 진행된 게임이 없습니다.</p>
+                </div>
+             )}
+
+             {displayedMatches.map((m, idx) => (
                 <div key={m.id} className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative group">
                     <div className="absolute top-0 left-0 right-0 bg-slate-100 px-3 py-1 flex justify-between items-center text-[10px] font-bold text-slate-500">
                         <span className="text-blue-600">GAME {idx + 1}</span> 
@@ -248,13 +244,15 @@ export default function LeaguePage() {
             ))}
         </section>
         
-        {/* ⭐ [오늘의 게임 종료] 버튼 추가 */}
-        <section>
-            <button onClick={handleFinishDailyGame} className="w-full bg-slate-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-slate-700">
-                <Medal size={20} className="text-yellow-400" />
-                [{matchDate}] 게임 종료 및 MVP 선정
-            </button>
-        </section>
+        {/* 오늘의 게임 종료 버튼 (필터링된 데이터가 있을 때만 표시) */}
+        {displayedMatches.length > 0 && (
+            <section>
+                <button onClick={handleFinishDailyGame} className="w-full bg-slate-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-slate-700">
+                    <Medal size={20} className="text-yellow-400" />
+                    [{matchDate}] 게임 종료 및 MVP 선정
+                </button>
+            </section>
+        )}
 
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-100 max-w-md mx-auto flex gap-2">
             <button onClick={handleManualSave} className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg"><Save size={18}/> 저장하기</button>
@@ -264,10 +262,9 @@ export default function LeaguePage() {
 
       {isHistoryOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-           {/* 히스토리 모달 내용 (기존 동일) */}
            <div className="bg-white rounded-xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl">
-               <div className="p-4 border-b flex justify-between items-center bg-slate-50 rounded-t-xl"><h3 className="font-bold text-lg flex items-center gap-2">경기 히스토리</h3><button onClick={() => setIsHistoryOpen(false)}><X size={24}/></button></div>
-               <div className="overflow-auto p-4 flex-1"><table className="w-full text-xs border-collapse border border-slate-300"><thead className="bg-slate-100 sticky top-0"><tr><th className="border p-2">날짜</th><th className="border p-2">A팀</th><th className="border p-2">점수</th><th className="border p-2">B팀</th><th className="border p-2">승자</th></tr></thead><tbody>{matches.map((m)=>(<tr key={m.id} className="hover:bg-slate-50"><td className="border p-2 text-center text-slate-500">{m.date.slice(5)}</td><td className="border p-2">{m.teamA.man.name}</td><td className="border p-2 text-center font-bold">{m.scoreA}:{m.scoreB}</td><td className="border p-2">{m.teamB.man.name}</td><td className="border p-2 font-bold">{m.scoreA>m.scoreB?'A':(m.scoreB>m.scoreA?'B':'-')}</td></tr>))}</tbody></table></div>
+               <div className="p-4 border-b flex justify-between items-center bg-slate-50 rounded-t-xl"><h3 className="font-bold text-lg flex items-center gap-2">경기 히스토리 (전체)</h3><button onClick={() => setIsHistoryOpen(false)}><X size={24}/></button></div>
+               <div className="overflow-auto p-4 flex-1"><table className="w-full text-xs border-collapse border border-slate-300"><thead className="bg-slate-100 sticky top-0"><tr><th className="border p-2">날짜</th><th className="border p-2">A팀</th><th className="border p-2">점수</th><th className="border p-2">B팀</th><th className="border p-2">승자</th></tr></thead><tbody>{matches.slice(0).reverse().map((m)=>(<tr key={m.id} className="hover:bg-slate-50"><td className="border p-2 text-center text-slate-500">{m.date.slice(5)}</td><td className="border p-2">{m.teamA.man.name}</td><td className="border p-2 text-center font-bold">{m.scoreA}:{m.scoreB}</td><td className="border p-2">{m.teamB.man.name}</td><td className="border p-2 font-bold">{m.scoreA>m.scoreB?'A':(m.scoreB>m.scoreA?'B':'-')}</td></tr>))}</tbody></table></div>
            </div>
         </div>
       )}
