@@ -5,6 +5,7 @@ export interface Player {
   name: string;
   gender: Gender;
   photo?: string;
+  bonusPoints?: number; // 👈 보너스 점수 필드 추가!
 }
 
 export interface Team {
@@ -15,7 +16,7 @@ export interface Team {
 
 export interface Match {
   id: string;
-  date: string; // 👈 날짜 추가됨!
+  date: string;
   teamA: Team;
   teamB: Team;
   scoreA: number;
