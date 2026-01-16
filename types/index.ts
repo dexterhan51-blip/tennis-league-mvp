@@ -4,7 +4,7 @@ export interface Player {
   id: string;
   name: string;
   gender: Gender;
-  photo?: string; // 👈 여기가 추가되었습니다! (물음표는 '있을 수도 있고 없을 수도 있다'는 뜻)
+  photo?: string; // 사진 (선택사항)
 }
 
 export interface Team {
@@ -22,6 +22,7 @@ export interface Match {
   isFinished: boolean;
 }
 
+// 👇 이 부분이 빠져서 빨간 줄이 떴던 겁니다!
 export interface PlayerStat {
   playerId: string;
   name: string;
