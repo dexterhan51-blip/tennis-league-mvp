@@ -35,7 +35,7 @@ export default function Home() {
         </Link>
 
         {/* 버튼 2: [ > 불러오기 ] */}
-        <Link href="/Load" className="block w-full">
+        <Link href="/load" className="block w-full">
             <div className="bg-white hover:bg-slate-50 border-2 border-slate-200 text-slate-700 p-5 rounded-2xl transition-all active:scale-95 flex items-center gap-4">
                 <div className="bg-slate-100 p-2 rounded-lg text-slate-500">
                     <FolderOpen size={24} />
