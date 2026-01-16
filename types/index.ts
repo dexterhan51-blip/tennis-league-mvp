@@ -4,7 +4,7 @@ export interface Player {
   id: string;
   name: string;
   gender: Gender;
-  photo?: string; // 사진 (선택사항)
+  photo?: string;
 }
 
 export interface Team {
@@ -15,6 +15,7 @@ export interface Team {
 
 export interface Match {
   id: string;
+  date: string; // 👈 날짜 추가됨!
   teamA: Team;
   teamB: Team;
   scoreA: number;
@@ -22,7 +23,6 @@ export interface Match {
   isFinished: boolean;
 }
 
-// 👇 이 부분이 빠져서 빨간 줄이 떴던 겁니다!
 export interface PlayerStat {
   playerId: string;
   name: string;
