@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Trophy, PlayCircle, FolderOpen, Users } from "lucide-react";
+import { Trophy, PlayCircle, FolderOpen, Users, Smartphone } from "lucide-react";
 
 export default function Home() {
   return (
@@ -51,6 +51,16 @@ export default function Home() {
                     <Users size={24} />
                 </div>
                 <div className="font-bold text-lg">선수 관리</div>
+            </div>
+        </Link>
+
+        {/* 버튼 4: [ 스코어보드 ] */}
+        <Link href="/scoreboard" className="block w-full">
+            <div className="bg-white hover:bg-slate-50 border-2 border-slate-200 text-slate-700 p-5 rounded-2xl transition-all active:scale-95 flex items-center gap-4">
+                <div className="bg-slate-100 p-2 rounded-lg text-slate-500">
+                    <Smartphone size={24} />
+                </div>
+                <div className="font-bold text-lg">스코어보드</div>
             </div>
         </Link>
 

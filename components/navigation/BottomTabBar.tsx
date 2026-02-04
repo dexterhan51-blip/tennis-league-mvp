@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Trophy, Users, Settings } from 'lucide-react';
+import { Home, Trophy, Users, Settings, Smartphone } from 'lucide-react';
 
 interface TabItem {
   href: string;
@@ -23,6 +23,11 @@ const tabs: TabItem[] = [
     icon: <Trophy className="w-6 h-6" />,
     label: '리그',
     matchPaths: ['/league', '/league/new', '/load'],
+  },
+  {
+    href: '/scoreboard',
+    icon: <Smartphone className="w-6 h-6" />,
+    label: '스코어',
   },
   {
     href: '/players',
