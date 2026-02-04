@@ -36,3 +36,30 @@ export interface PlayerStat {
   avgPoints: number;
   dailyBonus: boolean;
 }
+
+export interface PlayerWithRank extends PlayerStat {
+  currentRank: number;
+  previousRank?: number;
+  rankChange: number;
+}
+
+export interface AppSettings {
+  theme: 'light' | 'dark' | 'system';
+  fontSize: 'normal' | 'large' | 'xlarge';
+}
+
+export interface ExportData {
+  version: string;
+  exportedAt: string;
+  players: Player[];
+  leagues: (LeagueData | null)[];
+  settings?: AppSettings;
+}
+
+export interface LeagueData {
+  name: string;
+  players: Player[];
+  matches: Match[];
+  seasonEnd?: string;
+  createdAt: string;
+}

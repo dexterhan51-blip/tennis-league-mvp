@@ -1,19 +1,31 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Player, Match } from '@/types';
-import { 
-    generateMixedDoublesSchedule, generateDoubles, generateSingles, 
-    calculateRanking, calculateDailyMvp, GUEST_M_ID, GUEST_F_ID 
+import { Player, Match, PlayerWithRank } from '@/types';
+import {
+    generateMixedDoublesSchedule, generateDoubles, generateSingles,
+    calculateRanking, calculateDailyMvp, GUEST_M_ID, GUEST_F_ID
 } from '@/utils/tennisLogic';
-import { ChevronLeft, Trophy, Trash2, PlusCircle, XCircle, CheckCircle, Circle, Shield, Calendar, Table, Save, X, Crown, Medal } from 'lucide-react';
+import { ChevronLeft, Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { useToast } from '@/contexts/ToastContext';
+import { useUndo as useUndoContext } from '@/contexts/UndoContext';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import SwipeableItem from '@/components/ui/SwipeableItem';
+import ScoreInput from '@/components/ui/ScoreInput';
+import QuickDatePicker from '@/components/navigation/QuickDatePicker';
+import RankingRow from '@/components/ranking/RankingRow';
+import PlayerStatsModal from '@/components/ranking/PlayerStatsModal';
+
+const PREVIOUS_RANKINGS_KEY = 'previous-rankings';
 
 export default function LeaguePage() {
   const router = useRouter();
-  
+  const { showToast } = useToast();
+  const { pushAction } = useUndoContext();
+
   const [leagueName, setLeagueName] = useState("");
   const [players, setPlayers] = useState<Player[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -22,6 +34,19 @@ export default function LeaguePage() {
   const [selectedForMatch, setSelectedForMatch] = useState<string[]>([]);
   const [matchDate, setMatchDate] = useState("");
   const [slotIndex, setSlotIndex] = useState<string | null>(null);
+
+  // New state for modals
+  const [deleteMatchId, setDeleteMatchId] = useState<string | null>(null);
+  const [showDeleteLeagueDialog, setShowDeleteLeagueDialog] = useState(false);
+  const [showMvpDialog, setShowMvpDialog] = useState(false);
+  const [mvpResult, setMvpResult] = useState<{ maleMvp: any; femaleMvp: any } | null>(null);
+
+  // Player stats modal
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [showPlayerStats, setShowPlayerStats] = useState(false);
+
+  // Previous rankings for rank change display
+  const [previousRankings, setPreviousRankings] = useState<Record<string, number>>({});
 
   const guestMale: Player = { id: GUEST_M_ID, name: '게스트(남)', gender: 'MALE' };
   const guestFemale: Player = { id: GUEST_F_ID, name: '게스트(여)', gender: 'FEMALE' };
@@ -32,7 +57,7 @@ export default function LeaguePage() {
 
     const savedLeague = localStorage.getItem("current-league");
     if (!savedLeague) {
-        alert("선택된 리그가 없습니다.");
+        showToast("선택된 리그가 없습니다.", "error");
         router.push("/");
         return;
     }
@@ -42,7 +67,13 @@ export default function LeaguePage() {
     setMatches(data.matches || []);
     const today = new Date().toISOString().split('T')[0];
     setMatchDate(today);
-  }, [router]);
+
+    // Load previous rankings
+    const savedPreviousRankings = localStorage.getItem(PREVIOUS_RANKINGS_KEY);
+    if (savedPreviousRankings) {
+      setPreviousRankings(JSON.parse(savedPreviousRankings));
+    }
+  }, [router, showToast]);
 
   useEffect(() => {
     if (leagueName) {
@@ -54,20 +85,46 @@ export default function LeaguePage() {
 
   const rankings = useMemo(() => calculateRanking(players, matches), [players, matches]);
 
+  // Enhanced rankings with rank change info
+  const rankingsWithChange: PlayerWithRank[] = useMemo(() => {
+    return rankings.map((r, idx) => {
+      const currentRank = idx + 1;
+      const previousRank = previousRankings[r.playerId];
+      const rankChange = previousRank !== undefined ? previousRank - currentRank : 0;
+      return {
+        ...r,
+        currentRank,
+        previousRank,
+        rankChange,
+      };
+    });
+  }, [rankings, previousRankings]);
+
+  // Get unique match dates for the quick date picker
+  const matchDates = useMemo(() => {
+    return [...new Set(matches.map(m => m.date))];
+  }, [matches]);
+
   const toggleMatchPlayer = (id: string) => {
     if (selectedForMatch.includes(id)) setSelectedForMatch(selectedForMatch.filter(pid => pid !== id));
     else setSelectedForMatch([...selectedForMatch, id]);
   };
 
   const handleCreateMatch = (type: 'MIXED' | 'DOUBLES' | 'SINGLES' | 'MANUAL') => {
-    if (!matchDate) return alert("날짜를 선택해주세요.");
+    if (!matchDate) {
+      showToast("날짜를 선택해주세요.", "warning");
+      return;
+    }
     const pool = [guestMale, guestFemale, ...players].filter(p => selectedForMatch.includes(p.id));
 
     try {
         let newMatches: Match[] = [];
         if (type === 'MIXED') {
             const proposedMatches = generateMixedDoublesSchedule(pool, matchDate);
-            if (proposedMatches.length === 0) return alert("매칭 가능한 조합이 없습니다.");
+            if (proposedMatches.length === 0) {
+              showToast("매칭 가능한 조합이 없습니다.", "error");
+              return;
+            }
             if (!confirm(`총 ${proposedMatches.length}개의 게임이 생성됩니다. 진행하시겠습니까?`)) return;
             newMatches = proposedMatches;
         } else if (type === 'DOUBLES') newMatches = generateDoubles(pool, matchDate);
@@ -78,198 +135,479 @@ export default function LeaguePage() {
             setMatches([...matches, ...newMatches]);
             setIsMatchViewOpen(false);
             setSelectedForMatch([]);
+            showToast(`${newMatches.length}개의 게임이 생성되었습니다.`, "success");
         }
-    } catch (e: any) { alert(e.message); }
-  };
-
-  // ⭐ 점수 업데이트 (0~6점 제한 로직 추가)
-  const updateScore = (matchId: string, scoreA: number, scoreB: number) => {
-    // 0~6 사이로 강제 고정 (Clamp)
-    const safeA = Math.min(6, Math.max(0, scoreA));
-    const safeB = Math.min(6, Math.max(0, scoreB));
-    
-    // 점수가 하나라도 0 이상이면 경기 종료로 처리 (혹은 6점 도달시? 여기선 입력하면 종료로 간주)
-    // 보통 테니스는 6선승제이므로 한쪽이 6이거나 합쳐서 결과가 나오면 finished
-    // 편의상 입력값이 변경되면 finished로 처리
-    const isFinished = true;
-
-    setMatches(prev => prev.map(m => m.id === matchId ? { ...m, scoreA: safeA, scoreB: safeB, isFinished } : m));
-  };
-
-  const deleteMatch = (matchId: string) => {
-    if (confirm("경기 기록을 삭제하시겠습니까?")) setMatches(prev => prev.filter(m => m.id !== matchId));
-  };
-
-  const handleManualSave = () => {
-    if (slotIndex) {
-        const data = { name: leagueName, players, matches, savedAt: new Date().toISOString() };
-        localStorage.setItem(`league-slot-${slotIndex}`, JSON.stringify(data));
-        alert(`SLOT ${slotIndex}에 저장되었습니다!`);
-    } else alert("저장되었습니다.");
-  };
-
-  const handleFinishDailyGame = () => {
-    if(!matchDate) return alert("날짜가 선택되지 않았습니다.");
-    const result = calculateDailyMvp(players, matches, matchDate);
-    if (!result.maleMvp && !result.femaleMvp) return alert("완료된 경기 기록이 없습니다.");
-    let msg = `[${matchDate} 게임 종료]\n\n`;
-    if (result.maleMvp) msg += `🤴 남자 MVP: ${result.maleMvp.name} (승률 ${(result.maleMvp.winRate * 100).toFixed(0)}%)\n`;
-    if (result.femaleMvp) msg += `👸 여자 MVP: ${result.femaleMvp.name} (승률 ${(result.femaleMvp.winRate * 100).toFixed(0)}%)\n`;
-    msg += `\n보너스 점수 2점을 부여하고 저장하시겠습니까?`;
-    if (confirm(msg)) {
-        const updatedPlayers = players.map(p => {
-            let bonus = p.bonusPoints || 0;
-            if (result.maleMvp && p.id === result.maleMvp.id) bonus += 2;
-            if (result.femaleMvp && p.id === result.femaleMvp.id) bonus += 2;
-            return { ...p, bonusPoints: bonus };
-        });
-        setPlayers(updatedPlayers);
-        alert("보너스 점수가 반영되었습니다! 👑");
+    } catch (e: any) {
+      showToast(e.message, "error");
     }
   };
 
+  const updateScore = useCallback((matchId: string, team: 'A' | 'B', score: number) => {
+    const safeScore = Math.min(6, Math.max(0, score));
+
+    setMatches(prev => {
+      const oldMatches = [...prev];
+      const matchIndex = prev.findIndex(m => m.id === matchId);
+      if (matchIndex === -1) return prev;
+
+      const oldMatch = prev[matchIndex];
+      const newMatch = {
+        ...oldMatch,
+        scoreA: team === 'A' ? safeScore : oldMatch.scoreA,
+        scoreB: team === 'B' ? safeScore : oldMatch.scoreB,
+        isFinished: true
+      };
+
+      // Push undo action
+      pushAction('점수 변경', oldMatches, () => setMatches(oldMatches));
+
+      return prev.map(m => m.id === matchId ? newMatch : m);
+    });
+  }, [pushAction]);
+
+  const deleteMatch = useCallback((matchId: string) => {
+    const matchToDelete = matches.find(m => m.id === matchId);
+    if (!matchToDelete) return;
+
+    setMatches(prev => prev.filter(m => m.id !== matchId));
+    setDeleteMatchId(null);
+    showToast("경기가 삭제되었습니다.", "success");
+
+    // Push undo action
+    pushAction('경기 삭제', matches, () => setMatches(matches));
+  }, [matches, showToast, pushAction]);
+
+  const handleManualSave = () => {
+    // Save current rankings as previous for next session
+    const currentRankingsMap: Record<string, number> = {};
+    rankings.forEach((r, idx) => {
+      currentRankingsMap[r.playerId] = idx + 1;
+    });
+    localStorage.setItem(PREVIOUS_RANKINGS_KEY, JSON.stringify(currentRankingsMap));
+
+    if (slotIndex) {
+        const data = { name: leagueName, players, matches, savedAt: new Date().toISOString() };
+        localStorage.setItem(`league-slot-${slotIndex}`, JSON.stringify(data));
+        showToast(`SLOT ${slotIndex}에 저장되었습니다!`, "success");
+    } else {
+        showToast("저장되었습니다.", "success");
+    }
+  };
+
+  const handleFinishDailyGame = () => {
+    if(!matchDate) {
+      showToast("날짜가 선택되지 않았습니다.", "warning");
+      return;
+    }
+    const result = calculateDailyMvp(players, matches, matchDate);
+    if (!result.maleMvp && !result.femaleMvp) {
+      showToast("완료된 경기 기록이 없습니다.", "warning");
+      return;
+    }
+    setMvpResult(result);
+    setShowMvpDialog(true);
+  };
+
+  const confirmMvpAward = () => {
+    if (!mvpResult) return;
+
+    const updatedPlayers = players.map(p => {
+        let bonus = p.bonusPoints || 0;
+        if (mvpResult.maleMvp && p.id === mvpResult.maleMvp.id) bonus += 2;
+        if (mvpResult.femaleMvp && p.id === mvpResult.femaleMvp.id) bonus += 2;
+        return { ...p, bonusPoints: bonus };
+    });
+    setPlayers(updatedPlayers);
+    setShowMvpDialog(false);
+    setMvpResult(null);
+    showToast("MVP 보너스 점수가 반영되었습니다! 👑", "success");
+  };
+
   const handleDeleteLeague = () => {
-    if (confirm("정말 삭제하시겠습니까?")) {
-        localStorage.removeItem("current-league");
-        if(slotIndex) localStorage.removeItem(`league-slot-${slotIndex}`);
-        router.push("/");
+    localStorage.removeItem("current-league");
+    if(slotIndex) localStorage.removeItem(`league-slot-${slotIndex}`);
+    setShowDeleteLeagueDialog(false);
+    showToast("리그가 삭제되었습니다.", "success");
+    router.push("/");
+  };
+
+  const handlePlayerClick = (playerId: string) => {
+    const player = players.find(p => p.id === playerId);
+    if (player) {
+      setSelectedPlayer(player);
+      setShowPlayerStats(true);
     }
   };
 
   const displayedMatches = matches.filter(m => m.date === matchDate);
+  const selectedPlayerStats = selectedPlayer
+    ? rankings.find(r => r.playerId === selectedPlayer.id) || null
+    : null;
 
   return (
-    <main className="max-w-md mx-auto min-h-screen bg-white pb-32 relative">
+    <main className="max-w-md mx-auto min-h-screen bg-white pb-40 relative">
       <header className="p-4 flex items-center justify-between sticky top-0 bg-white z-10 border-b border-slate-100 shadow-sm">
         <div className="flex items-center gap-2">
-            <Link href="/" className="p-2 hover:bg-slate-100 rounded-full text-slate-400"><ChevronLeft size={24} /></Link>
+            <Link href="/" className="p-2 hover:bg-slate-100 rounded-full text-slate-400 touch-target" aria-label="홈으로">
+              <ChevronLeft size={24} />
+            </Link>
             {slotIndex && <span className="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded font-bold">SLOT {slotIndex}</span>}
         </div>
-        <button onClick={() => setIsHistoryOpen(true)} className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-bold text-xs border border-green-200"><Table size={14}/> 기록</button>
+        <button
+          onClick={() => setIsHistoryOpen(true)}
+          className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-bold text-xs border border-green-200 touch-target"
+          aria-label="경기 기록 보기"
+        >
+          <Table size={14}/> 기록
+        </button>
       </header>
 
-      <div className="px-6 space-y-8 pt-4">
-        <div className="text-center"><h1 className="text-2xl font-black text-slate-800 flex justify-center items-center gap-2"><span className="text-blue-600">-</span> {leagueName} <span className="text-blue-600">-</span></h1></div>
+      <div className="px-4 space-y-6 pt-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-black text-slate-800 flex justify-center items-center gap-2">
+            <span className="text-blue-600">-</span> {leagueName} <span className="text-blue-600">-</span>
+          </h1>
+        </div>
 
+        {/* Ranking Section */}
         <section>
-            <h2 className="text-sm font-bold text-slate-500 mb-3 flex items-center gap-2"><Trophy size={16} /> 실시간 랭킹</h2>
-            <div className="overflow-hidden rounded-xl border border-slate-200 shadow-sm">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
-                        <tr><th className="p-3 text-center">순위</th><th className="p-3">이름</th><th className="p-3 text-center">승/패</th><th className="p-3 text-right">점수</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                        {rankings.map((r, idx) => (
-                            <tr key={r.playerId} className={`bg-white ${idx === 0 ? 'bg-yellow-50' : ''}`}>
-                                <td className="p-3 text-center font-bold text-slate-600">{idx + 1}</td>
-                                <td className="p-3 font-bold text-slate-800 flex items-center gap-1">
-                                    {r.name}
-                                    {idx === 0 && <Crown size={14} className="text-yellow-500 fill-yellow-500"/>} 
-                                </td>
-                                <td className="p-3 text-center text-slate-500">{r.wins}승 {r.losses}패</td>
-                                <td className="p-3 text-right font-bold text-blue-600">{r.totalPoints}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section>
-            <button onClick={() => setIsMatchViewOpen(!isMatchViewOpen)} className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-md ${isMatchViewOpen ? 'bg-slate-100 text-slate-600' : 'bg-blue-600 text-white'}`}>{isMatchViewOpen ? <XCircle size={20}/> : <PlusCircle size={20}/>}{isMatchViewOpen ? '닫기' : '게임 등록'}</button>
-            {isMatchViewOpen && (
-                <div className="mt-4 p-4 bg-slate-50 rounded-xl border-2 border-slate-200">
-                    <div className="mb-4"><label className="block text-xs font-bold text-slate-500 mb-1">경기 날짜</label><div className="relative"><Calendar className="absolute left-3 top-2.5 text-slate-400" size={16} /><input type="date" value={matchDate} onChange={(e) => setMatchDate(e.target.value)} className="w-full pl-10 pr-3 py-2 rounded-lg border border-slate-300 font-bold text-sm bg-white"/></div></div>
-                    <div className="mb-6"><div className="grid grid-cols-3 gap-2">{[guestMale, guestFemale, ...players].map(p => (<div key={p.id} onClick={() => toggleMatchPlayer(p.id)} className={`p-2 rounded-lg border cursor-pointer text-center text-xs font-bold ${selectedForMatch.includes(p.id) ? 'bg-blue-100 border-blue-500 text-blue-700' : 'bg-white border-slate-200'}`}>{p.name}</div>))}</div></div>
-                    <div className="space-y-2">
-                        <button onClick={() => handleCreateMatch('MIXED')} className="w-full bg-blue-50 border-2 border-blue-200 text-blue-700 py-3 rounded-xl font-bold">👩‍❤️‍👨 혼복 풀리그</button>
-                        <div className="grid grid-cols-2 gap-2"><button onClick={() => handleCreateMatch('DOUBLES')} className="bg-white border text-slate-600 py-3 rounded-xl font-bold text-xs">👥 복식</button><button onClick={() => handleCreateMatch('SINGLES')} className="bg-white border text-slate-600 py-3 rounded-xl font-bold text-xs">👤 단식</button></div>
-                        <button onClick={() => handleCreateMatch('MANUAL')} className="w-full bg-slate-200 text-slate-600 py-3 rounded-xl font-bold text-xs">✍️ 수동</button>
-                    </div>
-                </div>
-            )}
-        </section>
-
-        <section className="space-y-4">
-             {displayedMatches.length === 0 && (
-                <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-300"><p className="text-sm">오늘 진행된 게임이 없습니다.</p></div>
-             )}
-
-             {displayedMatches.map((m, idx) => (
-                <div key={m.id} className={`p-3 rounded-lg border shadow-sm relative group transition-colors ${m.isFinished ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-200'}`}>
-                    <div className="absolute top-0 left-0 right-0 bg-slate-100 px-3 py-1 flex justify-between items-center text-[10px] font-bold text-slate-500">
-                        <div className="flex items-center gap-2">
-                            <span className="text-blue-600">GAME {idx + 1}</span>
-                            {/* ⭐ 경기 종료 배지 */}
-                            {m.isFinished && <span className="bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded text-[9px]">경기종료</span>}
-                        </div>
-                        <span>{m.date}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-2 mt-6">
-                        <div className="text-center w-1/3">
-                            <div className="font-bold text-slate-700 text-sm">{m.teamA.man.name}</div>
-                            {m.teamA.man.id !== m.teamA.woman.id && <div className="font-bold text-slate-700 text-sm">{m.teamA.woman.name}</div>}
-                        </div>
-                        <div className="flex items-center gap-1">
-                            {/* ⭐ 점수 입력 제한 (min=0, max=6) */}
-                            <input type="number" min="0" max="6" className={`w-10 h-10 text-center border rounded font-bold text-lg ${m.isFinished ? 'bg-slate-200 text-slate-500' : 'bg-white border-blue-500'}`} placeholder="0" value={m.scoreA} onChange={(e) => updateScore(m.id, Number(e.target.value), m.scoreB)}/>
-                            <span className="font-bold text-slate-300">:</span>
-                            <input type="number" min="0" max="6" className={`w-10 h-10 text-center border rounded font-bold text-lg ${m.isFinished ? 'bg-slate-200 text-slate-500' : 'bg-white border-blue-500'}`} placeholder="0" value={m.scoreB} onChange={(e) => updateScore(m.id, m.scoreA, Number(e.target.value))}/>
-                        </div>
-                        <div className="text-center w-1/3">
-                            <div className="font-bold text-slate-700 text-sm">{m.teamB.man.name}</div>
-                            {m.teamB.man.id !== m.teamB.woman.id && <div className="font-bold text-slate-700 text-sm">{m.teamB.woman.name}</div>}
-                        </div>
-                    </div>
-                    <button onClick={() => deleteMatch(m.id)} className="absolute bottom-2 right-2 p-1.5 text-slate-300 hover:text-red-500"><Trash2 size={16}/></button>
-                </div>
+          <h2 className="text-sm font-bold text-slate-500 mb-3 flex items-center gap-2">
+            <Trophy size={16} /> 실시간 랭킹
+          </h2>
+          <div className="space-y-2">
+            {rankingsWithChange.map((r) => (
+              <RankingRow
+                key={r.playerId}
+                player={r}
+                onClick={() => handlePlayerClick(r.playerId)}
+              />
             ))}
+            {rankingsWithChange.length === 0 && (
+              <div className="text-center py-8 text-slate-400">
+                아직 랭킹 데이터가 없습니다.
+              </div>
+            )}
+          </div>
         </section>
-        
-        {displayedMatches.length > 0 && (
-            <section>
-                <button onClick={handleFinishDailyGame} className="w-full bg-slate-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-slate-700">
-                    <Medal size={20} className="text-yellow-400" /> [{matchDate}] 게임 종료
+
+        {/* Game Registration Section */}
+        <section>
+          <button
+            onClick={() => setIsMatchViewOpen(!isMatchViewOpen)}
+            className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-md touch-target ${isMatchViewOpen ? 'bg-slate-100 text-slate-600' : 'bg-blue-600 text-white'}`}
+            aria-expanded={isMatchViewOpen}
+          >
+            {isMatchViewOpen ? <XCircle size={20}/> : <PlusCircle size={20}/>}
+            {isMatchViewOpen ? '닫기' : '게임 등록'}
+          </button>
+
+          {isMatchViewOpen && (
+            <div className="mt-4 p-4 bg-slate-50 rounded-xl border-2 border-slate-200 animate-scale-in">
+              <div className="mb-4">
+                <label className="block text-xs font-bold text-slate-500 mb-2">경기 날짜</label>
+                <QuickDatePicker
+                  selectedDate={matchDate}
+                  onChange={setMatchDate}
+                  matchDates={matchDates}
+                />
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-xs font-bold text-slate-500 mb-2">참가 선수 선택</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[guestMale, guestFemale, ...players].map(p => (
+                    <button
+                      key={p.id}
+                      onClick={() => toggleMatchPlayer(p.id)}
+                      className={`p-3 rounded-lg border text-center text-xs font-bold transition-all touch-target ${
+                        selectedForMatch.includes(p.id)
+                          ? 'bg-blue-100 border-blue-500 text-blue-700'
+                          : 'bg-white border-slate-200 hover:bg-slate-50'
+                      }`}
+                      aria-pressed={selectedForMatch.includes(p.id)}
+                    >
+                      {p.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <button
+                  onClick={() => handleCreateMatch('MIXED')}
+                  className="w-full bg-blue-50 border-2 border-blue-200 text-blue-700 py-3 rounded-xl font-bold touch-target"
+                >
+                  👩‍❤️‍👨 혼복 풀리그
                 </button>
-            </section>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => handleCreateMatch('DOUBLES')}
+                    className="bg-white border text-slate-600 py-3 rounded-xl font-bold text-sm touch-target"
+                  >
+                    👥 복식
+                  </button>
+                  <button
+                    onClick={() => handleCreateMatch('SINGLES')}
+                    className="bg-white border text-slate-600 py-3 rounded-xl font-bold text-sm touch-target"
+                  >
+                    👤 단식
+                  </button>
+                </div>
+                <button
+                  onClick={() => handleCreateMatch('MANUAL')}
+                  className="w-full bg-slate-200 text-slate-600 py-3 rounded-xl font-bold text-sm touch-target"
+                >
+                  ✍️ 수동
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Match List Section */}
+        <section className="space-y-3">
+          {displayedMatches.length === 0 && (
+            <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+              <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">{matchDate} 진행된 게임이 없습니다.</p>
+            </div>
+          )}
+
+          {displayedMatches.map((m, idx) => (
+            <SwipeableItem
+              key={m.id}
+              onDelete={() => setDeleteMatchId(m.id)}
+            >
+              <div className={`p-4 rounded-xl border shadow-sm transition-colors ${
+                m.isFinished ? 'bg-green-50/50 border-green-200' : 'bg-white border-slate-200'
+              }`}>
+                {/* Header */}
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-xs font-bold text-blue-600">GAME {idx + 1}</span>
+                  {m.isFinished && (
+                    <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">
+                      경기종료
+                    </span>
+                  )}
+                </div>
+
+                {/* Team A */}
+                <div className="mb-3">
+                  <div className="text-sm font-bold text-slate-700 mb-2">
+                    {m.teamA.man.name}
+                    {m.teamA.man.id !== m.teamA.woman.id && (
+                      <span className="text-slate-400"> & {m.teamA.woman.name}</span>
+                    )}
+                  </div>
+                  <ScoreInput
+                    value={m.scoreA}
+                    onChange={(score) => updateScore(m.id, 'A', score)}
+                    disabled={m.isFinished}
+                  />
+                </div>
+
+                {/* VS */}
+                <div className="flex items-center gap-2 my-2">
+                  <div className="flex-1 border-t border-slate-200" />
+                  <span className="text-xs font-bold text-slate-400">VS</span>
+                  <div className="flex-1 border-t border-slate-200" />
+                </div>
+
+                {/* Team B */}
+                <div>
+                  <div className="text-sm font-bold text-slate-700 mb-2">
+                    {m.teamB.man.name}
+                    {m.teamB.man.id !== m.teamB.woman.id && (
+                      <span className="text-slate-400"> & {m.teamB.woman.name}</span>
+                    )}
+                  </div>
+                  <ScoreInput
+                    value={m.scoreB}
+                    onChange={(score) => updateScore(m.id, 'B', score)}
+                    disabled={m.isFinished}
+                  />
+                </div>
+              </div>
+            </SwipeableItem>
+          ))}
+        </section>
+
+        {/* Daily MVP Button */}
+        {displayedMatches.length > 0 && (
+          <section>
+            <button
+              onClick={handleFinishDailyGame}
+              className="w-full bg-slate-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-slate-700 touch-target"
+            >
+              <Medal size={20} className="text-yellow-400" /> [{matchDate}] 게임 종료
+            </button>
+          </section>
         )}
 
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-100 max-w-md mx-auto flex gap-2">
-            <button onClick={handleManualSave} className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg"><Save size={18}/> 저장하기</button>
-            <button onClick={handleDeleteLeague} className="px-4 bg-slate-100 text-red-400 rounded-xl font-bold"><Trash2 size={18}/></button>
+        {/* Bottom Action Bar */}
+        <div className="fixed bottom-20 left-0 right-0 p-4 bg-white border-t border-slate-100 max-w-md mx-auto flex gap-2 z-30">
+          <button
+            onClick={handleManualSave}
+            className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg touch-target"
+          >
+            <Save size={18}/> 저장하기
+          </button>
+          <button
+            onClick={() => setShowDeleteLeagueDialog(true)}
+            className="px-4 bg-slate-100 text-red-400 rounded-xl font-bold touch-target"
+            aria-label="리그 삭제"
+          >
+            <Trash2 size={18}/>
+          </button>
         </div>
       </div>
 
+      {/* History Modal */}
       {isHistoryOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-           <div className="bg-white rounded-xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl">
-               <div className="p-4 border-b flex justify-between items-center bg-slate-50 rounded-t-xl"><h3 className="font-bold text-lg flex items-center gap-2">경기 히스토리 (전체)</h3><button onClick={() => setIsHistoryOpen(false)}><X size={24}/></button></div>
-               <div className="overflow-auto p-4 flex-1">
-                   <table className="w-full text-xs border-collapse border border-slate-300">
-                       <thead className="bg-slate-100 sticky top-0"><tr><th className="border p-2">날짜</th><th className="border p-2">A팀</th><th className="border p-2">점수</th><th className="border p-2">B팀</th><th className="border p-2">승자</th></tr></thead>
-                       <tbody>
-                           {matches.slice(0).reverse().map((m)=>(
-                               <tr key={m.id} className="hover:bg-slate-50">
-                                   <td className="border p-2 text-center text-slate-500">{m.date.slice(5)}</td>
-                                   {/* ⭐ 히스토리: 팀원 2명 모두 표시 */}
-                                   <td className="border p-2 text-center">
-                                       <div className="font-bold">{m.teamA.man.name}</div>
-                                       {m.teamA.man.id !== m.teamA.woman.id && <div className="text-slate-600">{m.teamA.woman.name}</div>}
-                                   </td>
-                                   <td className="border p-2 text-center font-bold">{m.scoreA}:{m.scoreB}</td>
-                                   <td className="border p-2 text-center">
-                                       <div className="font-bold">{m.teamB.man.name}</div>
-                                       {m.teamB.man.id !== m.teamB.woman.id && <div className="text-slate-600">{m.teamB.woman.name}</div>}
-                                   </td>
-                                   <td className="border p-2 font-bold text-center">{m.scoreA>m.scoreB?'A':(m.scoreB>m.scoreA?'B':'-')}</td>
-                               </tr>
-                           ))}
-                       </tbody>
-                   </table>
-               </div>
-           </div>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl animate-scale-in">
+            <div className="p-4 border-b flex justify-between items-center bg-slate-50 rounded-t-xl">
+              <h3 className="font-bold text-lg flex items-center gap-2">경기 히스토리 (전체)</h3>
+              <button onClick={() => setIsHistoryOpen(false)} className="p-2 hover:bg-slate-200 rounded-full touch-target" aria-label="닫기">
+                <X size={24}/>
+              </button>
+            </div>
+            <div className="overflow-auto p-4 flex-1">
+              <table className="w-full text-xs border-collapse border border-slate-300">
+                <thead className="bg-slate-100 sticky top-0">
+                  <tr>
+                    <th className="border p-2">날짜</th>
+                    <th className="border p-2">A팀</th>
+                    <th className="border p-2">점수</th>
+                    <th className="border p-2">B팀</th>
+                    <th className="border p-2">승자</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {matches.slice(0).reverse().map((m) => (
+                    <tr key={m.id} className="hover:bg-slate-50">
+                      <td className="border p-2 text-center text-slate-500">{m.date.slice(5)}</td>
+                      <td className="border p-2 text-center">
+                        <div className="font-bold">{m.teamA.man.name}</div>
+                        {m.teamA.man.id !== m.teamA.woman.id && (
+                          <div className="text-slate-600">{m.teamA.woman.name}</div>
+                        )}
+                      </td>
+                      <td className="border p-2 text-center font-bold">{m.scoreA}:{m.scoreB}</td>
+                      <td className="border p-2 text-center">
+                        <div className="font-bold">{m.teamB.man.name}</div>
+                        {m.teamB.man.id !== m.teamB.woman.id && (
+                          <div className="text-slate-600">{m.teamB.woman.name}</div>
+                        )}
+                      </td>
+                      <td className="border p-2 font-bold text-center">
+                        {m.scoreA > m.scoreB ? 'A' : (m.scoreB > m.scoreA ? 'B' : '-')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {matches.length === 0 && (
+                <div className="text-center py-8 text-slate-400">
+                  경기 기록이 없습니다.
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
+
+      {/* Delete Match Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={!!deleteMatchId}
+        title="경기 삭제"
+        message="이 경기 기록을 삭제하시겠습니까?"
+        confirmText="삭제"
+        variant="danger"
+        onConfirm={() => deleteMatchId && deleteMatch(deleteMatchId)}
+        onCancel={() => setDeleteMatchId(null)}
+      />
+
+      {/* Delete League Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteLeagueDialog}
+        title="리그 삭제"
+        message="이 리그의 모든 데이터가 삭제됩니다."
+        confirmText="삭제"
+        variant="danger"
+        requireDoubleConfirm
+        onConfirm={handleDeleteLeague}
+        onCancel={() => setShowDeleteLeagueDialog(false)}
+      />
+
+      {/* MVP Award Dialog */}
+      {showMvpDialog && mvpResult && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl animate-scale-in overflow-hidden">
+            <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 text-center">
+              <Crown className="w-12 h-12 mx-auto text-white mb-2" />
+              <h3 className="text-xl font-bold text-white">{matchDate} 게임 종료</h3>
+            </div>
+            <div className="p-6 space-y-4">
+              {mvpResult.maleMvp && (
+                <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl">
+                  <span className="text-2xl">🤴</span>
+                  <div className="flex-1">
+                    <div className="text-xs text-blue-600 font-medium">남자 MVP</div>
+                    <div className="font-bold text-slate-900">{mvpResult.maleMvp.name}</div>
+                    <div className="text-xs text-slate-500">
+                      승률 {(mvpResult.maleMvp.winRate * 100).toFixed(0)}%
+                    </div>
+                  </div>
+                  <span className="text-lg font-bold text-blue-600">+2점</span>
+                </div>
+              )}
+              {mvpResult.femaleMvp && (
+                <div className="flex items-center gap-4 p-4 bg-pink-50 rounded-xl">
+                  <span className="text-2xl">👸</span>
+                  <div className="flex-1">
+                    <div className="text-xs text-pink-600 font-medium">여자 MVP</div>
+                    <div className="font-bold text-slate-900">{mvpResult.femaleMvp.name}</div>
+                    <div className="text-xs text-slate-500">
+                      승률 {(mvpResult.femaleMvp.winRate * 100).toFixed(0)}%
+                    </div>
+                  </div>
+                  <span className="text-lg font-bold text-pink-600">+2점</span>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-3 p-4 border-t border-slate-200">
+              <button
+                onClick={() => {
+                  setShowMvpDialog(false);
+                  setMvpResult(null);
+                }}
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors touch-target"
+              >
+                취소
+              </button>
+              <button
+                onClick={confirmMvpAward}
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors touch-target"
+              >
+                보너스 부여
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Player Stats Modal */}
+      <PlayerStatsModal
+        isOpen={showPlayerStats}
+        player={selectedPlayer}
+        matches={matches}
+        stats={selectedPlayerStats}
+        onClose={() => {
+          setShowPlayerStats(false);
+          setSelectedPlayer(null);
+        }}
+      />
     </main>
   );
 }
