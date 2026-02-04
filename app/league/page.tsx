@@ -142,8 +142,27 @@ export default function LeaguePage() {
     }
   };
 
-  const updateScore = useCallback((matchId: string, team: 'A' | 'B', score: number) => {
+  // Pending scores state for each match (not yet committed)
+  const [pendingScores, setPendingScores] = useState<Record<string, { scoreA: number; scoreB: number }>>({});
+
+  const updatePendingScore = useCallback((matchId: string, team: 'A' | 'B', score: number) => {
     const safeScore = Math.min(6, Math.max(0, score));
+    setPendingScores(prev => {
+      const current = prev[matchId] || { scoreA: 0, scoreB: 0 };
+      return {
+        ...prev,
+        [matchId]: {
+          ...current,
+          scoreA: team === 'A' ? safeScore : current.scoreA,
+          scoreB: team === 'B' ? safeScore : current.scoreB,
+        }
+      };
+    });
+  }, []);
+
+  const commitScore = useCallback((matchId: string) => {
+    const pending = pendingScores[matchId];
+    if (!pending) return;
 
     setMatches(prev => {
       const oldMatches = [...prev];
@@ -153,13 +172,46 @@ export default function LeaguePage() {
       const oldMatch = prev[matchIndex];
       const newMatch = {
         ...oldMatch,
-        scoreA: team === 'A' ? safeScore : oldMatch.scoreA,
-        scoreB: team === 'B' ? safeScore : oldMatch.scoreB,
+        scoreA: pending.scoreA,
+        scoreB: pending.scoreB,
         isFinished: true
       };
 
       // Push undo action
-      pushAction('점수 변경', oldMatches, () => setMatches(oldMatches));
+      pushAction('점수 입력', oldMatches, () => setMatches(oldMatches));
+
+      return prev.map(m => m.id === matchId ? newMatch : m);
+    });
+
+    // Clear pending score after commit
+    setPendingScores(prev => {
+      const newPending = { ...prev };
+      delete newPending[matchId];
+      return newPending;
+    });
+  }, [pendingScores, pushAction]);
+
+  const cancelFinished = useCallback((matchId: string) => {
+    setMatches(prev => {
+      const oldMatches = [...prev];
+      const matchIndex = prev.findIndex(m => m.id === matchId);
+      if (matchIndex === -1) return prev;
+
+      const oldMatch = prev[matchIndex];
+
+      // Set pending scores to current scores for editing
+      setPendingScores(p => ({
+        ...p,
+        [matchId]: { scoreA: oldMatch.scoreA, scoreB: oldMatch.scoreB }
+      }));
+
+      const newMatch = {
+        ...oldMatch,
+        isFinished: false
+      };
+
+      // Push undo action
+      pushAction('점수 수정 취소', oldMatches, () => setMatches(oldMatches));
 
       return prev.map(m => m.id === matchId ? newMatch : m);
     });
@@ -373,63 +425,103 @@ export default function LeaguePage() {
             </div>
           )}
 
-          {displayedMatches.map((m, idx) => (
-            <SwipeableItem
-              key={m.id}
-              onDelete={() => setDeleteMatchId(m.id)}
-            >
-              <div className={`p-4 rounded-xl border shadow-sm transition-colors ${
-                m.isFinished ? 'bg-green-50/50 border-green-200' : 'bg-white border-slate-200'
-              }`}>
-                {/* Header */}
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-xs font-bold text-blue-600">GAME {idx + 1}</span>
-                  {m.isFinished && (
-                    <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">
-                      경기종료
-                    </span>
-                  )}
-                </div>
+          {displayedMatches.map((m, idx) => {
+            const pending = pendingScores[m.id];
+            const displayScoreA = pending ? pending.scoreA : m.scoreA;
+            const displayScoreB = pending ? pending.scoreB : m.scoreB;
+            const hasPendingScore = !!pending;
 
-                {/* Team A */}
-                <div className="mb-3">
-                  <div className="text-sm font-bold text-slate-700 mb-2">
-                    {m.teamA.man.name}
-                    {m.teamA.man.id !== m.teamA.woman.id && (
-                      <span className="text-slate-400"> & {m.teamA.woman.name}</span>
+            return (
+              <SwipeableItem
+                key={m.id}
+                onDelete={() => setDeleteMatchId(m.id)}
+              >
+                <div className={`p-4 rounded-xl border shadow-sm transition-colors ${
+                  m.isFinished ? 'bg-green-50/50 border-green-200' : 'bg-white border-slate-200'
+                }`}>
+                  {/* Header */}
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-xs font-bold text-blue-600">GAME {idx + 1}</span>
+                    {m.isFinished && (
+                      <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">
+                        경기종료
+                      </span>
                     )}
                   </div>
-                  <ScoreInput
-                    value={m.scoreA}
-                    onChange={(score) => updateScore(m.id, 'A', score)}
-                    disabled={m.isFinished}
-                  />
-                </div>
 
-                {/* VS */}
-                <div className="flex items-center gap-2 my-2">
-                  <div className="flex-1 border-t border-slate-200" />
-                  <span className="text-xs font-bold text-slate-400">VS</span>
-                  <div className="flex-1 border-t border-slate-200" />
-                </div>
+                  {/* Team A */}
+                  <div className="mb-3">
+                    <div className="text-sm font-bold text-slate-700 mb-2">
+                      {m.teamA.man.name}
+                      {m.teamA.man.id !== m.teamA.woman.id && (
+                        <span className="text-slate-400"> & {m.teamA.woman.name}</span>
+                      )}
+                    </div>
+                    <ScoreInput
+                      value={displayScoreA}
+                      onChange={(score) => updatePendingScore(m.id, 'A', score)}
+                      disabled={m.isFinished}
+                    />
+                  </div>
 
-                {/* Team B */}
-                <div>
-                  <div className="text-sm font-bold text-slate-700 mb-2">
-                    {m.teamB.man.name}
-                    {m.teamB.man.id !== m.teamB.woman.id && (
-                      <span className="text-slate-400"> & {m.teamB.woman.name}</span>
+                  {/* VS */}
+                  <div className="flex items-center gap-2 my-2">
+                    <div className="flex-1 border-t border-slate-200" />
+                    <span className="text-xs font-bold text-slate-400">VS</span>
+                    <div className="flex-1 border-t border-slate-200" />
+                  </div>
+
+                  {/* Team B */}
+                  <div className="mb-3">
+                    <div className="text-sm font-bold text-slate-700 mb-2">
+                      {m.teamB.man.name}
+                      {m.teamB.man.id !== m.teamB.woman.id && (
+                        <span className="text-slate-400"> & {m.teamB.woman.name}</span>
+                      )}
+                    </div>
+                    <ScoreInput
+                      value={displayScoreB}
+                      onChange={(score) => updatePendingScore(m.id, 'B', score)}
+                      disabled={m.isFinished}
+                    />
+                  </div>
+
+                  {/* Complete/Cancel Button */}
+                  <div className="mt-4 pt-3 border-t border-slate-200">
+                    {m.isFinished ? (
+                      <button
+                        onClick={() => cancelFinished(m.id)}
+                        className="w-full py-2.5 rounded-lg font-bold text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors touch-target"
+                      >
+                        수정하기
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          if (!hasPendingScore) {
+                            // Initialize pending scores if not set
+                            setPendingScores(p => ({
+                              ...p,
+                              [m.id]: { scoreA: displayScoreA, scoreB: displayScoreB }
+                            }));
+                          }
+                          commitScore(m.id);
+                        }}
+                        disabled={!hasPendingScore}
+                        className={`w-full py-2.5 rounded-lg font-bold text-sm transition-colors touch-target ${
+                          hasPendingScore
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                        }`}
+                      >
+                        완료
+                      </button>
                     )}
                   </div>
-                  <ScoreInput
-                    value={m.scoreB}
-                    onChange={(score) => updateScore(m.id, 'B', score)}
-                    disabled={m.isFinished}
-                  />
                 </div>
-              </div>
-            </SwipeableItem>
-          ))}
+              </SwipeableItem>
+            );
+          })}
         </section>
 
         {/* Daily MVP Button */}
