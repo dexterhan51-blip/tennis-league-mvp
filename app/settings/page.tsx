@@ -310,7 +310,7 @@ export default function SettingsPage() {
 
         {/* App Info */}
         <section className="text-center text-sm text-slate-400 py-4">
-          <p>러브포티 리그 매니저 v1.0.0</p>
+          <p>러브포티 리그 매니저 v2.0</p>
           <p className="mt-1">L40 Rank 테니스 리그</p>
         </section>
       </div>
