@@ -8,7 +8,7 @@ import {
     generateMixedDoublesSchedule, generateDoubles, generateSingles,
     calculateRanking, calculateDailyMvp, GUEST_M_ID, GUEST_F_ID
 } from '@/utils/tennisLogic';
-import { ChevronLeft, Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal } from 'lucide-react';
+import { ChevronLeft, Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Share2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/contexts/ToastContext';
 import { useUndo as useUndoContext } from '@/contexts/UndoContext';
@@ -18,8 +18,10 @@ import ScoreInput from '@/components/ui/ScoreInput';
 import QuickDatePicker from '@/components/navigation/QuickDatePicker';
 import RankingRow from '@/components/ranking/RankingRow';
 import PlayerStatsModal from '@/components/ranking/PlayerStatsModal';
+import ShareButton from '@/components/share/ShareButton';
 
 const PREVIOUS_RANKINGS_KEY = 'previous-rankings';
+const FINISHED_DATES_KEY = 'finished-dates';
 
 export default function LeaguePage() {
   const router = useRouter();
@@ -48,6 +50,9 @@ export default function LeaguePage() {
   // Previous rankings for rank change display
   const [previousRankings, setPreviousRankings] = useState<Record<string, number>>({});
 
+  // Track finished dates (to prevent duplicate MVP awards)
+  const [finishedDates, setFinishedDates] = useState<string[]>([]);
+
   const guestMale: Player = { id: GUEST_M_ID, name: '게스트(남)', gender: 'MALE' };
   const guestFemale: Player = { id: GUEST_F_ID, name: '게스트(여)', gender: 'FEMALE' };
 
@@ -72,6 +77,12 @@ export default function LeaguePage() {
     const savedPreviousRankings = localStorage.getItem(PREVIOUS_RANKINGS_KEY);
     if (savedPreviousRankings) {
       setPreviousRankings(JSON.parse(savedPreviousRankings));
+    }
+
+    // Load finished dates
+    const savedFinishedDates = localStorage.getItem(FINISHED_DATES_KEY);
+    if (savedFinishedDates) {
+      setFinishedDates(JSON.parse(savedFinishedDates));
     }
   }, [router, showToast]);
 
@@ -270,6 +281,12 @@ export default function LeaguePage() {
         return { ...p, bonusPoints: bonus };
     });
     setPlayers(updatedPlayers);
+
+    // Mark date as finished to prevent duplicate MVP awards
+    const newFinishedDates = [...finishedDates, matchDate];
+    setFinishedDates(newFinishedDates);
+    localStorage.setItem(FINISHED_DATES_KEY, JSON.stringify(newFinishedDates));
+
     setShowMvpDialog(false);
     setMvpResult(null);
     showToast("MVP 보너스 점수가 반영되었습니다! 👑", "success");
@@ -524,15 +541,27 @@ export default function LeaguePage() {
           })}
         </section>
 
-        {/* Daily MVP Button */}
+        {/* Daily MVP Button + Share Button */}
         {displayedMatches.length > 0 && (
-          <section>
-            <button
-              onClick={handleFinishDailyGame}
-              className="w-full bg-slate-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-slate-700 touch-target"
-            >
-              <Medal size={20} className="text-yellow-400" /> [{matchDate}] 게임 종료
-            </button>
+          <section className="flex gap-2">
+            {finishedDates.includes(matchDate) ? (
+              <div className="flex-1 bg-slate-300 text-slate-500 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 cursor-not-allowed">
+                <Medal size={20} /> [{matchDate}] 게임 종료 완료
+              </div>
+            ) : (
+              <button
+                onClick={handleFinishDailyGame}
+                className="flex-1 bg-slate-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-slate-700 touch-target"
+              >
+                <Medal size={20} className="text-yellow-400" /> [{matchDate}] 게임 종료
+              </button>
+            )}
+            <ShareButton
+              leagueName={leagueName}
+              matchDate={matchDate}
+              matches={matches}
+              rankings={rankingsWithChange}
+            />
           </section>
         )}
 
