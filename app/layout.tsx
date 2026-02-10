@@ -1,4 +1,7 @@
-import type { Metadata } from "next";
+// Toss Mini App: 기능스킴은 토스 개발자센터에서 등록
+// 홈 바로가기: / (루트 URL)
+
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/contexts/ToastContext";
@@ -10,8 +13,16 @@ import UndoButton from "@/components/match/UndoButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
-  title: "러브포티 리그 매니저",
+  title: "러브포티 테니스 리그 매니저",
   description: "테니스 리그 관리 시스템",
 };
 

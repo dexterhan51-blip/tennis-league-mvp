@@ -12,7 +12,7 @@ export default function Home() {
         <div className="inline-flex justify-center items-center w-20 h-20 bg-blue-600 rounded-3xl shadow-lg shadow-blue-200 mb-4 transform rotate-3">
             <Trophy size={40} className="text-white" />
         </div>
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">L40 Rank </h1>
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">러브포티 테니스</h1>
         <p className="text-slate-500 font-medium">러브포티 테니스 리그 매니저</p>
       </div>
 
@@ -67,7 +67,7 @@ export default function Home() {
       </nav>
 
       <footer className="mt-12 text-center text-xs text-slate-400 font-medium">
-        v2.0 L40 by 한PD
+        v2.0 러브포티 테니스 리그 매니저
       </footer>
     </main>
   );

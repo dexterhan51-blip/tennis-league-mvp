@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Player, Match, PlayerWithRank } from '@/types';
 import {
     generateMixedDoublesSchedule, generateDoubles, generateSingles,
     calculateRanking, calculateDailyMvp, GUEST_M_ID, GUEST_F_ID
 } from '@/utils/tennisLogic';
-import { ChevronLeft, Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Share2 } from 'lucide-react';
+import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Share2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/contexts/ToastContext';
 import { useUndo as useUndoContext } from '@/contexts/UndoContext';
@@ -317,9 +316,6 @@ export default function LeaguePage() {
     <main className="max-w-md mx-auto min-h-screen bg-white pb-40 relative">
       <header className="p-4 flex items-center justify-between sticky top-0 bg-white z-10 border-b border-slate-100 shadow-sm">
         <div className="flex items-center gap-2">
-            <Link href="/" className="p-2 hover:bg-slate-100 rounded-full text-slate-400 touch-target" aria-label="홈으로">
-              <ChevronLeft size={24} />
-            </Link>
             {slotIndex && <span className="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded font-bold">SLOT {slotIndex}</span>}
         </div>
         <button

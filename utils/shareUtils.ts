@@ -12,7 +12,7 @@ export function generateShareText(
   const lines: string[] = [];
 
   // 헤더
-  lines.push(`[러브포티 리그 - ${leagueName}]`);
+  lines.push(`[러브포티 테니스 리그 - ${leagueName}]`);
   lines.push(`${matchDate} 경기 결과`);
   lines.push('');
 
@@ -52,7 +52,7 @@ export function generateShareText(
   }
 
   // 푸터
-  lines.push('러브포티 리그 매니저');
+  lines.push('러브포티 테니스 리그 매니저');
 
   return lines.join('\n');
 }

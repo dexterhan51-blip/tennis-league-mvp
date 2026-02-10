@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useCallback } from 'react';
-import Link from 'next/link';
-import { ChevronLeft, RotateCcw, Undo2 } from 'lucide-react';
+import { RotateCcw, Undo2 } from 'lucide-react';
 
 type PointValue = 0 | 15 | 30 | 40;
 
@@ -135,9 +134,6 @@ export default function ScoreboardPage() {
     <main className="max-w-md mx-auto min-h-screen bg-slate-900 flex flex-col">
       {/* Header */}
       <header className="p-4 flex items-center justify-between bg-slate-800">
-        <Link href="/" className="p-2 hover:bg-slate-700 rounded-full text-slate-400">
-          <ChevronLeft size={24} />
-        </Link>
         <h1 className="text-white font-bold">스코어보드</h1>
         <div className="flex gap-2">
           <button

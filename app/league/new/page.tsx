@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Calendar, CheckCircle, Circle, Trophy, Save, User } from "lucide-react";
+import { Calendar, CheckCircle, Circle, Trophy, Save, User } from "lucide-react";
 import { Player } from "@/types";
 import { useToast } from "@/contexts/ToastContext";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -96,10 +96,7 @@ export default function NewLeaguePage() {
 
   return (
     <main className="max-w-md mx-auto min-h-screen bg-slate-50 pb-32">
-      <header className="bg-white p-4 sticky top-0 z-10 border-b border-slate-200 flex items-center gap-4">
-        <Link href="/" className="p-2 hover:bg-slate-100 rounded-full touch-target" aria-label="홈으로">
-          <ChevronLeft size={24} />
-        </Link>
+      <header className="bg-white p-4 sticky top-0 z-10 border-b border-slate-200">
         <h1 className="text-xl font-bold text-slate-800">새 리그 설정</h1>
       </header>
 

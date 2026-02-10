@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import Link from "next/link";
-import { ChevronLeft, UserPlus, Trash2, User, Camera, Image as ImageIcon, X, GripVertical } from "lucide-react";
+import { UserPlus, Trash2, User, Camera, Image as ImageIcon, X, GripVertical } from "lucide-react";
 import { Player, Gender } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/contexts/ToastContext";
@@ -157,10 +156,7 @@ export default function PlayersPage() {
   return (
     <main className="max-w-md mx-auto min-h-screen bg-slate-50 p-4 pb-24">
       {/* 헤더 */}
-      <header className="flex items-center gap-4 mb-6">
-        <Link href="/" className="p-2 hover:bg-slate-200 rounded-full transition-colors bg-white shadow-sm touch-target" aria-label="홈으로">
-          <ChevronLeft size={24} />
-        </Link>
+      <header className="mb-6">
         <h1 className="text-xl font-bold text-slate-800">선수 관리</h1>
       </header>
 

@@ -53,11 +53,12 @@ export default function BottomTabBar() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 pb-safe"
+      className="fixed bottom-0 left-0 right-0 z-40 px-4 pointer-events-none"
+      style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }}
       role="navigation"
       aria-label="하단 내비게이션"
     >
-      <div className="max-w-md mx-auto h-16 flex items-center justify-around">
+      <div className="max-w-md mx-auto h-14 flex items-center justify-around bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] pointer-events-auto">
         {tabs.map((tab) => {
           const active = isActive(tab);
           return (

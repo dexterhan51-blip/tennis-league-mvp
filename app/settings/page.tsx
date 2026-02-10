@@ -3,7 +3,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  ArrowLeft,
   Sun,
   Moon,
   Monitor,
@@ -174,14 +173,7 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-slate-50 pb-24">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors touch-target"
-            aria-label="뒤로 가기"
-          >
-            <ArrowLeft className="w-5 h-5 text-slate-600" />
-          </button>
+        <div className="max-w-md mx-auto px-4 py-4">
           <h1 className="text-lg font-bold text-slate-900">설정</h1>
         </div>
       </div>
@@ -310,8 +302,8 @@ export default function SettingsPage() {
 
         {/* App Info */}
         <section className="text-center text-sm text-slate-400 py-4">
-          <p>러브포티 리그 매니저 v2.0</p>
-          <p className="mt-1">L40 Rank 테니스 리그</p>
+          <p>러브포티 테니스 리그 매니저 v2.0</p>
+          <p className="mt-1">by 한PD</p>
         </section>
       </div>
 
