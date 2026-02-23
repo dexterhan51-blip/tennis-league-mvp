@@ -38,6 +38,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   font-size: calc(1rem * var(--font-scale));
+  overscroll-behavior: contain;
 }
 
 /* Touch target minimum size for accessibility */
@@ -159,6 +160,21 @@ body {
 
 .active\:scale-95:active {
   transform: scale(0.95);
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-toast-slide-down,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-slide-up,
+  .animate-score-bump,
+  .animate-rank-slide {
+    animation: none !important;
+  }
+  .swipeable {
+    transition: none !important;
+  }
 }
 
 /* Dark mode specific styles */

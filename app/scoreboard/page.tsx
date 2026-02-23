@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useCallback } from 'react';
-import { RotateCcw, Undo2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { RotateCcw, Undo2, Circle, ArrowLeft } from 'lucide-react';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 type PointValue = 0 | 15 | 30 | 40;
 
@@ -24,8 +26,10 @@ const initialState: GameState = {
 };
 
 export default function ScoreboardPage() {
+  const router = useRouter();
   const [state, setState] = useState<GameState>(initialState);
   const [history, setHistory] = useState<GameState[]>([]);
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   const getNextPoint = (current: PointValue): PointValue | 'GAME' => {
     switch (current) {
@@ -119,10 +123,9 @@ export default function ScoreboardPage() {
   }, [history]);
 
   const reset = useCallback(() => {
-    if (confirm('점수를 초기화하시겠습니까?')) {
-      setState(initialState);
-      setHistory([]);
-    }
+    setState(initialState);
+    setHistory([]);
+    setShowResetDialog(false);
   }, []);
 
   const displayPoint = (point: PointValue | 'AD') => {
@@ -134,7 +137,16 @@ export default function ScoreboardPage() {
     <main className="max-w-md mx-auto min-h-screen bg-slate-900 flex flex-col">
       {/* Header */}
       <header className="p-4 flex items-center justify-between bg-slate-800">
-        <h1 className="text-white font-bold">스코어보드</h1>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => router.back()}
+            className="p-2 hover:bg-slate-700 rounded-full text-slate-400"
+            aria-label="뒤로 가기"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <h1 className="text-white font-bold">스코어보드</h1>
+        </div>
         <div className="flex gap-2">
           <button
             onClick={undo}
@@ -145,7 +157,7 @@ export default function ScoreboardPage() {
             <Undo2 size={20} />
           </button>
           <button
-            onClick={reset}
+            onClick={() => setShowResetDialog(true)}
             className="p-2 hover:bg-slate-700 rounded-full text-slate-400"
             aria-label="리셋"
           >
@@ -163,7 +175,7 @@ export default function ScoreboardPage() {
         >
           {state.server === 'A' && (
             <div className="absolute top-4 left-4 flex items-center gap-2">
-              <span className="text-yellow-300 text-2xl">🎾</span>
+              <Circle size={20} className="text-yellow-300 fill-yellow-300" />
               <span className="text-yellow-300 text-sm font-bold">서브</span>
             </div>
           )}
@@ -198,7 +210,7 @@ export default function ScoreboardPage() {
         >
           {state.server === 'B' && (
             <div className="absolute top-4 left-4 flex items-center gap-2">
-              <span className="text-yellow-300 text-2xl">🎾</span>
+              <Circle size={20} className="text-yellow-300 fill-yellow-300" />
               <span className="text-yellow-300 text-sm font-bold">서브</span>
             </div>
           )}
@@ -219,6 +231,16 @@ export default function ScoreboardPage() {
           )}
         </button>
       </div>
+
+      <ConfirmDialog
+        isOpen={showResetDialog}
+        title="점수 초기화"
+        message="점수를 초기화하시겠습니까?"
+        confirmText="초기화"
+        variant="danger"
+        onConfirm={reset}
+        onCancel={() => setShowResetDialog(false)}
+      />
     </main>
   );
 }

@@ -51,6 +51,11 @@ export default function BottomTabBar() {
     return pathname === tab.href;
   };
 
+  // Hide tab bar on scoreboard page for full-screen experience
+  if (pathname === '/scoreboard') {
+    return null;
+  }
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-40 px-4 pointer-events-none"

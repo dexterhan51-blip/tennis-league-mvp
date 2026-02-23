@@ -7,7 +7,7 @@ import {
     generateMixedDoublesSchedule, generateDoubles, generateSingles,
     calculateRanking, calculateDailyMvp, GUEST_M_ID, GUEST_F_ID
 } from '@/utils/tennisLogic';
-import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Share2 } from 'lucide-react';
+import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Share2, Shuffle, Users, User, Edit3 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/contexts/ToastContext';
 import { useUndo as useUndoContext } from '@/contexts/UndoContext';
@@ -51,6 +51,9 @@ export default function LeaguePage() {
 
   // Track finished dates (to prevent duplicate MVP awards)
   const [finishedDates, setFinishedDates] = useState<string[]>([]);
+
+  // Confirm dialog for match creation
+  const [pendingMixedMatches, setPendingMixedMatches] = useState<Match[] | null>(null);
 
   const guestMale: Player = { id: GUEST_M_ID, name: '게스트(남)', gender: 'MALE' };
   const guestFemale: Player = { id: GUEST_F_ID, name: '게스트(여)', gender: 'FEMALE' };
@@ -135,8 +138,8 @@ export default function LeaguePage() {
               showToast("매칭 가능한 조합이 없습니다.", "error");
               return;
             }
-            if (!confirm(`총 ${proposedMatches.length}개의 게임이 생성됩니다. 진행하시겠습니까?`)) return;
-            newMatches = proposedMatches;
+            setPendingMixedMatches(proposedMatches);
+            return;
         } else if (type === 'DOUBLES') newMatches = generateDoubles(pool, matchDate);
         else if (type === 'SINGLES') newMatches = generateSingles(pool, matchDate);
         else if (type === 'MANUAL') newMatches = [{ id: uuidv4(), date: matchDate, teamA: { id: uuidv4(), man: pool[0]||guestMale, woman: pool[1]||guestFemale }, teamB: { id: uuidv4(), man: pool[2]||guestMale, woman: pool[3]||guestFemale }, scoreA: 0, scoreB: 0, isFinished: false }];
@@ -307,6 +310,15 @@ export default function LeaguePage() {
     }
   };
 
+  const confirmMixedMatchCreation = useCallback(() => {
+    if (!pendingMixedMatches) return;
+    setMatches(prev => [...prev, ...pendingMixedMatches]);
+    setIsMatchViewOpen(false);
+    setSelectedForMatch([]);
+    showToast(`${pendingMixedMatches.length}개의 게임이 생성되었습니다.`, "success");
+    setPendingMixedMatches(null);
+  }, [pendingMixedMatches, showToast]);
+
   const displayedMatches = matches.filter(m => m.date === matchDate);
   const selectedPlayerStats = selectedPlayer
     ? rankings.find(r => r.playerId === selectedPlayer.id) || null
@@ -320,7 +332,7 @@ export default function LeaguePage() {
         </div>
         <button
           onClick={() => setIsHistoryOpen(true)}
-          className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-bold text-xs border border-green-200 touch-target"
+          className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-bold text-xs border border-green-200 touch-target cursor-pointer active:scale-[0.98] transition-transform"
           aria-label="경기 기록 보기"
         >
           <Table size={14}/> 기록
@@ -349,7 +361,14 @@ export default function LeaguePage() {
             ))}
             {rankingsWithChange.length === 0 && (
               <div className="text-center py-8 text-slate-400">
-                아직 랭킹 데이터가 없습니다.
+                <Trophy size={32} className="mx-auto mb-2 opacity-30" />
+                <p className="text-sm mb-3">아직 랭킹 데이터가 없습니다.</p>
+                <button
+                  onClick={() => setIsMatchViewOpen(true)}
+                  className="text-sm text-blue-600 font-bold hover:underline cursor-pointer"
+                >
+                  + 게임 등록하기
+                </button>
               </div>
             )}
           </div>
@@ -400,29 +419,29 @@ export default function LeaguePage() {
               <div className="space-y-2">
                 <button
                   onClick={() => handleCreateMatch('MIXED')}
-                  className="w-full bg-blue-50 border-2 border-blue-200 text-blue-700 py-3 rounded-xl font-bold touch-target"
+                  className="w-full bg-blue-50 border-2 border-blue-200 text-blue-700 py-3 rounded-xl font-bold touch-target cursor-pointer active:scale-[0.98] transition-transform"
                 >
-                  👩‍❤️‍👨 혼복 풀리그
+                  <Shuffle size={16} className="inline -mt-0.5" /> 혼복 풀리그
                 </button>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => handleCreateMatch('DOUBLES')}
-                    className="bg-white border text-slate-600 py-3 rounded-xl font-bold text-sm touch-target"
+                    className="bg-white border text-slate-600 py-3 rounded-xl font-bold text-sm touch-target cursor-pointer active:scale-[0.98] transition-transform"
                   >
-                    👥 복식
+                    <Users size={14} className="inline -mt-0.5" /> 복식
                   </button>
                   <button
                     onClick={() => handleCreateMatch('SINGLES')}
-                    className="bg-white border text-slate-600 py-3 rounded-xl font-bold text-sm touch-target"
+                    className="bg-white border text-slate-600 py-3 rounded-xl font-bold text-sm touch-target cursor-pointer active:scale-[0.98] transition-transform"
                   >
-                    👤 단식
+                    <User size={14} className="inline -mt-0.5" /> 단식
                   </button>
                 </div>
                 <button
                   onClick={() => handleCreateMatch('MANUAL')}
-                  className="w-full bg-slate-200 text-slate-600 py-3 rounded-xl font-bold text-sm touch-target"
+                  className="w-full bg-slate-200 text-slate-600 py-3 rounded-xl font-bold text-sm touch-target cursor-pointer active:scale-[0.98] transition-transform"
                 >
-                  ✍️ 수동
+                  <Edit3 size={14} className="inline -mt-0.5" /> 수동
                 </button>
               </div>
             </div>
@@ -434,7 +453,13 @@ export default function LeaguePage() {
           {displayedMatches.length === 0 && (
             <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-300">
               <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">{matchDate} 진행된 게임이 없습니다.</p>
+              <p className="text-sm mb-3">{matchDate} 진행된 게임이 없습니다.</p>
+              <button
+                onClick={() => setIsMatchViewOpen(true)}
+                className="text-sm text-blue-600 font-bold hover:underline cursor-pointer"
+              >
+                + 게임 등록하기
+              </button>
             </div>
           )}
 
@@ -589,41 +614,39 @@ export default function LeaguePage() {
                 <X size={24}/>
               </button>
             </div>
-            <div className="overflow-auto p-4 flex-1">
-              <table className="w-full text-xs border-collapse border border-slate-300">
-                <thead className="bg-slate-100 sticky top-0">
-                  <tr>
-                    <th className="border p-2">날짜</th>
-                    <th className="border p-2">A팀</th>
-                    <th className="border p-2">점수</th>
-                    <th className="border p-2">B팀</th>
-                    <th className="border p-2">승자</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {matches.slice(0).reverse().map((m) => (
-                    <tr key={m.id} className="hover:bg-slate-50">
-                      <td className="border p-2 text-center text-slate-500">{m.date.slice(5)}</td>
-                      <td className="border p-2 text-center">
-                        <div className="font-bold">{m.teamA.man.name}</div>
+            <div className="overflow-auto p-4 flex-1 space-y-3">
+              {matches.slice(0).reverse().map((m) => {
+                const winner = m.scoreA > m.scoreB ? 'A' : (m.scoreB > m.scoreA ? 'B' : null);
+                return (
+                  <div key={m.id} className="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xs text-slate-500 font-medium">{m.date}</span>
+                      {m.isFinished && (
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-bold">완료</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className={`flex-1 text-right ${winner === 'A' ? 'font-bold text-slate-900' : 'text-slate-600'}`}>
+                        <div className="text-sm">{m.teamA.man.name}</div>
                         {m.teamA.man.id !== m.teamA.woman.id && (
-                          <div className="text-slate-600">{m.teamA.woman.name}</div>
+                          <div className="text-xs text-slate-400">{m.teamA.woman.name}</div>
                         )}
-                      </td>
-                      <td className="border p-2 text-center font-bold">{m.scoreA}:{m.scoreB}</td>
-                      <td className="border p-2 text-center">
-                        <div className="font-bold">{m.teamB.man.name}</div>
+                      </div>
+                      <div className="flex-shrink-0 text-center">
+                        <span className={`text-lg font-black ${winner === 'A' ? 'text-blue-600' : 'text-slate-800'}`}>{m.scoreA}</span>
+                        <span className="text-slate-400 mx-1">:</span>
+                        <span className={`text-lg font-black ${winner === 'B' ? 'text-blue-600' : 'text-slate-800'}`}>{m.scoreB}</span>
+                      </div>
+                      <div className={`flex-1 text-left ${winner === 'B' ? 'font-bold text-slate-900' : 'text-slate-600'}`}>
+                        <div className="text-sm">{m.teamB.man.name}</div>
                         {m.teamB.man.id !== m.teamB.woman.id && (
-                          <div className="text-slate-600">{m.teamB.woman.name}</div>
+                          <div className="text-xs text-slate-400">{m.teamB.woman.name}</div>
                         )}
-                      </td>
-                      <td className="border p-2 font-bold text-center">
-                        {m.scoreA > m.scoreB ? 'A' : (m.scoreB > m.scoreA ? 'B' : '-')}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
               {matches.length === 0 && (
                 <div className="text-center py-8 text-slate-400">
                   경기 기록이 없습니다.
@@ -657,6 +680,16 @@ export default function LeaguePage() {
         onCancel={() => setShowDeleteLeagueDialog(false)}
       />
 
+      {/* Mixed Match Creation Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={!!pendingMixedMatches}
+        title="게임 생성"
+        message={`총 ${pendingMixedMatches?.length || 0}개의 게임이 생성됩니다. 진행하시겠습니까?`}
+        confirmText="생성"
+        onConfirm={confirmMixedMatchCreation}
+        onCancel={() => setPendingMixedMatches(null)}
+      />
+
       {/* MVP Award Dialog */}
       {showMvpDialog && mvpResult && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
@@ -668,7 +701,9 @@ export default function LeaguePage() {
             <div className="p-6 space-y-4">
               {mvpResult.maleMvp && (
                 <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl">
-                  <span className="text-2xl">🤴</span>
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <Crown size={20} className="text-blue-600" />
+                  </div>
                   <div className="flex-1">
                     <div className="text-xs text-blue-600 font-medium">남자 MVP</div>
                     <div className="font-bold text-slate-900">{mvpResult.maleMvp.name}</div>
@@ -681,7 +716,9 @@ export default function LeaguePage() {
               )}
               {mvpResult.femaleMvp && (
                 <div className="flex items-center gap-4 p-4 bg-pink-50 rounded-xl">
-                  <span className="text-2xl">👸</span>
+                  <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
+                    <Crown size={20} className="text-pink-600" />
+                  </div>
                   <div className="flex-1">
                     <div className="text-xs text-pink-600 font-medium">여자 MVP</div>
                     <div className="font-bold text-slate-900">{mvpResult.femaleMvp.name}</div>

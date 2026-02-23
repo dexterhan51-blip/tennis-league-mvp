@@ -285,7 +285,15 @@ export default function PlayersPage() {
         {filteredPlayers.length === 0 ? (
             <div className="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100 border-dashed">
                 <UserPlus size={48} className="mx-auto mb-2 opacity-20" />
-                <p>{searchQuery ? '검색 결과가 없습니다.' : '아직 등록된 선수가 없습니다.'}</p>
+                <p className="mb-3">{searchQuery ? '검색 결과가 없습니다.' : '아직 등록된 선수가 없습니다.'}</p>
+                {!searchQuery && (
+                  <button
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="text-sm text-blue-600 font-bold hover:underline cursor-pointer"
+                  >
+                    위에서 새 멤버를 등록해주세요
+                  </button>
+                )}
             </div>
         ) : (
             <div
