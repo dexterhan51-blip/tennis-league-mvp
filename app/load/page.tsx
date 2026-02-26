@@ -6,6 +6,9 @@ import { Save, Trash2, CheckCircle, Gamepad2, Calendar, Users } from "lucide-rea
 import { useToast } from "@/contexts/ToastContext";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import type { LeagueData } from "@/types";
+import { safeGetAsync, safeSetAsync, safeRemoveAsync } from "@/lib/storage";
+import { safeSetString } from "@/lib/storage";
+import { LeagueDataSchema } from "@/lib/schemas";
 
 export default function LoadPage() {
   const router = useRouter();
@@ -13,14 +16,19 @@ export default function LoadPage() {
   const [slots, setSlots] = useState<(LeagueData | null)[]>([null, null, null]);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [deleteSlotIdx, setDeleteSlotIdx] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadedSlots = [
-      localStorage.getItem("league-slot-1"),
-      localStorage.getItem("league-slot-2"),
-      localStorage.getItem("league-slot-3"),
-    ].map(item => item ? JSON.parse(item) : null);
-    setSlots(loadedSlots);
+    const load = async () => {
+      const loadedSlots = await Promise.all([
+        safeGetAsync('league-slot-1', LeagueDataSchema),
+        safeGetAsync('league-slot-2', LeagueDataSchema),
+        safeGetAsync('league-slot-3', LeagueDataSchema),
+      ]);
+      setSlots(loadedSlots.map(s => s ?? null));
+      setIsLoading(false);
+    };
+    load();
   }, []);
 
   const handleSelectSlot = (index: number) => {
@@ -28,7 +36,7 @@ export default function LoadPage() {
     setSelectedIdx(index === selectedIdx ? null : index);
   };
 
-  const handleLoadGame = () => {
+  const handleLoadGame = async () => {
     if (selectedIdx === null) {
       showToast("불러올 슬롯을 선택해주세요.", "warning");
       return;
@@ -39,15 +47,15 @@ export default function LoadPage() {
       return;
     }
 
-    localStorage.setItem("current-slot-index", (selectedIdx + 1).toString());
-    localStorage.setItem("current-league", JSON.stringify(data));
+    safeSetString("current-slot-index", (selectedIdx + 1).toString());
+    await safeSetAsync("current-league", data);
 
     showToast(`${data.name} 리그를 불러왔습니다.`, "success");
     router.push("/league");
   };
 
-  const handleDelete = (slotIndex: number) => {
-    localStorage.removeItem(`league-slot-${slotIndex + 1}`);
+  const handleDelete = async (slotIndex: number) => {
+    await safeRemoveAsync(`league-slot-${slotIndex + 1}`);
     const newSlots = [...slots];
     newSlots[slotIndex] = null;
     setSlots(newSlots);
@@ -55,6 +63,14 @@ export default function LoadPage() {
     setDeleteSlotIdx(null);
     showToast(`슬롯 ${slotIndex + 1} 데이터가 삭제되었습니다.`, "success");
   };
+
+  if (isLoading) {
+    return (
+      <main className="max-w-md mx-auto min-h-screen bg-slate-900 text-white flex items-center justify-center">
+        <div className="text-slate-400 text-sm">불러오는 중...</div>
+      </main>
+    );
+  }
 
   return (
     <main className="max-w-md mx-auto min-h-screen bg-slate-900 text-white pb-32">
@@ -84,11 +100,7 @@ export default function LoadPage() {
               aria-pressed={isSelected}
             >
               <div className="flex justify-between items-start mb-3">
-                <span
-                  className={`text-xs font-bold px-2 py-1 rounded ${
-                    isSelected ? 'bg-blue-600' : 'bg-slate-700'
-                  }`}
-                >
+                <span className={`text-xs font-bold px-2 py-1 rounded ${isSelected ? 'bg-blue-600' : 'bg-slate-700'}`}>
                   SLOT {index + 1}
                 </span>
                 {isSelected && <CheckCircle className="text-blue-500" size={20} />}
@@ -116,10 +128,7 @@ export default function LoadPage() {
                   </div>
 
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteSlotIdx(index);
-                    }}
+                    onClick={(e) => { e.stopPropagation(); setDeleteSlotIdx(index); }}
                     className="absolute bottom-4 right-4 p-2 text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors touch-target"
                     aria-label={`슬롯 ${index + 1} 삭제`}
                   >
@@ -137,7 +146,6 @@ export default function LoadPage() {
         })}
       </div>
 
-      {/* Bottom Action Bar */}
       <div className="fixed bottom-20 left-0 right-0 p-4 bg-slate-900 border-t border-slate-800 max-w-md mx-auto">
         <button
           onClick={handleLoadGame}
@@ -152,7 +160,6 @@ export default function LoadPage() {
         </button>
       </div>
 
-      {/* Delete Confirm Dialog */}
       <ConfirmDialog
         isOpen={deleteSlotIdx !== null}
         title="슬롯 데이터 삭제"

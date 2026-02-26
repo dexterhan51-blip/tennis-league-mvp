@@ -3,6 +3,10 @@ import { Player, Match, PlayerStat } from '@/types';
 export const GUEST_M_ID = 'guest-male';
 export const GUEST_F_ID = 'guest-female';
 
+export function isGuestPlayer(id: string): boolean {
+  return id.startsWith('guest-');
+}
+
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 // --- 1. 매치 메이킹 (기존과 동일) ---
@@ -13,8 +17,8 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 // (코드 생략 - generateMixedDoublesSchedule, generateDoubles, generateSingles)
 export const generateMixedDoublesSchedule = (players: Player[], date: string): Match[] => {
     // ... (이전과 동일)
-    const men = players.filter(p => p.gender === 'MALE' || p.id === GUEST_M_ID);
-    const women = players.filter(p => p.gender === 'FEMALE' || p.id === GUEST_F_ID);
+    const men = players.filter(p => p.gender === 'MALE');
+    const women = players.filter(p => p.gender === 'FEMALE');
     if (men.length < 2 || women.length < 2) throw new Error("혼복 리그는 남/녀 각각 2명 이상 필요합니다.");
     let matchPool: Match[] = [];
     const rotationCount = women.length;
@@ -79,8 +83,8 @@ export const calculateRanking = (players: Player[], matches: Match[]): PlayerSta
   const statsMap = new Map<string, PlayerStat>();
 
   players.forEach((p) => {
-    if (p.id === GUEST_M_ID || p.id === GUEST_F_ID) return;
-    
+    if (isGuestPlayer(p.id)) return;
+
     // 기본 보너스 점수 로드
     const bonus = p.bonusPoints || 0;
 
@@ -131,7 +135,7 @@ export const calculateDailyMvp = (players: Player[], matches: Match[], date: str
 
     targetMatches.forEach(m => {
         const processPlayer = (p: Player, isWin: boolean) => {
-            if (p.id === GUEST_M_ID || p.id === GUEST_F_ID) return;
+            if (isGuestPlayer(p.id)) return;
             if (!dailyStats.has(p.id)) dailyStats.set(p.id, { wins: 0, played: 0, name: p.name, gender: p.gender });
             const s = dailyStats.get(p.id)!;
             s.played++;

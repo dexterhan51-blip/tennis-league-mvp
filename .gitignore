@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AIT deployment
+*.ait
+.granite/
+
+# Project docs (local only)
+docs/
+
+# Granite config
+granite.config.mts

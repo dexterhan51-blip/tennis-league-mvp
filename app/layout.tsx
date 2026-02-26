@@ -10,6 +10,7 @@ import { UndoProvider } from "@/contexts/UndoContext";
 import ToastContainer from "@/components/ui/Toast";
 import BottomTabBar from "@/components/navigation/BottomTabBar";
 import UndoButton from "@/components/match/UndoButton";
+import StorageMigration from "@/components/StorageMigration";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,8 +23,17 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "러브포티 테니스 리그 매니저",
-  description: "테니스 리그 관리 시스템",
+  title: {
+    default: "러브포티 테니스 리그 매니저",
+    template: "%s | 러브포티 테니스",
+  },
+  description: "테니스 리그 관리, 매치 메이킹, 실시간 랭킹, MVP 시상까지 한 번에",
+  openGraph: {
+    title: "러브포티 테니스 리그 매니저",
+    description: "테니스 리그 관리, 매치 메이킹, 실시간 랭킹, MVP 시상까지 한 번에",
+    type: "website",
+    locale: "ko_KR",
+  },
 };
 
 export default function RootLayout({
@@ -37,6 +47,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ToastProvider>
             <UndoProvider>
+              <StorageMigration />
               <main className="pb-16">
                 {children}
               </main>
