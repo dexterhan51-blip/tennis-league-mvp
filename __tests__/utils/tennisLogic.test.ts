@@ -254,6 +254,137 @@ describe('generateMixedDoublesSchedule', () => {
       expect(m.isFinished).toBe(false);
     });
   });
+
+  it('includes ALL players when men count is odd (3M + 3W)', () => {
+    const men = [makePlayer('m1', 'M1', 'MALE'), makePlayer('m2', 'M2', 'MALE'), makePlayer('m3', 'M3', 'MALE')];
+    const women = [makePlayer('w1', 'W1', 'FEMALE'), makePlayer('w2', 'W2', 'FEMALE'), makePlayer('w3', 'W3', 'FEMALE')];
+    const allPlayers = [...men, ...women];
+
+    // Run multiple times to account for randomness
+    for (let trial = 0; trial < 10; trial++) {
+      const matches = generateMixedDoublesSchedule(allPlayers, '2026-01-01');
+      const participatingPlayerIds = new Set<string>();
+      matches.forEach(m => {
+        participatingPlayerIds.add(m.teamA.man.id);
+        participatingPlayerIds.add(m.teamA.woman.id);
+        participatingPlayerIds.add(m.teamB.man.id);
+        participatingPlayerIds.add(m.teamB.woman.id);
+      });
+
+      // Every player must participate in at least one match
+      allPlayers.forEach(p => {
+        expect(participatingPlayerIds.has(p.id)).toBe(true);
+      });
+    }
+  });
+
+  it('includes ALL players when men > women (5M + 3W)', () => {
+    const men = Array.from({ length: 5 }, (_, i) => makePlayer(`m${i+1}`, `M${i+1}`, 'MALE'));
+    const women = Array.from({ length: 3 }, (_, i) => makePlayer(`w${i+1}`, `W${i+1}`, 'FEMALE'));
+    const allPlayers = [...men, ...women];
+
+    for (let trial = 0; trial < 10; trial++) {
+      const matches = generateMixedDoublesSchedule(allPlayers, '2026-01-01');
+      const participatingPlayerIds = new Set<string>();
+      matches.forEach(m => {
+        participatingPlayerIds.add(m.teamA.man.id);
+        participatingPlayerIds.add(m.teamA.woman.id);
+        participatingPlayerIds.add(m.teamB.man.id);
+        participatingPlayerIds.add(m.teamB.woman.id);
+      });
+
+      men.forEach(p => {
+        expect(participatingPlayerIds.has(p.id)).toBe(true);
+      });
+    }
+  });
+
+  it('includes ALL players when women > men (3M + 5W)', () => {
+    const men = Array.from({ length: 3 }, (_, i) => makePlayer(`m${i+1}`, `M${i+1}`, 'MALE'));
+    const women = Array.from({ length: 5 }, (_, i) => makePlayer(`w${i+1}`, `W${i+1}`, 'FEMALE'));
+    const allPlayers = [...men, ...women];
+
+    for (let trial = 0; trial < 10; trial++) {
+      const matches = generateMixedDoublesSchedule(allPlayers, '2026-01-01');
+      const participatingPlayerIds = new Set<string>();
+      matches.forEach(m => {
+        participatingPlayerIds.add(m.teamA.man.id);
+        participatingPlayerIds.add(m.teamA.woman.id);
+        participatingPlayerIds.add(m.teamB.man.id);
+        participatingPlayerIds.add(m.teamB.woman.id);
+      });
+
+      women.forEach(p => {
+        expect(participatingPlayerIds.has(p.id)).toBe(true);
+      });
+    }
+  });
+
+  it('covers ALL possible man-woman pairings for 3M + 3W', () => {
+    const men = [makePlayer('m1', 'M1', 'MALE'), makePlayer('m2', 'M2', 'MALE'), makePlayer('m3', 'M3', 'MALE')];
+    const women = [makePlayer('w1', 'W1', 'FEMALE'), makePlayer('w2', 'W2', 'FEMALE'), makePlayer('w3', 'W3', 'FEMALE')];
+    const allPlayers = [...men, ...women];
+
+    // 가능한 모든 페어링: 3x3 = 9개
+    const allPossiblePairings = new Set<string>();
+    men.forEach(m => women.forEach(w => allPossiblePairings.add(`${m.id}:${w.id}`)));
+    expect(allPossiblePairings.size).toBe(9);
+
+    // 10회 시행에서 매번 모든 페어링이 커버되는지 확인
+    for (let trial = 0; trial < 10; trial++) {
+      const matches = generateMixedDoublesSchedule(allPlayers, '2026-01-01');
+      const usedPairings = new Set<string>();
+      matches.forEach(m => {
+        usedPairings.add(`${m.teamA.man.id}:${m.teamA.woman.id}`);
+        usedPairings.add(`${m.teamB.man.id}:${m.teamB.woman.id}`);
+      });
+
+      // 모든 9개 페어링이 존재해야 함
+      allPossiblePairings.forEach(pairing => {
+        expect(usedPairings.has(pairing)).toBe(true);
+      });
+    }
+  });
+
+  it('generates more matches for 3M + 3W to cover all pairings', () => {
+    const men = [makePlayer('m1', 'M1', 'MALE'), makePlayer('m2', 'M2', 'MALE'), makePlayer('m3', 'M3', 'MALE')];
+    const women = [makePlayer('w1', 'W1', 'FEMALE'), makePlayer('w2', 'W2', 'FEMALE'), makePlayer('w3', 'W3', 'FEMALE')];
+
+    const matches = generateMixedDoublesSchedule([...men, ...women], '2026-01-01');
+    // 이전: 3경기만 생성 (9개 페어링 중 6개만 커버)
+    // 수정 후: 최소 5경기 (9개 페어링 커버에 필요한 최소 경기 수: ceil(9/2) = 5)
+    expect(matches.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('does not generate duplicate matches', () => {
+    const men = Array.from({ length: 4 }, (_, i) => makePlayer(`m${i+1}`, `M${i+1}`, 'MALE'));
+    const women = Array.from({ length: 4 }, (_, i) => makePlayer(`w${i+1}`, `W${i+1}`, 'FEMALE'));
+
+    for (let trial = 0; trial < 10; trial++) {
+      const matches = generateMixedDoublesSchedule([...men, ...women], '2026-01-01');
+      const matchKeys = matches.map(m => {
+        const a = `${m.teamA.man.id}:${m.teamA.woman.id}`;
+        const b = `${m.teamB.man.id}:${m.teamB.woman.id}`;
+        return [a, b].sort().join('|');
+      });
+      const uniqueKeys = new Set(matchKeys);
+      expect(uniqueKeys.size).toBe(matchKeys.length);
+    }
+  });
+
+  it('each match has 4 unique players', () => {
+    const men = Array.from({ length: 4 }, (_, i) => makePlayer(`m${i+1}`, `M${i+1}`, 'MALE'));
+    const women = Array.from({ length: 3 }, (_, i) => makePlayer(`w${i+1}`, `W${i+1}`, 'FEMALE'));
+
+    const matches = generateMixedDoublesSchedule([...men, ...women], '2026-01-01');
+    matches.forEach(m => {
+      const playerIds = [m.teamA.man.id, m.teamA.woman.id, m.teamB.man.id, m.teamB.woman.id];
+      // Men must be different across teams
+      expect(m.teamA.man.id).not.toBe(m.teamB.man.id);
+      // Women must be different across teams
+      expect(m.teamA.woman.id).not.toBe(m.teamB.woman.id);
+    });
+  });
 });
 
 // --- generateDoubles ---

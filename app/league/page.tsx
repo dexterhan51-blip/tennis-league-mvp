@@ -6,15 +6,18 @@ import { isGuestPlayer } from '@/utils/tennisLogic';
 import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Minus, Plus, Shuffle, Users, User, Edit3 } from 'lucide-react';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MatchCreatedDialog from '@/components/match/MatchCreatedDialog';
+import ManualMatchDialog from '@/components/match/ManualMatchDialog';
 import SwipeableItem from '@/components/ui/SwipeableItem';
 import ScoreInput from '@/components/ui/ScoreInput';
 import QuickDatePicker from '@/components/navigation/QuickDatePicker';
 import RankingRow from '@/components/ranking/RankingRow';
 import PlayerStatsModal from '@/components/ranking/PlayerStatsModal';
 import ShareButton from '@/components/share/ShareButton';
+import { LiveShareControl } from '@/components/live/LiveShareControl';
 import { useLeagueData } from '@/hooks/useLeagueData';
 import { useLeagueRankings } from '@/hooks/useLeagueRankings';
 import { useMatchManagement } from '@/hooks/useMatchManagement';
+import { useLeagueSync } from '@/hooks/useLeagueSync';
 
 export default function LeaguePage() {
   const {
@@ -34,12 +37,22 @@ export default function LeaguePage() {
   const { rankings, rankingsWithChange, matchDates } = useLeagueRankings(players, matches, previousRankings);
 
   const {
+    isConfigured: isSyncConfigured,
+    isPublished,
+    isSyncing,
+    shareUrl,
+    publish: publishLeague,
+    unpublish: unpublishLeague,
+  } = useLeagueSync({ leagueName, players, matches });
+
+  const {
     pendingScores, setPendingScores,
     selectedForMatch, pendingMixedMatches, setPendingMixedMatches,
     mvpResult, showMvpDialog, setShowMvpDialog, setMvpResult,
     maleGuestCount, femaleGuestCount, setMaleGuestCount, setFemaleGuestCount,
     guestPlayers,
     createdMatches, createdMatchType, closeCreatedDialog, handleReshuffle,
+    showManualDialog, setShowManualDialog, confirmManualMatch,
     toggleMatchPlayer, handleCreateMatch, confirmMixedMatchCreation,
     updatePendingScore, commitScore, cancelFinished, deleteMatch,
     handleFinishDailyGame, confirmMvpAward,
@@ -85,13 +98,23 @@ export default function LeaguePage() {
         <div className="flex items-center gap-2">
           {slotIndex && <span className="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded font-bold">SLOT {slotIndex}</span>}
         </div>
-        <button
-          onClick={() => setIsHistoryOpen(true)}
-          className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-bold text-xs border border-green-200 touch-target cursor-pointer active:scale-[0.98] transition-transform"
-          aria-label="경기 기록 보기"
-        >
-          <Table size={14}/> 기록
-        </button>
+        <div className="flex items-center gap-2">
+          <LiveShareControl
+            isConfigured={isSyncConfigured}
+            isPublished={isPublished}
+            isSyncing={isSyncing}
+            shareUrl={shareUrl}
+            onPublish={publishLeague}
+            onUnpublish={unpublishLeague}
+          />
+          <button
+            onClick={() => setIsHistoryOpen(true)}
+            className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-bold text-xs border border-green-200 touch-target cursor-pointer active:scale-[0.98] transition-transform"
+            aria-label="경기 기록 보기"
+          >
+            <Table size={14}/> 기록
+          </button>
+        </div>
       </header>
 
       <div className="px-4 space-y-6 pt-4">
@@ -475,6 +498,18 @@ export default function LeaguePage() {
           </div>
         </div>
       )}
+
+      {/* Manual Match Dialog */}
+      <ManualMatchDialog
+        isOpen={showManualDialog}
+        players={players}
+        guestPlayers={guestPlayers}
+        onConfirm={(teamA, teamB) => {
+          confirmManualMatch(teamA, teamB);
+          setIsMatchViewOpen(false);
+        }}
+        onClose={() => setShowManualDialog(false)}
+      />
 
       {/* Player Stats Modal */}
       <PlayerStatsModal

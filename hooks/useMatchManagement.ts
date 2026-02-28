@@ -66,6 +66,9 @@ export function useMatchManagement({
   const [createdMatches, setCreatedMatches] = useState<Match[] | null>(null);
   const [createdMatchType, setCreatedMatchType] = useState<'MIXED' | 'DOUBLES' | 'SINGLES' | 'MANUAL' | null>(null);
 
+  // Manual match dialog state
+  const [showManualDialog, setShowManualDialog] = useState(false);
+
   // Dynamic guest players
   const guestPlayers = useMemo(
     () => buildGuestPlayers(maleGuestCount, femaleGuestCount),
@@ -125,13 +128,8 @@ export function useMatchManagement({
       } else if (type === 'DOUBLES') newMatches = generateDoubles(pool, matchDate);
       else if (type === 'SINGLES') newMatches = generateSingles(pool, matchDate);
       else if (type === 'MANUAL') {
-        const placeholder: Player = { id: 'guest-placeholder', name: '-', gender: 'MALE' };
-        newMatches = [{
-          id: uuidv4(), date: matchDate,
-          teamA: { id: uuidv4(), man: pool[0] || placeholder, woman: pool[1] || placeholder },
-          teamB: { id: uuidv4(), man: pool[2] || placeholder, woman: pool[3] || placeholder },
-          scoreA: 0, scoreB: 0, isFinished: false,
-        }];
+        setShowManualDialog(true);
+        return;
       }
 
       if (newMatches.length > 0) {
@@ -165,15 +163,9 @@ export function useMatchManagement({
   }, [pendingMixedMatches, showToast, setMatches]);
 
   const handleReshuffle = useCallback(() => {
-    if (!pendingMixedMatches || !matchDate) return;
-    // Collect all players from the pending matches to rebuild the pool
-    const playerMap = new Map<string, Player>();
-    pendingMixedMatches.forEach(m => {
-      [m.teamA.man, m.teamA.woman, m.teamB.man, m.teamB.woman].forEach(p => {
-        playerMap.set(p.id, p);
-      });
-    });
-    const pool = Array.from(playerMap.values());
+    if (!matchDate) return;
+    // 원래 선택된 전체 선수 풀에서 다시 생성 (누락 선수 방지)
+    const pool = [...guestPlayers, ...players].filter(p => selectedForMatch.includes(p.id));
 
     try {
       const reshuffled = generateMixedDoublesSchedule(pool, matchDate);
@@ -186,7 +178,26 @@ export function useMatchManagement({
     } catch (e: any) {
       showToast(e.message, 'error');
     }
-  }, [pendingMixedMatches, matchDate, showToast]);
+  }, [matchDate, players, guestPlayers, selectedForMatch, showToast]);
+
+  const confirmManualMatch = useCallback((teamA: [Player, Player], teamB: [Player, Player]) => {
+    if (!matchDate) return;
+    const newMatch: Match = {
+      id: uuidv4(),
+      date: matchDate,
+      teamA: { id: uuidv4(), man: teamA[0], woman: teamA[1] },
+      teamB: { id: uuidv4(), man: teamB[0], woman: teamB[1] },
+      scoreA: 0,
+      scoreB: 0,
+      isFinished: false,
+    };
+    setMatches(prev => [...prev, newMatch]);
+    setShowManualDialog(false);
+    setSelectedForMatch([]);
+    setMaleGuestCount(0);
+    setFemaleGuestCount(0);
+    showToast('경기가 생성되었습니다.', 'success');
+  }, [matchDate, showToast, setMatches]);
 
   const closeCreatedDialog = useCallback(() => {
     setCreatedMatches(null);
@@ -313,6 +324,10 @@ export function useMatchManagement({
     createdMatchType,
     closeCreatedDialog,
     handleReshuffle,
+    // Manual match dialog
+    showManualDialog,
+    setShowManualDialog,
+    confirmManualMatch,
     // Actions
     toggleMatchPlayer,
     handleCreateMatch,

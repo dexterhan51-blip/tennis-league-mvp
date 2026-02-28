@@ -16,38 +16,79 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 // [스마트 셔플 등 매칭 함수들은 그대로 유지...]
 // (코드 생략 - generateMixedDoublesSchedule, generateDoubles, generateSingles)
 export const generateMixedDoublesSchedule = (players: Player[], date: string): Match[] => {
-    // ... (이전과 동일)
     const men = players.filter(p => p.gender === 'MALE');
     const women = players.filter(p => p.gender === 'FEMALE');
     if (men.length < 2 || women.length < 2) throw new Error("혼복 리그는 남/녀 각각 2명 이상 필요합니다.");
-    let matchPool: Match[] = [];
-    const rotationCount = women.length;
+
+    // 랜덤 셔플로 매번 다른 조합 생성
+    const shuffledMen = [...men].sort(() => Math.random() - 0.5);
+    const shuffledWomen = [...women].sort(() => Math.random() - 0.5);
+
+    const matchPool: Match[] = [];
+    // 더 많은 성별의 수만큼 로테이션하여 모든 선수에게 기회 보장
+    const rotationCount = Math.max(shuffledMen.length, shuffledWomen.length);
+    const seenMatchKeys = new Set<string>();
+
     for (let r = 0; r < rotationCount; r++) {
-      const pairs: { m: Player, w: Player }[] = [];
-      for (let i = 0; i < men.length; i++) {
-          const womanIndex = (i + r) % women.length;
-          pairs.push({ m: men[i], w: women[womanIndex] });
+      // 남녀 페어 생성 (각 남자당 1명의 여자)
+      const pairs: { m: Player; w: Player }[] = [];
+      for (let i = 0; i < shuffledMen.length; i++) {
+        const womanIndex = (i + r) % shuffledWomen.length;
+        pairs.push({ m: shuffledMen[i], w: shuffledWomen[womanIndex] });
       }
-      for (let k = 0; k < pairs.length - 1; k += 2) {
-          matchPool.push({
-              id: generateId(), date: date,
-              teamA: { id: generateId(), man: pairs[k].m, woman: pairs[k].w },
-              teamB: { id: generateId(), man: pairs[k+1].m, woman: pairs[k+1].w },
+
+      if (pairs.length % 2 === 1) {
+        // 홀수 페어: 모든 가능한 skip 조합을 시도하여 더 많은 매치 생성
+        for (let s = 0; s < pairs.length; s++) {
+          const matchPairs = pairs.filter((_, i) => i !== s);
+          for (let k = 0; k + 1 < matchPairs.length; k += 2) {
+            const teamA = matchPairs[k];
+            const teamB = matchPairs[k + 1];
+            const keyA = `${teamA.m.id}:${teamA.w.id}`;
+            const keyB = `${teamB.m.id}:${teamB.w.id}`;
+            const matchKey = [keyA, keyB].sort().join('|');
+            if (seenMatchKeys.has(matchKey)) continue;
+            seenMatchKeys.add(matchKey);
+            matchPool.push({
+              id: generateId(), date,
+              teamA: { id: generateId(), man: teamA.m, woman: teamA.w },
+              teamB: { id: generateId(), man: teamB.m, woman: teamB.w },
               scoreA: 0, scoreB: 0, isFinished: false,
+            });
+          }
+        }
+      } else {
+        // 짝수 페어: 모든 페어를 매치에 사용
+        for (let k = 0; k + 1 < pairs.length; k += 2) {
+          const teamA = pairs[k];
+          const teamB = pairs[k + 1];
+          const keyA = `${teamA.m.id}:${teamA.w.id}`;
+          const keyB = `${teamB.m.id}:${teamB.w.id}`;
+          const matchKey = [keyA, keyB].sort().join('|');
+          if (seenMatchKeys.has(matchKey)) continue;
+          seenMatchKeys.add(matchKey);
+          matchPool.push({
+            id: generateId(), date,
+            teamA: { id: generateId(), man: teamA.m, woman: teamA.w },
+            teamB: { id: generateId(), man: teamB.m, woman: teamB.w },
+            scoreA: 0, scoreB: 0, isFinished: false,
           });
+        }
       }
     }
+
+    // 스마트 스케줄링: 연속 경기에서 같은 선수가 겹치지 않도록 배치
     const scheduledMatches: Match[] = [];
     let remainingMatches = [...matchPool];
     while (remainingMatches.length > 0) {
       let candidates: Match[] = [];
       if (scheduledMatches.length > 0) {
-          const lastMatch = scheduledMatches[scheduledMatches.length - 1];
-          const lastPlayers = [lastMatch.teamA.man.id, lastMatch.teamA.woman.id, lastMatch.teamB.man.id, lastMatch.teamB.woman.id];
-          candidates = remainingMatches.filter(m => {
-              const currentPlayers = [m.teamA.man.id, m.teamA.woman.id, m.teamB.man.id, m.teamB.woman.id];
-              return !currentPlayers.some(p => lastPlayers.includes(p));
-          });
+        const lastMatch = scheduledMatches[scheduledMatches.length - 1];
+        const lastPlayers = [lastMatch.teamA.man.id, lastMatch.teamA.woman.id, lastMatch.teamB.man.id, lastMatch.teamB.woman.id];
+        candidates = remainingMatches.filter(m => {
+          const currentPlayers = [m.teamA.man.id, m.teamA.woman.id, m.teamB.man.id, m.teamB.woman.id];
+          return !currentPlayers.some(p => lastPlayers.includes(p));
+        });
       }
       if (candidates.length === 0) candidates = remainingMatches;
       const randomIndex = Math.floor(Math.random() * candidates.length);

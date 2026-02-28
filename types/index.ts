@@ -63,3 +63,15 @@ export interface LeagueData {
   seasonEnd?: string;
   createdAt: string;
 }
+
+export interface SharedLeague {
+  id: string;
+  name: string;
+  pin_code: string;
+  players: Player[];
+  matches: Match[];
+  season_end?: string;
+  created_at: string;
+  updated_at: string;
+  is_active: boolean;
+}

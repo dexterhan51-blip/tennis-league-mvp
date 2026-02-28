@@ -1,0 +1,106 @@
+'use client';
+
+import { CheckCircle, Clock } from 'lucide-react';
+import type { Match } from '@/types';
+
+interface LiveMatchListProps {
+  matches: Match[];
+  finished: number;
+  total: number;
+}
+
+function TeamDisplay({ man, woman }: { man: { name: string; id: string }; woman: { name: string; id: string } }) {
+  if (man.id === woman.id) {
+    return <span className="text-sm font-medium text-slate-900">{man.name}</span>;
+  }
+  return (
+    <span className="text-sm font-medium text-slate-900">
+      {man.name} & {woman.name}
+    </span>
+  );
+}
+
+export function LiveMatchList({ matches, finished, total }: LiveMatchListProps) {
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-sm font-bold text-slate-900">경기 결과</h2>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium">
+            완료 {finished}
+          </span>
+          {total - finished > 0 && (
+            <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full font-medium">
+              진행 {total - finished}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {matches.length === 0 ? (
+        <p className="text-sm text-slate-400 text-center py-4">이 날짜의 경기가 없습니다.</p>
+      ) : (
+        <div className="space-y-2">
+          {matches.map((match, idx) => {
+            const isFinished = match.isFinished;
+            const aWon = match.scoreA > match.scoreB;
+            const bWon = match.scoreB > match.scoreA;
+            const isDraw = match.scoreA === match.scoreB && isFinished;
+
+            return (
+              <div
+                key={match.id}
+                className={`rounded-xl border p-3 transition-all ${
+                  isFinished
+                    ? 'border-green-200 bg-green-50/30'
+                    : 'border-slate-200 bg-slate-50/50'
+                }`}
+              >
+                {/* 게임 번호 + 상태 */}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-400">GAME {idx + 1}</span>
+                  {isFinished ? (
+                    <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                  ) : (
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                  )}
+                </div>
+
+                {/* 팀 A */}
+                <div className={`flex items-center justify-between py-1 ${aWon ? 'opacity-100' : isFinished ? 'opacity-60' : ''}`}>
+                  <div className="flex items-center gap-2">
+                    {aWon && <span className="text-xs font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">WIN</span>}
+                    <TeamDisplay man={match.teamA.man} woman={match.teamA.woman} />
+                  </div>
+                  <span className={`text-lg font-black ${aWon ? 'text-blue-600' : 'text-slate-500'}`}>
+                    {isFinished ? match.scoreA : '-'}
+                  </span>
+                </div>
+
+                {/* vs 구분선 */}
+                <div className="text-center text-[10px] text-slate-300 font-bold my-0.5">VS</div>
+
+                {/* 팀 B */}
+                <div className={`flex items-center justify-between py-1 ${bWon ? 'opacity-100' : isFinished ? 'opacity-60' : ''}`}>
+                  <div className="flex items-center gap-2">
+                    {bWon && <span className="text-xs font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">WIN</span>}
+                    <TeamDisplay man={match.teamB.man} woman={match.teamB.woman} />
+                  </div>
+                  <span className={`text-lg font-black ${bWon ? 'text-blue-600' : 'text-slate-500'}`}>
+                    {isFinished ? match.scoreB : '-'}
+                  </span>
+                </div>
+
+                {isDraw && (
+                  <div className="text-center mt-1">
+                    <span className="text-xs font-medium text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">무승부</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
