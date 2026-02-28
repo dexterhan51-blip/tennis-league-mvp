@@ -10,7 +10,7 @@ interface RankingRowProps {
 }
 
 export default function RankingRow({ player, onClick }: RankingRowProps) {
-  const { currentRank, previousRank, rankChange, name, wins, losses, totalPoints, gender, dailyBonus } = player;
+  const { currentRank, previousRank, rankChange, name, wins, draws, losses, totalPoints, gender, dailyBonus } = player;
 
   const getRankChangeDisplay = () => {
     if (rankChange > 0) {
@@ -66,7 +66,7 @@ export default function RankingRow({ player, onClick }: RankingRowProps) {
           )}
         </div>
         <div className="text-xs text-slate-500">
-          {wins}승 {losses}패
+          {wins}승 {draws > 0 ? `${draws}무 ` : ''}{losses}패
         </div>
       </div>
 

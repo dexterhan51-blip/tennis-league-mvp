@@ -30,6 +30,7 @@ export interface PlayerStat {
   gender: Gender;
   matchesPlayed: number;
   wins: number;
+  draws: number;
   losses: number;
   totalPoints: number;
   winRate: number;

@@ -28,10 +28,11 @@ export function LiveRanking({ rankings }: LiveRankingProps) {
       </div>
 
       {/* 테이블 헤더 */}
-      <div className="grid grid-cols-[2rem_1fr_2.5rem_2.5rem_3rem_3rem] gap-1 text-xs font-medium text-slate-400 px-2 pb-1 border-b border-slate-100">
+      <div className="grid grid-cols-[2rem_1fr_2rem_2rem_2rem_3rem_3rem] gap-1 text-xs font-medium text-slate-400 px-2 pb-1 border-b border-slate-100">
         <span>#</span>
         <span>이름</span>
         <span className="text-center">승</span>
+        <span className="text-center">무</span>
         <span className="text-center">패</span>
         <span className="text-center">승률</span>
         <span className="text-right">점수</span>
@@ -47,7 +48,7 @@ export function LiveRanking({ rankings }: LiveRankingProps) {
           return (
             <div
               key={stat.playerId}
-              className={`grid grid-cols-[2rem_1fr_2.5rem_2.5rem_3rem_3rem] gap-1 items-center px-2 py-2.5 ${
+              className={`grid grid-cols-[2rem_1fr_2rem_2rem_2rem_3rem_3rem] gap-1 items-center px-2 py-2.5 ${
                 isTop3 ? 'bg-yellow-50/50' : ''
               }`}
             >
@@ -62,6 +63,7 @@ export function LiveRanking({ rankings }: LiveRankingProps) {
                 </span>
               </div>
               <span className="text-sm font-bold text-blue-600 text-center">{stat.wins}</span>
+              <span className="text-sm text-slate-400 text-center">{stat.draws}</span>
               <span className="text-sm text-slate-500 text-center">{stat.losses}</span>
               <span className="text-xs font-medium text-slate-600 text-center">{winRatePercent}%</span>
               <span className="text-sm font-black text-slate-900 text-right">{stat.totalPoints}</span>

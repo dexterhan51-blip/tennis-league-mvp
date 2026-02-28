@@ -120,51 +120,63 @@ export const generateMixedDoublesSchedule = (players: Player[], date: string): M
   };
 
 // --- 2. 랭킹 계산 (보너스 점수 반영) ---
+// 점수 체계: 참석 1점 + 승리 1점 / 패배 0점 / 무승부 0점 / MVP 보너스 2점
 export const calculateRanking = (players: Player[], matches: Match[]): PlayerStat[] => {
   const statsMap = new Map<string, PlayerStat>();
 
   players.forEach((p) => {
     if (isGuestPlayer(p.id)) return;
 
-    // 기본 보너스 점수 로드
     const bonus = p.bonusPoints || 0;
 
     statsMap.set(p.id, {
       playerId: p.id, name: p.name, gender: p.gender,
-      matchesPlayed: 0, wins: 0, losses: 0, 
-      totalPoints: bonus, // 👈 여기서 보너스 점수 먹고 들어갑니다!
+      matchesPlayed: 0, wins: 0, draws: 0, losses: 0,
+      totalPoints: bonus,
       winRate: 0, avgPoints: 0, dailyBonus: false,
     });
   });
 
   matches.forEach((m) => {
     if (!m.isFinished) return;
-    const isADraw = m.scoreA === m.scoreB;
-    const winnerTeams = m.scoreA > m.scoreB ? [m.teamA] : (isADraw ? [] : [m.teamB]);
-    const loserTeams = m.scoreA > m.scoreB ? [m.teamB] : (isADraw ? [] : [m.teamA]);
+    const isDraw = m.scoreA === m.scoreB;
 
-    winnerTeams.forEach((t) => {
-        const teamPlayers = t.man.id === t.woman.id ? [t.man] : [t.man, t.woman];
-        teamPlayers.forEach((p) => {
-            const s = statsMap.get(p.id);
-            if (s) { s.matchesPlayed++; s.wins++; s.totalPoints += 2; }
-        });
-    });
+    const processTeamPlayers = (team: Match['teamA']) => {
+      const teamPlayers = team.man.id === team.woman.id ? [team.man] : [team.man, team.woman];
+      return teamPlayers;
+    };
 
-    loserTeams.forEach((t) => {
-        const teamPlayers = t.man.id === t.woman.id ? [t.man] : [t.man, t.woman];
-        teamPlayers.forEach((p) => {
-            const s = statsMap.get(p.id);
-            if (s) { s.matchesPlayed++; s.losses++; s.totalPoints += 1; }
+    if (isDraw) {
+      // 무승부: 참석 1점만 (승리 보너스 없음)
+      [m.teamA, m.teamB].forEach((t) => {
+        processTeamPlayers(t).forEach((p) => {
+          const s = statsMap.get(p.id);
+          if (s) { s.matchesPlayed++; s.draws++; s.totalPoints += 1; }
         });
-    });
+      });
+    } else {
+      const winnerTeam = m.scoreA > m.scoreB ? m.teamA : m.teamB;
+      const loserTeam = m.scoreA > m.scoreB ? m.teamB : m.teamA;
+
+      // 승리: 참석 1점 + 승리 1점 = 2점
+      processTeamPlayers(winnerTeam).forEach((p) => {
+        const s = statsMap.get(p.id);
+        if (s) { s.matchesPlayed++; s.wins++; s.totalPoints += 2; }
+      });
+
+      // 패배: 참석 1점 + 패배 0점 = 1점
+      processTeamPlayers(loserTeam).forEach((p) => {
+        const s = statsMap.get(p.id);
+        if (s) { s.matchesPlayed++; s.losses++; s.totalPoints += 1; }
+      });
+    }
   });
 
   return Array.from(statsMap.values()).map(s => {
     s.winRate = s.matchesPlayed > 0 ? (s.wins / s.matchesPlayed) * 100 : 0;
     s.avgPoints = s.matchesPlayed > 0 ? s.totalPoints / s.matchesPlayed : 0;
     return s;
-  }).sort((a, b) => b.totalPoints - a.totalPoints || b.winRate - a.winRate); // 총점 기준 정렬
+  }).sort((a, b) => b.totalPoints - a.totalPoints || b.winRate - a.winRate);
 };
 
 // --- 3. 오늘의 MVP 계산기 (NEW) ---

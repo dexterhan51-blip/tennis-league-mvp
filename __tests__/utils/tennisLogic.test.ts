@@ -61,7 +61,7 @@ describe('calculateRanking', () => {
     expect(result[0].totalPoints).toBe(0);
   });
 
-  it('awards +2 points for wins and +1 point for losses', () => {
+  it('awards attendance(1) + win(1) = 2pts for wins, attendance(1) + loss(0) = 1pt for losses', () => {
     const match = makeMatch({
       teamA: { id: 'ta', man: m1, woman: w1 },
       teamB: { id: 'tb', man: m2, woman: w2 },
@@ -75,8 +75,36 @@ describe('calculateRanking', () => {
     const m1Stats = result.find(r => r.playerId === 'm1')!;
     const m2Stats = result.find(r => r.playerId === 'm2')!;
     expect(m1Stats.wins).toBe(1);
+    expect(m1Stats.draws).toBe(0);
     expect(m1Stats.totalPoints).toBe(2);
     expect(m2Stats.losses).toBe(1);
+    expect(m2Stats.draws).toBe(0);
+    expect(m2Stats.totalPoints).toBe(1);
+  });
+
+  it('awards attendance(1) + draw(0) = 1pt for draws, counts as draw not win/loss', () => {
+    const match = makeMatch({
+      teamA: { id: 'ta', man: m1, woman: w1 },
+      teamB: { id: 'tb', man: m2, woman: w2 },
+      scoreA: 4,
+      scoreB: 4,
+      isFinished: true,
+    });
+
+    const result = calculateRanking([m1, m2, w1, w2], [match]);
+
+    const m1Stats = result.find(r => r.playerId === 'm1')!;
+    const m2Stats = result.find(r => r.playerId === 'm2')!;
+    // 무승부: 양팀 모두 참석 1점만
+    expect(m1Stats.matchesPlayed).toBe(1);
+    expect(m1Stats.wins).toBe(0);
+    expect(m1Stats.draws).toBe(1);
+    expect(m1Stats.losses).toBe(0);
+    expect(m1Stats.totalPoints).toBe(1);
+    expect(m2Stats.matchesPlayed).toBe(1);
+    expect(m2Stats.wins).toBe(0);
+    expect(m2Stats.draws).toBe(1);
+    expect(m2Stats.losses).toBe(0);
     expect(m2Stats.totalPoints).toBe(1);
   });
 

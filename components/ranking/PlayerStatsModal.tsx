@@ -38,12 +38,11 @@ export default function PlayerStatsModal({
       .map((m) => {
         const isInTeamA =
           m.teamA.man.id === player.id || m.teamA.woman.id === player.id;
-        const won = isInTeamA
-          ? m.scoreA > m.scoreB
-          : m.scoreB > m.scoreA;
         const myScore = isInTeamA ? m.scoreA : m.scoreB;
         const oppScore = isInTeamA ? m.scoreB : m.scoreA;
-        return { match: m, won, myScore, oppScore };
+        const won = myScore > oppScore;
+        const draw = myScore === oppScore;
+        return { match: m, won, draw, myScore, oppScore };
       });
   }, [player, matches]);
 
@@ -158,19 +157,25 @@ export default function PlayerStatsModal({
               </div>
             </div>
 
-            {/* Win/Loss */}
+            {/* Win/Draw/Loss */}
             <div className="mt-4 p-4 bg-slate-50 rounded-xl">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-slate-700">승/패</span>
+                <span className="text-sm font-medium text-slate-700">승/무/패</span>
                 <span className="text-sm font-bold text-slate-900">
-                  {stats.wins}승 {stats.losses}패
+                  {stats.wins}승 {stats.draws}무 {stats.losses}패
                 </span>
               </div>
-              <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div className="h-2 bg-slate-200 rounded-full overflow-hidden flex">
                 <div
                   className="h-full bg-blue-500 transition-all"
                   style={{
                     width: `${stats.matchesPlayed > 0 ? (stats.wins / stats.matchesPlayed) * 100 : 0}%`,
+                  }}
+                />
+                <div
+                  className="h-full bg-slate-400 transition-all"
+                  style={{
+                    width: `${stats.matchesPlayed > 0 ? (stats.draws / stats.matchesPlayed) * 100 : 0}%`,
                   }}
                 />
               </div>
@@ -187,15 +192,15 @@ export default function PlayerStatsModal({
                 <div
                   key={i}
                   className={`flex-1 p-3 rounded-xl text-center ${
-                    r.won ? 'bg-blue-100' : 'bg-red-100'
+                    r.won ? 'bg-blue-100' : r.draw ? 'bg-slate-100' : 'bg-red-100'
                   }`}
                 >
                   <div
                     className={`text-xs font-bold mb-1 ${
-                      r.won ? 'text-blue-600' : 'text-red-600'
+                      r.won ? 'text-blue-600' : r.draw ? 'text-slate-500' : 'text-red-600'
                     }`}
                   >
-                    {r.won ? '승' : '패'}
+                    {r.won ? '승' : r.draw ? '무' : '패'}
                   </div>
                   <div className="text-sm font-medium text-slate-900">
                     {r.myScore}-{r.oppScore}
