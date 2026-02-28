@@ -61,7 +61,7 @@ describe('calculateRanking', () => {
     expect(result[0].totalPoints).toBe(0);
   });
 
-  it('awards attendance(1) + win(1) = 2pts for wins, attendance(1) + loss(0) = 1pt for losses', () => {
+  it('awards daily attendance(1) + win(1) = 2pts, loss gets attendance(1) only', () => {
     const match = makeMatch({
       teamA: { id: 'ta', man: m1, woman: w1 },
       teamB: { id: 'tb', man: m2, woman: w2 },
@@ -74,15 +74,56 @@ describe('calculateRanking', () => {
 
     const m1Stats = result.find(r => r.playerId === 'm1')!;
     const m2Stats = result.find(r => r.playerId === 'm2')!;
+    // 승리: 참석 1 + 승점 1 = 2
     expect(m1Stats.wins).toBe(1);
-    expect(m1Stats.draws).toBe(0);
     expect(m1Stats.totalPoints).toBe(2);
+    // 패배: 참석 1 + 승점 0 = 1
     expect(m2Stats.losses).toBe(1);
-    expect(m2Stats.draws).toBe(0);
     expect(m2Stats.totalPoints).toBe(1);
   });
 
-  it('awards attendance(1) + draw(0) = 1pt for draws, counts as draw not win/loss', () => {
+  it('attendance point is once per day regardless of games played', () => {
+    // 같은 날 4경기, 1승 3패
+    const matches = [
+      makeMatch({ id: 'g1', date: '2026-01-01', teamA: { id: 'ta1', man: m1, woman: w1 }, teamB: { id: 'tb1', man: m2, woman: w2 }, scoreA: 6, scoreB: 3, isFinished: true }),
+      makeMatch({ id: 'g2', date: '2026-01-01', teamA: { id: 'ta2', man: m1, woman: w1 }, teamB: { id: 'tb2', man: m2, woman: w2 }, scoreA: 2, scoreB: 6, isFinished: true }),
+      makeMatch({ id: 'g3', date: '2026-01-01', teamA: { id: 'ta3', man: m1, woman: w1 }, teamB: { id: 'tb3', man: m2, woman: w2 }, scoreA: 3, scoreB: 6, isFinished: true }),
+      makeMatch({ id: 'g4', date: '2026-01-01', teamA: { id: 'ta4', man: m1, woman: w1 }, teamB: { id: 'tb4', man: m2, woman: w2 }, scoreA: 1, scoreB: 6, isFinished: true }),
+    ];
+
+    const result = calculateRanking([m1, m2, w1, w2], matches);
+    const m1Stats = result.find(r => r.playerId === 'm1')!;
+    // m1: 1승 3패, 하루 참석 1점 + 승점 1점 = 2점
+    expect(m1Stats.matchesPlayed).toBe(4);
+    expect(m1Stats.wins).toBe(1);
+    expect(m1Stats.losses).toBe(3);
+    expect(m1Stats.totalPoints).toBe(2);
+
+    const m2Stats = result.find(r => r.playerId === 'm2')!;
+    // m2: 3승 1패, 하루 참석 1점 + 승점 3점 = 4점
+    expect(m2Stats.wins).toBe(3);
+    expect(m2Stats.losses).toBe(1);
+    expect(m2Stats.totalPoints).toBe(4);
+  });
+
+  it('attendance point accumulates per different day', () => {
+    // 2일간 각 1경기
+    const matches = [
+      makeMatch({ id: 'g1', date: '2026-01-01', teamA: { id: 'ta1', man: m1, woman: w1 }, teamB: { id: 'tb1', man: m2, woman: w2 }, scoreA: 6, scoreB: 3, isFinished: true }),
+      makeMatch({ id: 'g2', date: '2026-01-02', teamA: { id: 'ta2', man: m1, woman: w1 }, teamB: { id: 'tb2', man: m2, woman: w2 }, scoreA: 6, scoreB: 3, isFinished: true }),
+    ];
+
+    const result = calculateRanking([m1, m2, w1, w2], matches);
+    const m1Stats = result.find(r => r.playerId === 'm1')!;
+    // m1: 2일 참석(2점) + 2승(2점) = 4점
+    expect(m1Stats.totalPoints).toBe(4);
+
+    const m2Stats = result.find(r => r.playerId === 'm2')!;
+    // m2: 2일 참석(2점) + 0승(0점) = 2점
+    expect(m2Stats.totalPoints).toBe(2);
+  });
+
+  it('draw gives attendance only, no win points', () => {
     const match = makeMatch({
       teamA: { id: 'ta', man: m1, woman: w1 },
       teamB: { id: 'tb', man: m2, woman: w2 },
@@ -94,18 +135,12 @@ describe('calculateRanking', () => {
     const result = calculateRanking([m1, m2, w1, w2], [match]);
 
     const m1Stats = result.find(r => r.playerId === 'm1')!;
-    const m2Stats = result.find(r => r.playerId === 'm2')!;
-    // 무승부: 양팀 모두 참석 1점만
+    // 무승부: 참석 1점 + 승점 0 = 1점
     expect(m1Stats.matchesPlayed).toBe(1);
     expect(m1Stats.wins).toBe(0);
     expect(m1Stats.draws).toBe(1);
     expect(m1Stats.losses).toBe(0);
     expect(m1Stats.totalPoints).toBe(1);
-    expect(m2Stats.matchesPlayed).toBe(1);
-    expect(m2Stats.wins).toBe(0);
-    expect(m2Stats.draws).toBe(1);
-    expect(m2Stats.losses).toBe(0);
-    expect(m2Stats.totalPoints).toBe(1);
   });
 
   it('excludes guest players', () => {

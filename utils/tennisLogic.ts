@@ -120,9 +120,11 @@ export const generateMixedDoublesSchedule = (players: Player[], date: string): M
   };
 
 // --- 2. 랭킹 계산 (보너스 점수 반영) ---
-// 점수 체계: 참석 1점 + 승리 1점 / 패배 0점 / 무승부 0점 / MVP 보너스 2점
+// 점수 체계: 참석 1점(하루 1회) + 승리 1점 / 패배 0점 / 무승부 0점 / MVP 보너스 2점
 export const calculateRanking = (players: Player[], matches: Match[]): PlayerStat[] => {
   const statsMap = new Map<string, PlayerStat>();
+  // 선수별 참석 날짜 추적 (하루 1점만 부여)
+  const attendanceDates = new Map<string, Set<string>>();
 
   players.forEach((p) => {
     if (isGuestPlayer(p.id)) return;
@@ -135,41 +137,52 @@ export const calculateRanking = (players: Player[], matches: Match[]): PlayerSta
       totalPoints: bonus,
       winRate: 0, avgPoints: 0, dailyBonus: false,
     });
+    attendanceDates.set(p.id, new Set());
   });
+
+  const getTeamPlayers = (team: Match['teamA']) =>
+    team.man.id === team.woman.id ? [team.man] : [team.man, team.woman];
 
   matches.forEach((m) => {
     if (!m.isFinished) return;
     const isDraw = m.scoreA === m.scoreB;
 
-    const processTeamPlayers = (team: Match['teamA']) => {
-      const teamPlayers = team.man.id === team.woman.id ? [team.man] : [team.man, team.woman];
-      return teamPlayers;
-    };
+    // 모든 참가 선수의 참석 날짜 기록
+    [...getTeamPlayers(m.teamA), ...getTeamPlayers(m.teamB)].forEach((p) => {
+      const dates = attendanceDates.get(p.id);
+      if (dates) dates.add(m.date);
+    });
 
     if (isDraw) {
-      // 무승부: 참석 1점만 (승리 보너스 없음)
+      // 무승부: 승점 0
       [m.teamA, m.teamB].forEach((t) => {
-        processTeamPlayers(t).forEach((p) => {
+        getTeamPlayers(t).forEach((p) => {
           const s = statsMap.get(p.id);
-          if (s) { s.matchesPlayed++; s.draws++; s.totalPoints += 1; }
+          if (s) { s.matchesPlayed++; s.draws++; }
         });
       });
     } else {
       const winnerTeam = m.scoreA > m.scoreB ? m.teamA : m.teamB;
       const loserTeam = m.scoreA > m.scoreB ? m.teamB : m.teamA;
 
-      // 승리: 참석 1점 + 승리 1점 = 2점
-      processTeamPlayers(winnerTeam).forEach((p) => {
+      // 승리: 승점 1
+      getTeamPlayers(winnerTeam).forEach((p) => {
         const s = statsMap.get(p.id);
-        if (s) { s.matchesPlayed++; s.wins++; s.totalPoints += 2; }
+        if (s) { s.matchesPlayed++; s.wins++; s.totalPoints += 1; }
       });
 
-      // 패배: 참석 1점 + 패배 0점 = 1점
-      processTeamPlayers(loserTeam).forEach((p) => {
+      // 패배: 승점 0
+      getTeamPlayers(loserTeam).forEach((p) => {
         const s = statsMap.get(p.id);
-        if (s) { s.matchesPlayed++; s.losses++; s.totalPoints += 1; }
+        if (s) { s.matchesPlayed++; s.losses++; }
       });
     }
+  });
+
+  // 참석 점수 반영 (하루 1점)
+  attendanceDates.forEach((dates, playerId) => {
+    const s = statsMap.get(playerId);
+    if (s) s.totalPoints += dates.size;
   });
 
   return Array.from(statsMap.values()).map(s => {
