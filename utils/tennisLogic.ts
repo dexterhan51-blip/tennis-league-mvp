@@ -143,7 +143,10 @@ export const calculateRanking = (players: Player[], matches: Match[]): PlayerSta
   const getTeamPlayers = (team: Match['teamA']) =>
     team.man.id === team.woman.id ? [team.man] : [team.man, team.woman];
 
-  matches.forEach((m) => {
+  // 시범경기 제외
+  const rankedMatches = matches.filter(m => !m.isExhibition);
+
+  rankedMatches.forEach((m) => {
     if (!m.isFinished) return;
     const isDraw = m.scoreA === m.scoreB;
 
@@ -196,8 +199,8 @@ export const calculateRanking = (players: Player[], matches: Match[]): PlayerSta
 export const calculateDailyMvp = (players: Player[], matches: Match[], date: string) => {
     const dailyStats = new Map<string, { wins: number, played: number, name: string, gender: string }>();
 
-    // 해당 날짜 매치만 필터링
-    const targetMatches = matches.filter(m => m.date === date && m.isFinished);
+    // 해당 날짜 매치만 필터링 (시범경기 제외)
+    const targetMatches = matches.filter(m => m.date === date && m.isFinished && !m.isExhibition);
 
     targetMatches.forEach(m => {
         const processPlayer = (p: Player, isWin: boolean) => {

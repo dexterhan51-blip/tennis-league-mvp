@@ -22,6 +22,7 @@ export interface Match {
   scoreA: number;
   scoreB: number;
   isFinished: boolean;
+  isExhibition?: boolean;
 }
 
 export interface PlayerStat {
@@ -42,6 +43,8 @@ export interface PlayerWithRank extends PlayerStat {
   currentRank: number;
   previousRank?: number;
   rankChange: number;
+  peakRank?: number;
+  seasonPeakRank?: number;
 }
 
 export interface AppSettings {
@@ -55,6 +58,8 @@ export interface ExportData {
   players: Player[];
   leagues: (LeagueData | null)[];
   settings?: AppSettings;
+  seasonHistory?: SeasonArchive[];
+  playerCareerStats?: PlayerCareerStats[];
 }
 
 export interface LeagueData {
@@ -63,6 +68,41 @@ export interface LeagueData {
   matches: Match[];
   seasonEnd?: string;
   createdAt: string;
+}
+
+export interface SeasonArchive {
+  id: string;
+  leagueName: string;
+  slotIndex: number;
+  players: Player[];
+  matches: Match[];
+  finalRankings: PlayerStat[];
+  championPlayerId?: string;
+  seasonStart: string;
+  seasonEnd: string;
+  totalMatchDays: number;
+  totalMatches: number;
+}
+
+export interface PlayerCareerStats {
+  playerId: string;
+  peakRank: number;
+  peakRankSeason?: string;
+  peakRankDate?: string;
+  championships: number;
+  seasonHistory: SeasonRecord[];
+}
+
+export interface SeasonRecord {
+  seasonId: string;
+  leagueName: string;
+  finalRank: number;
+  totalPoints: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  matchesPlayed: number;
+  seasonEnd: string;
 }
 
 export interface SharedLeague {

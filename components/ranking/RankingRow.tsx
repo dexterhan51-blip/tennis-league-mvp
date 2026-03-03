@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Crown, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Crown, TrendingUp, TrendingDown, Minus, Star } from 'lucide-react';
 import type { PlayerWithRank } from '@/types';
 
 interface RankingRowProps {
@@ -10,7 +10,7 @@ interface RankingRowProps {
 }
 
 export default function RankingRow({ player, onClick }: RankingRowProps) {
-  const { currentRank, previousRank, rankChange, name, wins, draws, losses, totalPoints, gender, dailyBonus } = player;
+  const { currentRank, previousRank, rankChange, name, wins, draws, losses, totalPoints, gender, dailyBonus, peakRank } = player;
 
   const getRankChangeDisplay = () => {
     if (rankChange > 0) {
@@ -65,8 +65,17 @@ export default function RankingRow({ player, onClick }: RankingRowProps) {
             </span>
           )}
         </div>
-        <div className="text-xs text-slate-500">
-          {wins}승 {draws > 0 ? `${draws}무 ` : ''}{losses}패
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-500">
+            {wins}승 {draws > 0 ? `${draws}무 ` : ''}{losses}패
+          </span>
+          {peakRank !== undefined && (
+            peakRank === currentRank ? (
+              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+            ) : (
+              <span className="text-xs text-amber-500">최고 {peakRank}위</span>
+            )
+          )}
         </div>
       </div>
 

@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { X, Trophy, Target, TrendingUp, Flame } from 'lucide-react';
-import type { Player, Match, PlayerStat } from '@/types';
+import { X, Trophy, Target, TrendingUp, Flame, Star, Crown } from 'lucide-react';
+import type { Player, Match, PlayerStat, PlayerCareerStats, PlayerWithRank } from '@/types';
 import { GUEST_M_ID, GUEST_F_ID } from '@/utils/tennisLogic';
+import SeasonHistorySection from '@/components/season/SeasonHistorySection';
 
 interface PlayerStatsModalProps {
   isOpen: boolean;
@@ -11,6 +12,8 @@ interface PlayerStatsModalProps {
   matches: Match[];
   stats: PlayerStat | null;
   onClose: () => void;
+  careerStats?: PlayerCareerStats | null;
+  currentRank?: number;
 }
 
 export default function PlayerStatsModal({
@@ -19,6 +22,8 @@ export default function PlayerStatsModal({
   matches,
   stats,
   onClose,
+  careerStats,
+  currentRank,
 }: PlayerStatsModalProps) {
   // Calculate recent form (last 5 matches)
   const recentMatches = useMemo(() => {
@@ -111,6 +116,44 @@ export default function PlayerStatsModal({
             </div>
           </div>
         </div>
+
+        {/* Career Section */}
+        {(careerStats || currentRank) && (
+          <div className="px-6 pb-4">
+            <div className="p-4 bg-amber-50 rounded-xl space-y-2">
+              <h3 className="text-sm font-bold text-amber-700 flex items-center gap-1.5">
+                <Crown className="w-4 h-4" /> 커리어
+              </h3>
+              <div className="grid grid-cols-3 gap-3 text-center">
+                {currentRank && (
+                  <div>
+                    <div className="text-xs text-slate-500">현재 순위</div>
+                    <div className="text-lg font-bold text-slate-900">{currentRank}위</div>
+                  </div>
+                )}
+                <div>
+                  <div className="text-xs text-slate-500">최고 순위</div>
+                  <div className="text-lg font-bold text-amber-600">
+                    {careerStats ? `${careerStats.peakRank}위` : currentRank ? `${currentRank}위` : '-'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500">시즌 우승</div>
+                  <div className="text-lg font-bold text-slate-900">
+                    {careerStats?.championships ?? 0}회
+                    {(careerStats?.championships ?? 0) > 0 && (
+                      <span className="ml-0.5">
+                        {Array.from({ length: Math.min(careerStats?.championships ?? 0, 5) }).map((_, i) => (
+                          <Trophy key={i} className="w-3 h-3 text-amber-500 inline" />
+                        ))}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats Grid */}
         {stats && (
@@ -214,6 +257,11 @@ export default function PlayerStatsModal({
             </p>
           )}
         </div>
+
+        {/* Season History */}
+        {careerStats && careerStats.seasonHistory.length > 0 && (
+          <SeasonHistorySection seasonHistory={careerStats.seasonHistory} />
+        )}
 
         {/* Total Points */}
         {stats && (

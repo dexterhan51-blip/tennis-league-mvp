@@ -7,10 +7,10 @@ import {
 import { useTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/contexts/ToastContext';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import type { AppSettings, ExportData, Player, LeagueData } from '@/types';
+import type { AppSettings, ExportData, Player, LeagueData, SeasonArchive, PlayerCareerStats } from '@/types';
 import { safeGetAsync, safeSetAsync, safeRemoveAsync } from '@/lib/storage';
 import { safeGetString, safeSetString, safeRemove } from '@/lib/storage';
-import { PlayersArraySchema, LeagueDataSchema } from '@/lib/schemas';
+import { PlayersArraySchema, LeagueDataSchema, SeasonHistorySchema, PlayerCareerStatsArraySchema } from '@/lib/schemas';
 
 const FONT_SIZE_KEY = 'tennis-app-font-size';
 
@@ -51,6 +51,8 @@ export default function SettingsPage() {
         safeGetAsync('league-slot-2', LeagueDataSchema).then(d => d ?? null),
         safeGetAsync('league-slot-3', LeagueDataSchema).then(d => d ?? null),
       ]);
+      const seasonHistory = await safeGetAsync('season-history', SeasonHistorySchema) ?? [];
+      const playerCareerStats = await safeGetAsync('player-career-stats', PlayerCareerStatsArraySchema) ?? [];
 
       const exportData: ExportData = {
         version: '1.0.0',
@@ -58,6 +60,8 @@ export default function SettingsPage() {
         players,
         leagues,
         settings: { theme, fontSize },
+        seasonHistory,
+        playerCareerStats,
       };
 
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -104,6 +108,13 @@ export default function SettingsPage() {
           if (data.settings.fontSize) handleFontSizeChange(data.settings.fontSize);
         }
 
+        if (data.seasonHistory) {
+          await safeSetAsync('season-history', data.seasonHistory);
+        }
+        if (data.playerCareerStats) {
+          await safeSetAsync('player-career-stats', data.playerCareerStats);
+        }
+
         showToast('데이터를 가져왔습니다', 'success');
         setImportError(null);
       } catch (error) {
@@ -125,6 +136,9 @@ export default function SettingsPage() {
     await safeRemoveAsync('current-league');
     await safeRemoveAsync('previous-rankings');
     await safeRemoveAsync('finished-dates');
+    await safeRemoveAsync('season-history');
+    await safeRemoveAsync('player-career-stats');
+    await safeRemoveAsync('current-season-peaks');
     safeRemove('current-slot-index');
 
     setShowResetDialog(false);

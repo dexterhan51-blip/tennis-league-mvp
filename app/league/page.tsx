@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Player } from '@/types';
 import { isGuestPlayer } from '@/utils/tennisLogic';
-import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Minus, Plus, Shuffle, Users, User, Edit3 } from 'lucide-react';
+import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Minus, Plus, Shuffle, Users, User, Edit3, Flag } from 'lucide-react';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MatchCreatedDialog from '@/components/match/MatchCreatedDialog';
 import ManualMatchDialog from '@/components/match/ManualMatchDialog';
@@ -14,27 +14,32 @@ import RankingRow from '@/components/ranking/RankingRow';
 import PlayerStatsModal from '@/components/ranking/PlayerStatsModal';
 import ShareButton from '@/components/share/ShareButton';
 import { LiveShareControl } from '@/components/live/LiveShareControl';
+import EndSeasonDialog from '@/components/season/EndSeasonDialog';
 import { useLeagueData } from '@/hooks/useLeagueData';
 import { useLeagueRankings } from '@/hooks/useLeagueRankings';
 import { useMatchManagement } from '@/hooks/useMatchManagement';
 import { useLeagueSync } from '@/hooks/useLeagueSync';
+import { usePlayerCareerStats } from '@/hooks/usePlayerCareerStats';
 
 export default function LeaguePage() {
   const {
     leagueName, players, setPlayers, matches, setMatches,
     slotIndex, previousRankings, finishedDates, setFinishedDates,
-    isLoading, handleManualSave, handleDeleteLeague,
+    isLoading, handleManualSave, handleDeleteLeague, handleEndSeason,
   } = useLeagueData();
 
   const [matchDate, setMatchDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [isExhibition, setIsExhibition] = useState(false);
   const [isMatchViewOpen, setIsMatchViewOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [deleteMatchId, setDeleteMatchId] = useState<string | null>(null);
   const [showDeleteLeagueDialog, setShowDeleteLeagueDialog] = useState(false);
+  const [showEndSeasonDialog, setShowEndSeasonDialog] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
 
-  const { rankings, rankingsWithChange, matchDates } = useLeagueRankings(players, matches, previousRankings);
+  const { careerStats, getPlayerCareer } = usePlayerCareerStats();
+  const { rankings, rankingsWithChange, matchDates } = useLeagueRankings(players, matches, previousRankings, careerStats);
 
   const {
     isConfigured: isSyncConfigured,
@@ -59,6 +64,7 @@ export default function LeaguePage() {
   } = useMatchManagement({
     players, setPlayers, matches, setMatches,
     matchDate, finishedDates, setFinishedDates,
+    isExhibition,
   });
 
   const handlePlayerClick = (playerId: string) => {
@@ -80,6 +86,9 @@ export default function LeaguePage() {
   };
 
   const displayedMatches = matches.filter(m => m.date === matchDate);
+  const seasonMatchDays = [...new Set(matches.map(m => m.date))].length;
+  const seasonTotalMatches = matches.filter(m => m.isFinished && !m.isExhibition).length;
+  const seasonChampion = rankings.length > 0 ? rankings[0] : null;
   const selectedPlayerStats = selectedPlayer
     ? rankings.find(r => r.playerId === selectedPlayer.id) || null
     : null;
@@ -157,7 +166,7 @@ export default function LeaguePage() {
           </button>
 
           {isMatchViewOpen && (
-            <div className="mt-4 p-4 bg-slate-50 rounded-xl border-2 border-slate-200 animate-scale-in">
+            <div className={`mt-4 p-4 rounded-xl border-2 animate-scale-in ${isExhibition ? 'bg-amber-50/50 border-amber-200' : 'bg-slate-50 border-slate-200'}`}>
               <div className="mb-4">
                 <label className="block text-xs font-bold text-slate-500 mb-2">경기 날짜</label>
                 <QuickDatePicker selectedDate={matchDate} onChange={setMatchDate} matchDates={matchDates} />
@@ -210,6 +219,29 @@ export default function LeaguePage() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Exhibition Toggle */}
+              <div className="mb-4">
+                <button
+                  onClick={() => setIsExhibition(!isExhibition)}
+                  className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
+                    isExhibition
+                      ? 'bg-amber-50 border-amber-400 text-amber-700'
+                      : 'bg-white border-slate-200 text-slate-500'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Flag size={16} />
+                    <span className="font-bold text-sm">시범경기 모드</span>
+                  </div>
+                  <div className={`w-10 h-6 rounded-full transition-colors relative ${isExhibition ? 'bg-amber-400' : 'bg-slate-300'}`}>
+                    <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${isExhibition ? 'translate-x-4.5' : 'translate-x-0.5'}`} />
+                  </div>
+                </button>
+                {isExhibition && (
+                  <p className="text-xs text-amber-600 mt-1 ml-1">랭킹에 반영되지 않습니다</p>
+                )}
               </div>
 
               {/* Player Selection */}
@@ -281,7 +313,10 @@ export default function LeaguePage() {
               <SwipeableItem key={m.id} onDelete={() => setDeleteMatchId(m.id)}>
                 <div className={`p-4 rounded-xl border shadow-sm transition-colors ${m.isFinished ? 'bg-green-50/50 border-green-200' : 'bg-white border-slate-200'}`}>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-xs font-bold text-blue-600">GAME {idx + 1}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-blue-600">GAME {idx + 1}</span>
+                      {m.isExhibition && <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-xs font-bold">시범</span>}
+                    </div>
                     {m.isFinished && <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">경기종료</span>}
                   </div>
 
@@ -357,8 +392,8 @@ export default function LeaguePage() {
           <button onClick={() => handleManualSave(rankings)} className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg touch-target">
             <Save size={18}/> 저장하기
           </button>
-          <button onClick={() => setShowDeleteLeagueDialog(true)} className="px-4 bg-slate-100 text-red-400 rounded-xl font-bold touch-target" aria-label="리그 삭제">
-            <Trash2 size={18}/>
+          <button onClick={() => setShowEndSeasonDialog(true)} className="px-4 bg-amber-50 text-amber-600 border border-amber-200 rounded-xl font-bold touch-target" aria-label="시즌 종료">
+            <Flag size={18}/>
           </button>
         </div>
       </div>
@@ -379,7 +414,10 @@ export default function LeaguePage() {
                 return (
                   <div key={m.id} className="bg-slate-50 rounded-xl p-3 border border-slate-200">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs text-slate-500 font-medium">{m.date}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs text-slate-500 font-medium">{m.date}</span>
+                        {m.isExhibition && <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-bold">시범</span>}
+                      </div>
                       {m.isFinished && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-bold">완료</span>}
                     </div>
                     <div className="flex items-center gap-3">
@@ -417,16 +455,18 @@ export default function LeaguePage() {
         onCancel={() => setDeleteMatchId(null)}
       />
 
-      {/* Delete League Confirm Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteLeagueDialog}
-        title="리그 삭제"
-        message="이 리그의 모든 데이터가 삭제됩니다."
-        confirmText="삭제"
-        variant="danger"
-        requireDoubleConfirm
-        onConfirm={() => { setShowDeleteLeagueDialog(false); handleDeleteLeague(); }}
-        onCancel={() => setShowDeleteLeagueDialog(false)}
+      {/* End Season Dialog */}
+      <EndSeasonDialog
+        isOpen={showEndSeasonDialog}
+        leagueName={leagueName}
+        totalMatchDays={seasonMatchDays}
+        totalMatches={seasonTotalMatches}
+        champion={seasonChampion}
+        onConfirm={(option) => {
+          setShowEndSeasonDialog(false);
+          handleEndSeason(option);
+        }}
+        onCancel={() => setShowEndSeasonDialog(false)}
       />
 
       {/* Match Created / Mixed Pending Dialog */}
@@ -518,6 +558,8 @@ export default function LeaguePage() {
         matches={matches}
         stats={selectedPlayerStats}
         onClose={() => { setShowPlayerStats(false); setSelectedPlayer(null); }}
+        careerStats={selectedPlayer ? getPlayerCareer(selectedPlayer.id) ?? null : null}
+        currentRank={selectedPlayer ? rankingsWithChange.find(r => r.playerId === selectedPlayer.id)?.currentRank : undefined}
       />
     </main>
   );

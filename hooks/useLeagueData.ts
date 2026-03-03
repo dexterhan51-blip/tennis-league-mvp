@@ -1,10 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Player, Match } from '@/types';
+import { Player, Match, SeasonArchive, PlayerStat } from '@/types';
 import { useToast } from '@/contexts/ToastContext';
 import { safeGetAsync, safeSetAsync, safeRemoveAsync } from '@/lib/storage';
 import { safeGetString, safeSetString, safeRemove } from '@/lib/storage';
-import { LeagueDataSchema, PreviousRankingsSchema, FinishedDatesSchema } from '@/lib/schemas';
+import { LeagueDataSchema, PreviousRankingsSchema, FinishedDatesSchema, SeasonHistorySchema } from '@/lib/schemas';
+import { calculateRanking } from '@/utils/tennisLogic';
+import { updatePlayerCareerStats } from '@/utils/careerStats';
+import { v4 as uuidv4 } from 'uuid';
+import type { EndSeasonOption } from '@/components/season/EndSeasonDialog';
 
 const PREVIOUS_RANKINGS_KEY = 'previous-rankings';
 const FINISHED_DATES_KEY = 'finished-dates';
@@ -22,6 +26,7 @@ interface UseLeagueDataResult {
   isLoading: boolean;
   handleManualSave: (rankings: { playerId: string }[]) => void;
   handleDeleteLeague: () => void;
+  handleEndSeason: (option: EndSeasonOption) => void;
 }
 
 export function useLeagueData(): UseLeagueDataResult {
@@ -95,6 +100,81 @@ export function useLeagueData(): UseLeagueDataResult {
     router.push('/');
   }, [slotIndex, showToast, router]);
 
+  const handleEndSeason = useCallback(async (option: EndSeasonOption) => {
+    // Calculate final rankings
+    const finalRankings = calculateRanking(players, matches);
+    const champion = finalRankings.length > 0 ? finalRankings[0] : null;
+
+    // Collect match dates for season range
+    const matchDates = [...new Set(matches.map(m => m.date))].sort();
+    const seasonStart = matchDates[0] || new Date().toISOString().split('T')[0];
+    const seasonEnd = new Date().toISOString().split('T')[0];
+    const totalMatchDays = matchDates.length;
+    const totalMatches = matches.filter(m => m.isFinished && !m.isExhibition).length;
+
+    // Create archive
+    const archive: SeasonArchive = {
+      id: uuidv4(),
+      leagueName,
+      slotIndex: slotIndex ? parseInt(slotIndex) : 0,
+      players: [...players],
+      matches: [...matches],
+      finalRankings,
+      championPlayerId: champion?.playerId,
+      seasonStart,
+      seasonEnd,
+      totalMatchDays,
+      totalMatches,
+    };
+
+    // Save to season history
+    const existingHistory = (await safeGetAsync('season-history', SeasonHistorySchema)) ?? [];
+    await safeSetAsync('season-history', [...existingHistory, archive]);
+
+    // Update career stats
+    await updatePlayerCareerStats(archive);
+
+    // Handle option
+    if (option === 'delete') {
+      handleDeleteLeague();
+      return;
+    }
+
+    if (option === 'archive-only') {
+      safeRemoveAsync('current-league');
+      if (slotIndex) safeRemoveAsync(`league-slot-${slotIndex}`);
+      safeRemoveAsync(PREVIOUS_RANKINGS_KEY);
+      safeRemoveAsync(FINISHED_DATES_KEY);
+      safeRemoveAsync('current-season-peaks');
+      showToast('시즌이 아카이브되었습니다.', 'success');
+      router.push('/');
+      return;
+    }
+
+    // archive-and-new: Reset matches, keep players, start fresh
+    const resetPlayers = players.map(p => ({ ...p, bonusPoints: 0 }));
+    setPlayers(resetPlayers);
+    setMatches([]);
+    setFinishedDates([]);
+    setPreviousRankings({});
+    await safeRemoveAsync(PREVIOUS_RANKINGS_KEY);
+    await safeRemoveAsync(FINISHED_DATES_KEY);
+    await safeRemoveAsync('current-season-peaks');
+
+    // Save the new clean state
+    const newData = {
+      name: leagueName,
+      players: resetPlayers,
+      matches: [],
+      savedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    };
+    await safeSetAsync('current-league', newData);
+    if (slotIndex) await safeSetAsync(`league-slot-${slotIndex}`, newData);
+
+    showToast('새 시즌이 시작되었습니다!', 'success');
+  }, [players, matches, leagueName, slotIndex, handleDeleteLeague, showToast, router, setPlayers, setMatches, setFinishedDates]);
+
   return {
     leagueName,
     players,
@@ -108,5 +188,6 @@ export function useLeagueData(): UseLeagueDataResult {
     isLoading,
     handleManualSave,
     handleDeleteLeague,
+    handleEndSeason,
   };
 }
