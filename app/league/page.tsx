@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Player } from '@/types';
 import { isGuestPlayer } from '@/utils/tennisLogic';
-import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Minus, Plus, Shuffle, Users, User, Edit3, Flag } from 'lucide-react';
+import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Minus, Plus, Shuffle, Users, User, Edit3, Flag, Clock } from 'lucide-react';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MatchCreatedDialog from '@/components/match/MatchCreatedDialog';
 import ManualMatchDialog from '@/components/match/ManualMatchDialog';
@@ -30,6 +30,8 @@ export default function LeaguePage() {
 
   const [matchDate, setMatchDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [isExhibition, setIsExhibition] = useState(false);
+  const [courtMinutes, setCourtMinutes] = useState(120);
+  const [gameMinutes, setGameMinutes] = useState(20);
   const [isMatchViewOpen, setIsMatchViewOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [deleteMatchId, setDeleteMatchId] = useState<string | null>(null);
@@ -65,6 +67,8 @@ export default function LeaguePage() {
     players, setPlayers, matches, setMatches,
     matchDate, finishedDates, setFinishedDates,
     isExhibition,
+    courtMinutes,
+    gameMinutes,
   });
 
   const handlePlayerClick = (playerId: string) => {
@@ -218,6 +222,61 @@ export default function LeaguePage() {
                       </button>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Court Time Settings */}
+              <div className="mb-4 p-3 bg-white rounded-lg border border-dashed border-slate-300">
+                <label className="block text-xs font-bold text-slate-500 mb-2 flex items-center gap-1">
+                  <Clock size={12} /> 코트 시간 설정
+                </label>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-xs text-slate-500 mb-1 block">대여 시간</span>
+                    <div className="flex gap-1.5">
+                      {[60, 90, 120, 150, 180].map(min => (
+                        <button
+                          key={min}
+                          onClick={() => setCourtMinutes(min)}
+                          className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                            courtMinutes === min
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {min >= 60 ? `${min / 60}시간` : `${min}분`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-xs text-slate-500 mb-1 block">게임당 시간</span>
+                    <div className="flex gap-1.5">
+                      {[15, 20, 25, 30].map(min => (
+                        <button
+                          key={min}
+                          onClick={() => setGameMinutes(min)}
+                          className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                            gameMinutes === min
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {min}분
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+                    <span className="text-xs text-slate-500">예상 가능 게임</span>
+                    <span className="text-sm font-bold text-blue-600">{Math.floor(courtMinutes / gameMinutes)}게임</span>
+                  </div>
+                  {selectedForMatch.length >= 4 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slate-500">1인당 적정</span>
+                      <span className="text-sm font-bold text-green-600">~{Math.round(Math.floor(courtMinutes / gameMinutes) * 4 / selectedForMatch.length)}게임</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

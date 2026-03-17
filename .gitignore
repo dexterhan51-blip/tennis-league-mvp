@@ -49,3 +49,4 @@ docs/
 
 # Granite config
 granite.config.mts
+.env*.local

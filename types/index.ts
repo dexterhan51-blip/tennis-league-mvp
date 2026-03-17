@@ -105,6 +105,12 @@ export interface SeasonRecord {
   seasonEnd: string;
 }
 
+export interface ScheduleConfig {
+  maxMatches: number;
+  players: Player[];
+  date: string;
+}
+
 export interface SharedLeague {
   id: string;
   name: string;

@@ -27,10 +27,10 @@ export default function QuickDatePicker({
     return d.toISOString().split('T')[0];
   }, []);
 
-  // Generate dates for the picker (past 30 days + today)
+  // Generate dates for the picker (past 30 days + today + future 7 days)
   const dates = useMemo(() => {
     const result: string[] = [];
-    for (let i = 30; i >= 0; i--) {
+    for (let i = 30; i >= -7; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       result.push(d.toISOString().split('T')[0]);
@@ -130,6 +130,7 @@ export default function QuickDatePicker({
           const isSelected = date === selectedDate;
           const hasMatch = matchDateSet.has(date);
           const isToday = date === today;
+          const isFuture = date > today;
 
           return (
             <button
@@ -142,6 +143,8 @@ export default function QuickDatePicker({
                   ? 'bg-blue-600 text-white shadow-md'
                   : hasMatch
                   ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : isFuture
+                  ? 'bg-purple-50 text-purple-600 border border-purple-200 hover:bg-purple-100'
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
                 }
               `}

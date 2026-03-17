@@ -39,6 +39,8 @@ interface UseMatchManagementArgs {
   finishedDates: string[];
   setFinishedDates: React.Dispatch<React.SetStateAction<string[]>>;
   isExhibition?: boolean;
+  courtMinutes?: number;
+  gameMinutes?: number;
 }
 
 export function useMatchManagement({
@@ -50,6 +52,8 @@ export function useMatchManagement({
   finishedDates,
   setFinishedDates,
   isExhibition = false,
+  courtMinutes = 120,
+  gameMinutes = 20,
 }: UseMatchManagementArgs) {
   const { showToast } = useToast();
   const { pushAction } = useUndoContext();
@@ -114,6 +118,8 @@ export function useMatchManagement({
     );
   }, []);
 
+  const maxMatches = Math.floor(courtMinutes / gameMinutes);
+
   const handleCreateMatch = useCallback((type: 'MIXED' | 'DOUBLES' | 'SINGLES' | 'MANUAL') => {
     if (!matchDate) {
       showToast('날짜를 선택해주세요.', 'warning');
@@ -124,7 +130,7 @@ export function useMatchManagement({
     try {
       let newMatches: Match[] = [];
       if (type === 'MIXED') {
-        const proposedMatches = stampExhibition(generateMixedDoublesSchedule(pool, matchDate));
+        const proposedMatches = stampExhibition(generateMixedDoublesSchedule(pool, matchDate, maxMatches));
         if (proposedMatches.length === 0) {
           showToast('매칭 가능한 조합이 없습니다.', 'error');
           return;
@@ -145,7 +151,6 @@ export function useMatchManagement({
         setSelectedForMatch([]);
         setCreatedMatches(newMatches);
         setCreatedMatchType(type);
-        // Reset guest counters after creation
         setMaleGuestCount(0);
         setFemaleGuestCount(0);
       }
@@ -154,7 +159,7 @@ export function useMatchManagement({
       showToast(e.message, 'error');
       return false;
     }
-  }, [matchDate, players, guestPlayers, selectedForMatch, showToast, setMatches, stampExhibition]);
+  }, [matchDate, players, guestPlayers, selectedForMatch, showToast, setMatches, stampExhibition, maxMatches]);
 
   const confirmMixedMatchCreation = useCallback(() => {
     if (!pendingMixedMatches) return;
@@ -172,11 +177,10 @@ export function useMatchManagement({
 
   const handleReshuffle = useCallback(() => {
     if (!matchDate) return;
-    // 원래 선택된 전체 선수 풀에서 다시 생성 (누락 선수 방지)
     const pool = [...guestPlayers, ...players].filter(p => selectedForMatch.includes(p.id));
 
     try {
-      const reshuffled = stampExhibition(generateMixedDoublesSchedule(pool, matchDate));
+      const reshuffled = stampExhibition(generateMixedDoublesSchedule(pool, matchDate, maxMatches));
       if (reshuffled.length === 0) {
         showToast('매칭 가능한 조합이 없습니다.', 'error');
         return;
@@ -186,7 +190,7 @@ export function useMatchManagement({
     } catch (e: any) {
       showToast(e.message, 'error');
     }
-  }, [matchDate, players, guestPlayers, selectedForMatch, showToast, stampExhibition]);
+  }, [matchDate, players, guestPlayers, selectedForMatch, showToast, stampExhibition, maxMatches]);
 
   const confirmManualMatch = useCallback((teamA: [Player, Player], teamB: [Player, Player]) => {
     if (!matchDate) return;
