@@ -54,3 +54,45 @@ ALTER PUBLICATION supabase_realtime ADD TABLE shared_leagues;
 
 -- 8. 인덱스
 CREATE INDEX idx_shared_leagues_active ON shared_leagues (is_active) WHERE is_active = true;
+
+-- ============================================
+-- 코트예약 도우미 - 실시간 공유 스키마
+-- ============================================
+
+-- 9. shared_bookings 테이블
+CREATE TABLE shared_bookings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pin_code TEXT NOT NULL,
+  bookings JSONB NOT NULL DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  is_active BOOLEAN DEFAULT true
+);
+
+-- 10. RLS 활성화
+ALTER TABLE shared_bookings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can view active bookings"
+  ON shared_bookings FOR SELECT
+  USING (is_active = true);
+
+CREATE POLICY "Anyone can create bookings"
+  ON shared_bookings FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Anyone can update bookings"
+  ON shared_bookings FOR UPDATE
+  USING (true);
+
+-- 11. updated_at 자동 갱신
+CREATE TRIGGER set_shared_bookings_updated_at
+  BEFORE UPDATE ON shared_bookings
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+-- 12. Realtime 활성화
+ALTER PUBLICATION supabase_realtime ADD TABLE shared_bookings;
+
+-- 13. 인덱스
+CREATE INDEX idx_shared_bookings_active ON shared_bookings (is_active) WHERE is_active = true;
+CREATE INDEX idx_shared_bookings_pin ON shared_bookings (pin_code) WHERE is_active = true;

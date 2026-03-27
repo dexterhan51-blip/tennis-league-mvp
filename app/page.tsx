@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Trophy, PlayCircle, FolderOpen, Users, Smartphone } from "lucide-react";
+import { Trophy, PlayCircle, FolderOpen, Users, Smartphone, CalendarDays } from "lucide-react";
 
 export default function Home() {
   return (
@@ -61,6 +61,19 @@ export default function Home() {
                     <Smartphone size={24} />
                 </div>
                 <div className="font-bold text-lg">스코어보드</div>
+            </div>
+        </Link>
+
+        {/* 버튼 5: [ 코트예약 도우미 ] */}
+        <Link href="/booking" className="block w-full">
+            <div className="bg-white hover:bg-slate-50 border-2 border-slate-200 text-slate-700 p-5 rounded-2xl transition-all active:scale-95 flex items-center gap-4">
+                <div className="bg-slate-100 p-2 rounded-lg text-slate-500">
+                    <CalendarDays size={24} />
+                </div>
+                <div className="text-left">
+                    <div className="font-bold text-lg">코트예약 도우미</div>
+                    <div className="text-slate-400 text-xs font-medium">팀원과 코트 예약 현황 공유</div>
+                </div>
             </div>
         </Link>
 
