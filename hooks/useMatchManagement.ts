@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { Player, Match } from '@/types';
 import {
   generateMixedDoublesSchedule, generateDoubles, generateSingles,
-  calculateDailyMvp, isGuestPlayer,
+  calculateDailyMvp, recalculateMvpBonuses, isGuestPlayer,
 } from '@/utils/tennisLogic';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/contexts/ToastContext';
@@ -315,6 +315,19 @@ export function useMatchManagement({
     showToast('MVP 보너스 점수가 반영되었습니다! 👑', 'success');
   }, [mvpResult, players, setPlayers, finishedDates, setFinishedDates, matchDate, showToast]);
 
+  const handleRecalculateMvp = useCallback(() => {
+    if (finishedDates.length === 0) {
+      showToast('완료된 게임 날짜가 없습니다.', 'warning');
+      return;
+    }
+
+    const { updatedPlayers, mvpLog } = recalculateMvpBonuses(players, matches, finishedDates);
+    setPlayers(updatedPlayers);
+
+    const totalMvps = mvpLog.filter(l => l.male || l.female).length;
+    showToast(`${finishedDates.length}일치 MVP 보너스를 재계산했습니다. (${totalMvps}일 MVP 반영)`, 'success');
+  }, [finishedDates, players, matches, setPlayers, showToast]);
+
   return {
     pendingScores,
     setPendingScores,
@@ -351,5 +364,6 @@ export function useMatchManagement({
     deleteMatch,
     handleFinishDailyGame,
     confirmMvpAward,
+    handleRecalculateMvp,
   };
 }

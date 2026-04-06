@@ -36,7 +36,7 @@ export function LiveMvp({ players, matches, date }: LiveMvpProps) {
             <p className="text-[10px] text-blue-400 font-medium mb-1">남자 MVP</p>
             <p className="text-sm font-black text-blue-700">{maleMvp.name}</p>
             <p className="text-xs text-blue-500 mt-0.5">
-              승률 {Math.round(maleMvp.winRate * 100)}%
+              승률 {Math.round(maleMvp.winRate * 100)}% · 득실 {maleMvp.scoreDiff > 0 ? '+' : ''}{maleMvp.scoreDiff}
             </p>
           </div>
         )}
@@ -45,7 +45,7 @@ export function LiveMvp({ players, matches, date }: LiveMvpProps) {
             <p className="text-[10px] text-pink-400 font-medium mb-1">여자 MVP</p>
             <p className="text-sm font-black text-pink-700">{femaleMvp.name}</p>
             <p className="text-xs text-pink-500 mt-0.5">
-              승률 {Math.round(femaleMvp.winRate * 100)}%
+              승률 {Math.round(femaleMvp.winRate * 100)}% · 득실 {femaleMvp.scoreDiff > 0 ? '+' : ''}{femaleMvp.scoreDiff}
             </p>
           </div>
         )}

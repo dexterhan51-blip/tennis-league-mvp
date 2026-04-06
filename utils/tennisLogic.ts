@@ -351,38 +351,88 @@ export const calculateRanking = (players: Player[], matches: Match[]): PlayerSta
 
 // --- 3. 오늘의 MVP 계산기 ---
 export const calculateDailyMvp = (players: Player[], matches: Match[], date: string) => {
-    const dailyStats = new Map<string, { wins: number, played: number, name: string, gender: string }>();
+    const dailyStats = new Map<string, { wins: number, played: number, scoreDiff: number, name: string, gender: string }>();
 
     const targetMatches = matches.filter(m => m.date === date && m.isFinished && !m.isExhibition);
 
     targetMatches.forEach(m => {
-        const processPlayer = (p: Player, isWin: boolean) => {
+        const diffA = m.scoreA - m.scoreB; // 팀A 기준 득실차 (양수면 승리, 음수면 패배)
+
+        const processPlayer = (p: Player, isWin: boolean, diff: number) => {
             if (isGuestPlayer(p.id)) return;
-            if (!dailyStats.has(p.id)) dailyStats.set(p.id, { wins: 0, played: 0, name: p.name, gender: p.gender });
+            if (!dailyStats.has(p.id)) dailyStats.set(p.id, { wins: 0, played: 0, scoreDiff: 0, name: p.name, gender: p.gender });
             const s = dailyStats.get(p.id)!;
             s.played++;
             if (isWin) s.wins++;
+            s.scoreDiff += diff;
         };
 
         const winA = m.scoreA > m.scoreB;
         const winB = m.scoreB > m.scoreA;
 
         const pA = m.teamA.man.id === m.teamA.woman.id ? [m.teamA.man] : [m.teamA.man, m.teamA.woman];
-        pA.forEach(p => processPlayer(p, winA));
+        pA.forEach(p => processPlayer(p, winA, diffA));
 
         const pB = m.teamB.man.id === m.teamB.woman.id ? [m.teamB.man] : [m.teamB.man, m.teamB.woman];
-        pB.forEach(p => processPlayer(p, winB));
+        pB.forEach(p => processPlayer(p, winB, -diffA));
     });
 
     const results = Array.from(dailyStats.entries()).map(([id, s]) => ({
         id, ...s, winRate: s.played > 0 ? s.wins / s.played : 0
     }));
 
-    const menResults = results.filter(r => r.gender === 'MALE').sort((a, b) => b.winRate - a.winRate || b.wins - a.wins);
-    const womenResults = results.filter(r => r.gender === 'FEMALE').sort((a, b) => b.winRate - a.winRate || b.wins - a.wins);
+    // 정렬: 1순위 승률 → 2순위 승수 → 3순위 득실차
+    const sortFn = (a: typeof results[0], b: typeof results[0]) =>
+        b.winRate - a.winRate || b.wins - a.wins || b.scoreDiff - a.scoreDiff;
+
+    const menResults = results.filter(r => r.gender === 'MALE').sort(sortFn);
+    const womenResults = results.filter(r => r.gender === 'FEMALE').sort(sortFn);
 
     return {
         maleMvp: menResults.length > 0 ? menResults[0] : null,
         femaleMvp: womenResults.length > 0 ? womenResults[0] : null
     };
+};
+
+// --- 4. MVP 보너스 점수 재계산 (소급 적용) ---
+// finishedDates의 모든 날짜에 대해 MVP를 다시 계산하여 bonusPoints를 재설정
+export const recalculateMvpBonuses = (
+    players: Player[],
+    matches: Match[],
+    finishedDates: string[]
+): { updatedPlayers: Player[]; mvpLog: { date: string; male: string | null; female: string | null }[] } => {
+    // 1. 모든 선수의 bonusPoints를 0으로 초기화
+    const bonusMap = new Map<string, number>();
+    players.forEach(p => bonusMap.set(p.id, 0));
+
+    // 2. 각 완료된 날짜에 대해 MVP 재계산
+    const mvpLog: { date: string; male: string | null; female: string | null }[] = [];
+
+    const sortedDates = [...finishedDates].sort();
+    sortedDates.forEach(date => {
+        const result = calculateDailyMvp(players, matches, date);
+
+        if (result.maleMvp) {
+            const current = bonusMap.get(result.maleMvp.id) || 0;
+            bonusMap.set(result.maleMvp.id, current + 2);
+        }
+        if (result.femaleMvp) {
+            const current = bonusMap.get(result.femaleMvp.id) || 0;
+            bonusMap.set(result.femaleMvp.id, current + 2);
+        }
+
+        mvpLog.push({
+            date,
+            male: result.maleMvp?.name || null,
+            female: result.femaleMvp?.name || null,
+        });
+    });
+
+    // 3. 선수 데이터에 반영
+    const updatedPlayers = players.map(p => ({
+        ...p,
+        bonusPoints: bonusMap.get(p.id) || 0,
+    }));
+
+    return { updatedPlayers, mvpLog };
 };

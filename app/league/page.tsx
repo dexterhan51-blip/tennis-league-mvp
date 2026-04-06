@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Player } from '@/types';
 import { isGuestPlayer } from '@/utils/tennisLogic';
-import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Minus, Plus, Shuffle, Users, User, Edit3, Flag, Clock } from 'lucide-react';
+import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Minus, Plus, Shuffle, Users, User, Edit3, Flag, Clock, RefreshCw } from 'lucide-react';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MatchCreatedDialog from '@/components/match/MatchCreatedDialog';
 import ManualMatchDialog from '@/components/match/ManualMatchDialog';
@@ -62,7 +62,7 @@ export default function LeaguePage() {
     showManualDialog, setShowManualDialog, confirmManualMatch,
     toggleMatchPlayer, handleCreateMatch, confirmMixedMatchCreation,
     updatePendingScore, commitScore, cancelFinished, deleteMatch,
-    handleFinishDailyGame, confirmMvpAward,
+    handleFinishDailyGame, confirmMvpAward, handleRecalculateMvp,
   } = useMatchManagement({
     players, setPlayers, matches, setMatches,
     matchDate, finishedDates, setFinishedDates,
@@ -139,9 +139,20 @@ export default function LeaguePage() {
 
         {/* Ranking Section */}
         <section>
-          <h2 className="text-sm font-bold text-slate-500 mb-3 flex items-center gap-2">
-            <Trophy size={16} /> 실시간 랭킹
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-slate-500 flex items-center gap-2">
+              <Trophy size={16} /> 실시간 랭킹
+            </h2>
+            {finishedDates.length > 0 && (
+              <button
+                onClick={handleRecalculateMvp}
+                className="text-xs text-slate-400 hover:text-blue-600 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors"
+                title="MVP 보너스 점수를 경기 기록 기반으로 재계산합니다"
+              >
+                <RefreshCw size={12} /> MVP 재계산
+              </button>
+            )}
+          </div>
           <div className="space-y-2">
             {rankingsWithChange.map((r) => (
               <RankingRow key={r.playerId} player={r} onClick={() => handlePlayerClick(r.playerId)} />
