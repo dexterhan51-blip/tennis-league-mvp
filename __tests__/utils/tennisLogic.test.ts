@@ -3,6 +3,8 @@ import {
   calculateRanking,
   calculateDailyMvp,
   generateMixedDoublesSchedule,
+  generateFromTemplate,
+  getTemplateKey,
   generateDoubles,
   generateSingles,
   isGuestPlayer,
@@ -160,6 +162,33 @@ describe('calculateRanking', () => {
     expect(result[0].playerId).toBe('m1');
   });
 
+  it('correctly distributes points for women-doubles match (stored as { man: w1, woman: w2 })', () => {
+    // 여자복식: team.man 슬롯에 여1, team.woman 슬롯에 여2 저장 (gender 필드는 둘 다 FEMALE)
+    const match = makeMatch({
+      teamA: { id: 'ta', man: w1, woman: w2 },
+      teamB: { id: 'tb', man: makePlayer('w3', 'W3', 'FEMALE'), woman: makePlayer('w4', 'W4', 'FEMALE') },
+      scoreA: 6,
+      scoreB: 3,
+      isFinished: true,
+    });
+    const w3 = makePlayer('w3', 'W3', 'FEMALE');
+    const w4 = makePlayer('w4', 'W4', 'FEMALE');
+
+    const result = calculateRanking([w1, w2, w3, w4], [match]);
+
+    // 승리 팀 (w1, w2): 출석 1 + 승점 1 = 2점
+    expect(result.find(r => r.playerId === 'w1')!.totalPoints).toBe(2);
+    expect(result.find(r => r.playerId === 'w1')!.wins).toBe(1);
+    expect(result.find(r => r.playerId === 'w2')!.totalPoints).toBe(2);
+    expect(result.find(r => r.playerId === 'w2')!.wins).toBe(1);
+
+    // 패배 팀 (w3, w4): 출석 1점만
+    expect(result.find(r => r.playerId === 'w3')!.totalPoints).toBe(1);
+    expect(result.find(r => r.playerId === 'w3')!.losses).toBe(1);
+    expect(result.find(r => r.playerId === 'w4')!.totalPoints).toBe(1);
+    expect(result.find(r => r.playerId === 'w4')!.losses).toBe(1);
+  });
+
   it('reflects bonusPoints in totalPoints', () => {
     const m1WithBonus = makePlayer('m1', 'M1', 'MALE', 5);
     const result = calculateRanking([m1WithBonus], []);
@@ -260,6 +289,27 @@ describe('calculateDailyMvp', () => {
     expect(result.femaleMvp).not.toBeNull();
     expect(result.maleMvp?.gender).toBe('MALE');
     expect(result.femaleMvp?.gender).toBe('FEMALE');
+  });
+
+  it('women-doubles match contributes only to female MVP pool', () => {
+    const w3 = makePlayer('w3', 'W3', 'FEMALE');
+    const w4 = makePlayer('w4', 'W4', 'FEMALE');
+    const match = makeMatch({
+      teamA: { id: 'ta', man: w1, woman: w2 },
+      teamB: { id: 'tb', man: w3, woman: w4 },
+      scoreA: 6,
+      scoreB: 3,
+      isFinished: true,
+      date: '2026-01-01',
+    });
+
+    const result = calculateDailyMvp([m1, m2, w1, w2, w3, w4], [match], '2026-01-01');
+    // 남자 MVP는 없어야 함 (남자가 참여하지 않은 경기)
+    expect(result.maleMvp).toBeNull();
+    // 여자 MVP는 승리 팀의 여자 중 한 명
+    expect(result.femaleMvp).not.toBeNull();
+    expect(['w1', 'w2']).toContain(result.femaleMvp!.id);
+    expect(result.femaleMvp!.gender).toBe('FEMALE');
   });
 
   it('excludes guest players from MVP', () => {
@@ -446,6 +496,196 @@ describe('generateMixedDoublesSchedule', () => {
       expect(m.teamA.man.id).not.toBe(m.teamB.man.id);
       // Women must be different across teams
       expect(m.teamA.woman.id).not.toBe(m.teamB.woman.id);
+    });
+  });
+});
+
+// --- getTemplateKey ---
+
+describe('getTemplateKey', () => {
+  it('returns the matching key for the 5 supported scenarios', () => {
+    expect(getTemplateKey(2, 3)).toBe('2-3');
+    expect(getTemplateKey(3, 2)).toBe('3-2');
+    expect(getTemplateKey(2, 4)).toBe('2-4');
+    expect(getTemplateKey(3, 3)).toBe('3-3');
+    expect(getTemplateKey(3, 4)).toBe('3-4');
+  });
+
+  it('returns null for unsupported combinations', () => {
+    expect(getTemplateKey(2, 2)).toBeNull();
+    expect(getTemplateKey(4, 4)).toBeNull();
+    expect(getTemplateKey(5, 3)).toBeNull();
+    expect(getTemplateKey(4, 3)).toBeNull();
+    expect(getTemplateKey(0, 0)).toBeNull();
+  });
+});
+
+// --- generateFromTemplate ---
+
+describe('generateFromTemplate', () => {
+  const buildMen = (n: number) =>
+    Array.from({ length: n }, (_, i) => makePlayer(`m${i + 1}`, `M${i + 1}`, 'MALE'));
+  const buildWomen = (n: number) =>
+    Array.from({ length: n }, (_, i) => makePlayer(`w${i + 1}`, `W${i + 1}`, 'FEMALE'));
+
+  // Helper: pair signature (gender-agnostic) for one team
+  const pair = (team: Match['teamA']) => `${team.man.id}+${team.woman.id}`;
+
+  it('generates exactly 6 sets for every supported template', () => {
+    (['2-3', '3-2', '2-4', '3-3', '3-4'] as const).forEach(key => {
+      const [m, w] = key.split('-').map(Number);
+      const matches = generateFromTemplate(key, buildMen(m), buildWomen(w), '2026-01-01');
+      expect(matches).toHaveLength(6);
+      matches.forEach(match => {
+        expect(match.date).toBe('2026-01-01');
+        expect(match.isFinished).toBe(false);
+        expect(match.scoreA).toBe(0);
+        expect(match.scoreB).toBe(0);
+      });
+    });
+  });
+
+  it('produces the exact 2-3 schedule (M1 always team A, M2 always team B)', () => {
+    const men = buildMen(2);
+    const women = buildWomen(3);
+    const matches = generateFromTemplate('2-3', men, women, '2026-01-01');
+    const expected: Array<[string, string]> = [
+      ['m1+w1', 'm2+w2'],
+      ['m1+w2', 'm2+w3'],
+      ['m1+w3', 'm2+w1'],
+      ['m1+w2', 'm2+w1'],
+      ['m1+w3', 'm2+w2'],
+      ['m1+w1', 'm2+w3'],
+    ];
+    matches.forEach((match, i) => {
+      expect(pair(match.teamA)).toBe(expected[i][0]);
+      expect(pair(match.teamB)).toBe(expected[i][1]);
+    });
+  });
+
+  it('produces the exact 3-2 schedule (W1 always team A, W2 always team B)', () => {
+    const men = buildMen(3);
+    const women = buildWomen(2);
+    const matches = generateFromTemplate('3-2', men, women, '2026-01-01');
+    // In 3-2 template, slots are (W, M) — man is stored in team.man, woman in team.woman
+    const expected: Array<[string, string, string, string]> = [
+      ['w1', 'm1', 'w2', 'm2'],
+      ['w1', 'm2', 'w2', 'm3'],
+      ['w1', 'm3', 'w2', 'm1'],
+      ['w1', 'm2', 'w2', 'm1'],
+      ['w1', 'm3', 'w2', 'm2'],
+      ['w1', 'm1', 'w2', 'm3'],
+    ];
+    matches.forEach((match, i) => {
+      const [aw, am, bw, bm] = expected[i];
+      expect(match.teamA.woman.id).toBe(aw);
+      expect(match.teamA.man.id).toBe(am);
+      expect(match.teamB.woman.id).toBe(bw);
+      expect(match.teamB.man.id).toBe(bm);
+    });
+  });
+
+  it('2-4 template includes women doubles in sets 1 and 6', () => {
+    const men = buildMen(2);
+    const women = buildWomen(4);
+    const matches = generateFromTemplate('2-4', men, women, '2026-01-01');
+
+    // Set 1: 여1+여2 vs 여3+여4
+    expect(matches[0].teamA.man.id).toBe('w1');
+    expect(matches[0].teamA.woman.id).toBe('w2');
+    expect(matches[0].teamB.man.id).toBe('w3');
+    expect(matches[0].teamB.woman.id).toBe('w4');
+    // 모두 여자
+    expect(matches[0].teamA.man.gender).toBe('FEMALE');
+    expect(matches[0].teamA.woman.gender).toBe('FEMALE');
+
+    // Set 6: 여1+여3 vs 여2+여4
+    expect(matches[5].teamA.man.id).toBe('w1');
+    expect(matches[5].teamA.woman.id).toBe('w3');
+    expect(matches[5].teamB.man.id).toBe('w2');
+    expect(matches[5].teamB.woman.id).toBe('w4');
+
+    // 중간 4세트는 혼복
+    [1, 2, 3, 4].forEach(idx => {
+      expect(matches[idx].teamA.man.gender).toBe('MALE');
+      expect(matches[idx].teamA.woman.gender).toBe('FEMALE');
+      expect(matches[idx].teamB.man.gender).toBe('MALE');
+      expect(matches[idx].teamB.woman.gender).toBe('FEMALE');
+    });
+  });
+
+  it('respects the order of input players (selection order → slot)', () => {
+    // M1 슬롯에 두 번째 선수, M2 슬롯에 첫 번째 선수 배정
+    const customMen = [
+      makePlayer('alpha', 'Alpha', 'MALE'),
+      makePlayer('beta', 'Beta', 'MALE'),
+    ];
+    const customWomen = [
+      makePlayer('x', 'X', 'FEMALE'),
+      makePlayer('y', 'Y', 'FEMALE'),
+      makePlayer('z', 'Z', 'FEMALE'),
+    ];
+    const matches = generateFromTemplate('2-3', customMen, customWomen, '2026-01-01');
+    // 1세트: M1+W1 vs M2+W2 → alpha+x vs beta+y
+    expect(matches[0].teamA.man.id).toBe('alpha');
+    expect(matches[0].teamA.woman.id).toBe('x');
+    expect(matches[0].teamB.man.id).toBe('beta');
+    expect(matches[0].teamB.woman.id).toBe('y');
+  });
+
+  it('throws when player counts do not match the template', () => {
+    expect(() =>
+      generateFromTemplate('2-3', buildMen(1), buildWomen(3), '2026-01-01'),
+    ).toThrow();
+    expect(() =>
+      generateFromTemplate('3-4', buildMen(3), buildWomen(2), '2026-01-01'),
+    ).toThrow();
+  });
+
+  it('3-3 template covers all 9 unique pairings', () => {
+    const men = buildMen(3);
+    const women = buildWomen(3);
+    const matches = generateFromTemplate('3-3', men, women, '2026-01-01');
+
+    const allPairings = new Set<string>();
+    men.forEach(m => women.forEach(w => allPairings.add(`${m.id}:${w.id}`)));
+
+    const used = new Set<string>();
+    matches.forEach(m => {
+      used.add(`${m.teamA.man.id}:${m.teamA.woman.id}`);
+      used.add(`${m.teamB.man.id}:${m.teamB.woman.id}`);
+    });
+    allPairings.forEach(p => expect(used.has(p)).toBe(true));
+  });
+
+  it('3-4 template covers all 12 unique pairings', () => {
+    const men = buildMen(3);
+    const women = buildWomen(4);
+    const matches = generateFromTemplate('3-4', men, women, '2026-01-01');
+
+    const allPairings = new Set<string>();
+    men.forEach(m => women.forEach(w => allPairings.add(`${m.id}:${w.id}`)));
+    expect(allPairings.size).toBe(12);
+
+    const used = new Set<string>();
+    matches.forEach(m => {
+      used.add(`${m.teamA.man.id}:${m.teamA.woman.id}`);
+      used.add(`${m.teamB.man.id}:${m.teamB.woman.id}`);
+    });
+    allPairings.forEach(p => expect(used.has(p)).toBe(true));
+  });
+
+  it('all 5 templates are deterministic (same input → same output pairings)', () => {
+    (['2-3', '3-2', '2-4', '3-3', '3-4'] as const).forEach(key => {
+      const [m, w] = key.split('-').map(Number);
+      const men = buildMen(m);
+      const women = buildWomen(w);
+      const r1 = generateFromTemplate(key, men, women, '2026-01-01');
+      const r2 = generateFromTemplate(key, men, women, '2026-01-01');
+      r1.forEach((match, i) => {
+        expect(pair(match.teamA)).toBe(pair(r2[i].teamA));
+        expect(pair(match.teamB)).toBe(pair(r2[i].teamB));
+      });
     });
   });
 });
