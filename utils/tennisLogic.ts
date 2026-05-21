@@ -9,6 +9,109 @@ export function isGuestPlayer(id: string): boolean {
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+// --- 0. 고정 템플릿 기반 대진 ---
+
+export type SlotKey = 'M1' | 'M2' | 'M3' | 'W1' | 'W2' | 'W3' | 'W4';
+type TemplateSet = { a: [SlotKey, SlotKey]; b: [SlotKey, SlotKey] };
+export type TemplateKey = '2-3' | '3-2' | '2-4' | '3-3' | '3-4';
+
+export const TEMPLATES: Record<TemplateKey, TemplateSet[]> = {
+  '2-3': [
+    { a: ['M1', 'W1'], b: ['M2', 'W2'] },
+    { a: ['M1', 'W2'], b: ['M2', 'W3'] },
+    { a: ['M1', 'W3'], b: ['M2', 'W1'] },
+    { a: ['M1', 'W2'], b: ['M2', 'W1'] },
+    { a: ['M1', 'W3'], b: ['M2', 'W2'] },
+    { a: ['M1', 'W1'], b: ['M2', 'W3'] },
+  ],
+  '3-2': [
+    { a: ['W1', 'M1'], b: ['W2', 'M2'] },
+    { a: ['W1', 'M2'], b: ['W2', 'M3'] },
+    { a: ['W1', 'M3'], b: ['W2', 'M1'] },
+    { a: ['W1', 'M2'], b: ['W2', 'M1'] },
+    { a: ['W1', 'M3'], b: ['W2', 'M2'] },
+    { a: ['W1', 'M1'], b: ['W2', 'M3'] },
+  ],
+  '2-4': [
+    { a: ['W1', 'W2'], b: ['W3', 'W4'] },
+    { a: ['M1', 'W3'], b: ['M2', 'W2'] },
+    { a: ['M1', 'W1'], b: ['M2', 'W4'] },
+    { a: ['M1', 'W4'], b: ['M2', 'W3'] },
+    { a: ['M1', 'W2'], b: ['M2', 'W1'] },
+    { a: ['W1', 'W3'], b: ['W2', 'W4'] },
+  ],
+  '3-3': [
+    { a: ['M1', 'W1'], b: ['M2', 'W2'] },
+    { a: ['M3', 'W3'], b: ['M1', 'W2'] },
+    { a: ['M2', 'W1'], b: ['M3', 'W3'] },
+    { a: ['M1', 'W2'], b: ['M2', 'W1'] },
+    { a: ['M1', 'W3'], b: ['M3', 'W2'] },
+    { a: ['M3', 'W1'], b: ['M2', 'W3'] },
+  ],
+  '3-4': [
+    { a: ['M2', 'W1'], b: ['M1', 'W3'] },
+    { a: ['M1', 'W4'], b: ['M3', 'W2'] },
+    { a: ['M3', 'W1'], b: ['M2', 'W2'] },
+    { a: ['M1', 'W1'], b: ['M2', 'W4'] },
+    { a: ['M1', 'W2'], b: ['M3', 'W3'] },
+    { a: ['M2', 'W3'], b: ['M3', 'W4'] },
+  ],
+};
+
+export function getTemplateKey(menCount: number, womenCount: number): TemplateKey | null {
+  const key = `${menCount}-${womenCount}` as TemplateKey;
+  return key in TEMPLATES ? key : null;
+}
+
+function resolveSlot(slot: SlotKey, men: Player[], women: Player[]): Player {
+  const idx = parseInt(slot.slice(1), 10) - 1;
+  const pool = slot.startsWith('M') ? men : women;
+  const player = pool[idx];
+  if (!player) throw new Error(`슬롯 ${slot}에 배정된 선수가 없습니다.`);
+  return player;
+}
+
+function buildTeam(
+  s1: SlotKey,
+  s2: SlotKey,
+  men: Player[],
+  women: Player[],
+): { man: Player; woman: Player } {
+  const p1 = resolveSlot(s1, men, women);
+  const p2 = resolveSlot(s2, men, women);
+  const p1Male = s1.startsWith('M');
+  const p2Male = s2.startsWith('M');
+  // 혼복: 남자를 man 슬롯, 여자를 woman 슬롯에 저장
+  if (p1Male && !p2Male) return { man: p1, woman: p2 };
+  if (!p1Male && p2Male) return { man: p2, woman: p1 };
+  // 동성 페어(여복/남복): 슬롯 순서 그대로 저장
+  return { man: p1, woman: p2 };
+}
+
+export function generateFromTemplate(
+  templateKey: TemplateKey,
+  men: Player[],
+  women: Player[],
+  date: string,
+): Match[] {
+  const template = TEMPLATES[templateKey];
+  if (!template) throw new Error(`지원하지 않는 템플릿: ${templateKey}`);
+
+  return template.map((set) => {
+    const teamA = buildTeam(set.a[0], set.a[1], men, women);
+    const teamB = buildTeam(set.b[0], set.b[1], men, women);
+    return {
+      id: generateId(),
+      date,
+      teamA: { id: generateId(), man: teamA.man, woman: teamA.woman },
+      teamB: { id: generateId(), man: teamB.man, woman: teamB.woman },
+      scoreA: 0,
+      scoreB: 0,
+      isFinished: false,
+    };
+  });
+}
+
 // --- 1. 스마트 스케줄링 알고리즘 ---
 
 /**

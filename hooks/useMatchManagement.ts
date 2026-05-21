@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { Player, Match } from '@/types';
 import {
   generateMixedDoublesSchedule, generateDoubles, generateSingles,
+  generateFromTemplate, getTemplateKey, TemplateKey,
   calculateDailyMvp, recalculateMvpBonuses, isGuestPlayer,
 } from '@/utils/tennisLogic';
 import { v4 as uuidv4 } from 'uuid';
@@ -75,6 +76,14 @@ export function useMatchManagement({
   // Manual match dialog state
   const [showManualDialog, setShowManualDialog] = useState(false);
 
+  // Slot assignment (고정 템플릿) state
+  const [slotAssignment, setSlotAssignment] = useState<{
+    templateKey: TemplateKey;
+    men: Player[];
+    women: Player[];
+  } | null>(null);
+  const [activeTemplateKey, setActiveTemplateKey] = useState<TemplateKey | null>(null);
+
   // Stamp exhibition flag on matches
   const stampExhibition = useCallback((matchList: Match[]): Match[] => {
     if (!isExhibition) return matchList;
@@ -130,11 +139,23 @@ export function useMatchManagement({
     try {
       let newMatches: Match[] = [];
       if (type === 'MIXED') {
+        const men = pool.filter(p => p.gender === 'MALE');
+        const women = pool.filter(p => p.gender === 'FEMALE');
+        const templateKey = getTemplateKey(men.length, women.length);
+
+        // 5가지 고정 시나리오에 해당하면 슬롯 배정 다이얼로그 오픈
+        if (templateKey) {
+          setSlotAssignment({ templateKey, men, women });
+          return;
+        }
+
+        // 그 외에는 기존 랜덤 로직
         const proposedMatches = stampExhibition(generateMixedDoublesSchedule(pool, matchDate, maxMatches));
         if (proposedMatches.length === 0) {
           showToast('매칭 가능한 조합이 없습니다.', 'error');
           return;
         }
+        setActiveTemplateKey(null);
         setPendingMixedMatches(proposedMatches);
         setCreatedMatches(proposedMatches);
         setCreatedMatchType('MIXED');
@@ -169,6 +190,7 @@ export function useMatchManagement({
     setPendingMixedMatches(null);
     setCreatedMatches(null);
     setCreatedMatchType(null);
+    setActiveTemplateKey(null);
     // Reset guest counters after creation
     setMaleGuestCount(0);
     setFemaleGuestCount(0);
@@ -178,6 +200,22 @@ export function useMatchManagement({
   const handleReshuffle = useCallback(() => {
     if (!matchDate) return;
     const pool = [...guestPlayers, ...players].filter(p => selectedForMatch.includes(p.id));
+
+    // 고정 템플릿 결과인 경우: 슬롯 배정 다이얼로그를 다시 열어 재배정
+    if (activeTemplateKey) {
+      const men = pool.filter(p => p.gender === 'MALE');
+      const women = pool.filter(p => p.gender === 'FEMALE');
+      const templateKey = getTemplateKey(men.length, women.length);
+      if (!templateKey) {
+        showToast('선수 구성이 변경되어 재배정할 수 없습니다.', 'error');
+        return;
+      }
+      setPendingMixedMatches(null);
+      setCreatedMatches(null);
+      setCreatedMatchType(null);
+      setSlotAssignment({ templateKey, men, women });
+      return;
+    }
 
     try {
       const reshuffled = stampExhibition(generateMixedDoublesSchedule(pool, matchDate, maxMatches));
@@ -190,7 +228,32 @@ export function useMatchManagement({
     } catch (e: any) {
       showToast(e.message, 'error');
     }
-  }, [matchDate, players, guestPlayers, selectedForMatch, showToast, stampExhibition, maxMatches]);
+  }, [matchDate, players, guestPlayers, selectedForMatch, showToast, stampExhibition, maxMatches, activeTemplateKey]);
+
+  const confirmSlotAssignment = useCallback((orderedMen: Player[], orderedWomen: Player[]) => {
+    if (!slotAssignment) return;
+    if (!matchDate) {
+      showToast('날짜를 선택해주세요.', 'warning');
+      return;
+    }
+
+    try {
+      const proposedMatches = stampExhibition(
+        generateFromTemplate(slotAssignment.templateKey, orderedMen, orderedWomen, matchDate),
+      );
+      setActiveTemplateKey(slotAssignment.templateKey);
+      setPendingMixedMatches(proposedMatches);
+      setCreatedMatches(proposedMatches);
+      setCreatedMatchType('MIXED');
+      setSlotAssignment(null);
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : '대진 생성 실패', 'error');
+    }
+  }, [slotAssignment, matchDate, showToast, stampExhibition]);
+
+  const cancelSlotAssignment = useCallback(() => {
+    setSlotAssignment(null);
+  }, []);
 
   const confirmManualMatch = useCallback((teamA: [Player, Player], teamB: [Player, Player]) => {
     if (!matchDate) return;
@@ -215,6 +278,7 @@ export function useMatchManagement({
   const closeCreatedDialog = useCallback(() => {
     setCreatedMatches(null);
     setCreatedMatchType(null);
+    setActiveTemplateKey(null);
   }, []);
 
   const updatePendingScore = useCallback((matchId: string, team: 'A' | 'B', score: number) => {
@@ -354,6 +418,10 @@ export function useMatchManagement({
     showManualDialog,
     setShowManualDialog,
     confirmManualMatch,
+    // Slot assignment (고정 템플릿)
+    slotAssignment,
+    confirmSlotAssignment,
+    cancelSlotAssignment,
     // Actions
     toggleMatchPlayer,
     handleCreateMatch,

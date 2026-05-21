@@ -7,6 +7,7 @@ import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, M
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MatchCreatedDialog from '@/components/match/MatchCreatedDialog';
 import ManualMatchDialog from '@/components/match/ManualMatchDialog';
+import SlotAssignmentDialog from '@/components/match/SlotAssignmentDialog';
 import SwipeableItem from '@/components/ui/SwipeableItem';
 import ScoreInput from '@/components/ui/ScoreInput';
 import QuickDatePicker from '@/components/navigation/QuickDatePicker';
@@ -60,6 +61,7 @@ export default function LeaguePage() {
     guestPlayers,
     createdMatches, createdMatchType, closeCreatedDialog, handleReshuffle,
     showManualDialog, setShowManualDialog, confirmManualMatch,
+    slotAssignment, confirmSlotAssignment, cancelSlotAssignment,
     toggleMatchPlayer, handleCreateMatch, confirmMixedMatchCreation,
     updatePendingScore, commitScore, cancelFinished, deleteMatch,
     handleFinishDailyGame, confirmMvpAward, handleRecalculateMvp,
@@ -538,6 +540,20 @@ export default function LeaguePage() {
         }}
         onCancel={() => setShowEndSeasonDialog(false)}
       />
+
+      {/* Slot Assignment (고정 템플릿) Dialog */}
+      {slotAssignment && (
+        <SlotAssignmentDialog
+          templateKey={slotAssignment.templateKey}
+          men={slotAssignment.men}
+          women={slotAssignment.women}
+          onConfirm={(orderedMen, orderedWomen) => {
+            confirmSlotAssignment(orderedMen, orderedWomen);
+            setIsMatchViewOpen(false);
+          }}
+          onClose={cancelSlotAssignment}
+        />
+      )}
 
       {/* Match Created / Mixed Pending Dialog */}
       <MatchCreatedDialog
