@@ -2,11 +2,12 @@
 
 import { Match } from '@/types';
 import { X, Shuffle } from 'lucide-react';
+import type { MatchCreationType } from '@/hooks/useMatchManagement';
 
 interface MatchCreatedDialogProps {
   isOpen: boolean;
   matches: Match[];
-  matchType: 'MIXED' | 'DOUBLES' | 'SINGLES' | 'MANUAL' | null;
+  matchType: MatchCreationType | null;
   isPending: boolean;
   onConfirm: () => void;
   onReshuffle?: () => void;
@@ -15,6 +16,7 @@ interface MatchCreatedDialogProps {
 
 const MATCH_TYPE_LABEL: Record<string, string> = {
   MIXED: '혼복 풀리그',
+  MIXED_SINGLES: '단식 포함',
   DOUBLES: '복식',
   SINGLES: '단식',
   MANUAL: '수동',

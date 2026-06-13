@@ -2,23 +2,23 @@
 
 import { useState } from 'react';
 import { Player } from '@/types';
-import { isGuestPlayer } from '@/utils/tennisLogic';
-import { Trophy, Trash2, PlusCircle, XCircle, Calendar, Table, Save, X, Crown, Medal, Minus, Plus, Shuffle, Users, User, Edit3, Flag, Clock, RefreshCw } from 'lucide-react';
+import { Table, Save, Medal, Flag } from 'lucide-react';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MatchCreatedDialog from '@/components/match/MatchCreatedDialog';
 import ManualMatchDialog from '@/components/match/ManualMatchDialog';
 import SlotAssignmentDialog from '@/components/match/SlotAssignmentDialog';
-import SwipeableItem from '@/components/ui/SwipeableItem';
-import ScoreInput from '@/components/ui/ScoreInput';
-import QuickDatePicker from '@/components/navigation/QuickDatePicker';
-import RankingRow from '@/components/ranking/RankingRow';
 import PlayerStatsModal from '@/components/ranking/PlayerStatsModal';
 import ShareButton from '@/components/share/ShareButton';
 import { LiveShareControl } from '@/components/live/LiveShareControl';
 import EndSeasonDialog from '@/components/season/EndSeasonDialog';
+import RankingSection from '@/components/league/RankingSection';
+import MatchRegistrationPanel from '@/components/league/MatchRegistrationPanel';
+import MatchList from '@/components/league/MatchList';
+import MatchHistoryModal from '@/components/league/MatchHistoryModal';
+import MvpAwardDialog from '@/components/league/MvpAwardDialog';
 import { useLeagueData } from '@/hooks/useLeagueData';
 import { useLeagueRankings } from '@/hooks/useLeagueRankings';
-import { useMatchManagement } from '@/hooks/useMatchManagement';
+import { useMatchManagement, type MatchCreationType } from '@/hooks/useMatchManagement';
 import { useLeagueSync } from '@/hooks/useLeagueSync';
 import { usePlayerCareerStats } from '@/hooks/usePlayerCareerStats';
 
@@ -26,7 +26,7 @@ export default function LeaguePage() {
   const {
     leagueName, players, setPlayers, matches, setMatches,
     slotIndex, previousRankings, finishedDates, setFinishedDates,
-    isLoading, handleManualSave, handleDeleteLeague, handleEndSeason,
+    isLoading, handleManualSave, handleEndSeason,
   } = useLeagueData();
 
   const [matchDate, setMatchDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -36,7 +36,6 @@ export default function LeaguePage() {
   const [isMatchViewOpen, setIsMatchViewOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [deleteMatchId, setDeleteMatchId] = useState<string | null>(null);
-  const [showDeleteLeagueDialog, setShowDeleteLeagueDialog] = useState(false);
   const [showEndSeasonDialog, setShowEndSeasonDialog] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
@@ -54,7 +53,7 @@ export default function LeaguePage() {
   } = useLeagueSync({ leagueName, players, matches });
 
   const {
-    pendingScores, setPendingScores,
+    pendingScores,
     selectedForMatch, pendingMixedMatches, setPendingMixedMatches,
     mvpResult, showMvpDialog, setShowMvpDialog, setMvpResult,
     maleGuestCount, femaleGuestCount, setMaleGuestCount, setFemaleGuestCount,
@@ -81,7 +80,7 @@ export default function LeaguePage() {
     }
   };
 
-  const onCreateMatch = (type: 'MIXED' | 'DOUBLES' | 'SINGLES' | 'MANUAL') => {
+  const onCreateMatch = (type: MatchCreationType) => {
     const result = handleCreateMatch(type);
     if (result === true) setIsMatchViewOpen(false);
   };
@@ -139,306 +138,48 @@ export default function LeaguePage() {
           </h1>
         </div>
 
-        {/* Ranking Section */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-slate-500 flex items-center gap-2">
-              <Trophy size={16} /> 실시간 랭킹
-            </h2>
-            {finishedDates.length > 0 && (
-              <button
-                onClick={handleRecalculateMvp}
-                className="text-xs text-slate-400 hover:text-blue-600 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors"
-                title="MVP 보너스 점수를 경기 기록 기반으로 재계산합니다"
-              >
-                <RefreshCw size={12} /> MVP 재계산
-              </button>
-            )}
-          </div>
-          <div className="space-y-2">
-            {rankingsWithChange.map((r) => (
-              <RankingRow key={r.playerId} player={r} onClick={() => handlePlayerClick(r.playerId)} />
-            ))}
-            {rankingsWithChange.length === 0 && (
-              <div className="text-center py-8 text-slate-400">
-                <Trophy size={32} className="mx-auto mb-2 opacity-30" />
-                <p className="text-sm mb-3">아직 랭킹 데이터가 없습니다.</p>
-                <button onClick={() => setIsMatchViewOpen(true)} className="text-sm text-blue-600 font-bold hover:underline cursor-pointer">
-                  + 게임 등록하기
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
+        <RankingSection
+          rankings={rankingsWithChange}
+          players={players}
+          showRecalculate={finishedDates.length > 0}
+          onRecalculateMvp={handleRecalculateMvp}
+          onPlayerClick={handlePlayerClick}
+          onOpenRegistration={() => setIsMatchViewOpen(true)}
+        />
 
-        {/* Game Registration Section */}
-        <section>
-          <button
-            onClick={() => setIsMatchViewOpen(!isMatchViewOpen)}
-            className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-md touch-target ${isMatchViewOpen ? 'bg-slate-100 text-slate-600' : 'bg-blue-600 text-white'}`}
-            aria-expanded={isMatchViewOpen}
-          >
-            {isMatchViewOpen ? <XCircle size={20}/> : <PlusCircle size={20}/>}
-            {isMatchViewOpen ? '닫기' : '게임 등록'}
-          </button>
+        <MatchRegistrationPanel
+          isOpen={isMatchViewOpen}
+          onToggle={() => setIsMatchViewOpen(!isMatchViewOpen)}
+          matchDate={matchDate}
+          onChangeDate={setMatchDate}
+          matchDates={matchDates}
+          maleGuestCount={maleGuestCount}
+          femaleGuestCount={femaleGuestCount}
+          setMaleGuestCount={setMaleGuestCount}
+          setFemaleGuestCount={setFemaleGuestCount}
+          courtMinutes={courtMinutes}
+          setCourtMinutes={setCourtMinutes}
+          gameMinutes={gameMinutes}
+          setGameMinutes={setGameMinutes}
+          isExhibition={isExhibition}
+          onToggleExhibition={() => setIsExhibition(!isExhibition)}
+          players={players}
+          guestPlayers={guestPlayers}
+          selectedForMatch={selectedForMatch}
+          onTogglePlayer={toggleMatchPlayer}
+          onCreateMatch={onCreateMatch}
+        />
 
-          {isMatchViewOpen && (
-            <div className={`mt-4 p-4 rounded-xl border-2 animate-scale-in ${isExhibition ? 'bg-amber-50/50 border-amber-200' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="mb-4">
-                <label className="block text-xs font-bold text-slate-500 mb-2">경기 날짜</label>
-                <QuickDatePicker selectedDate={matchDate} onChange={setMatchDate} matchDates={matchDates} />
-              </div>
-
-              {/* Guest Counter */}
-              <div className="mb-4 p-3 bg-white rounded-lg border border-dashed border-slate-300">
-                <label className="block text-xs font-bold text-slate-500 mb-2">게스트</label>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-slate-700">남자</span>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => setMaleGuestCount(maleGuestCount - 1)}
-                        disabled={maleGuestCount <= 0}
-                        className="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors touch-target"
-                        aria-label="남자 게스트 감소"
-                      >
-                        <Minus size={14} />
-                      </button>
-                      <span className="w-6 text-center font-bold text-slate-800">{maleGuestCount}</span>
-                      <button
-                        onClick={() => setMaleGuestCount(maleGuestCount + 1)}
-                        className="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors touch-target"
-                        aria-label="남자 게스트 증가"
-                      >
-                        <Plus size={14} />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-slate-700">여자</span>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => setFemaleGuestCount(femaleGuestCount - 1)}
-                        disabled={femaleGuestCount <= 0}
-                        className="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors touch-target"
-                        aria-label="여자 게스트 감소"
-                      >
-                        <Minus size={14} />
-                      </button>
-                      <span className="w-6 text-center font-bold text-slate-800">{femaleGuestCount}</span>
-                      <button
-                        onClick={() => setFemaleGuestCount(femaleGuestCount + 1)}
-                        className="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors touch-target"
-                        aria-label="여자 게스트 증가"
-                      >
-                        <Plus size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Court Time Settings */}
-              <div className="mb-4 p-3 bg-white rounded-lg border border-dashed border-slate-300">
-                <label className="block text-xs font-bold text-slate-500 mb-2 flex items-center gap-1">
-                  <Clock size={12} /> 코트 시간 설정
-                </label>
-                <div className="space-y-3">
-                  <div>
-                    <span className="text-xs text-slate-500 mb-1 block">대여 시간</span>
-                    <div className="flex gap-1.5">
-                      {[60, 90, 120, 150, 180].map(min => (
-                        <button
-                          key={min}
-                          onClick={() => setCourtMinutes(min)}
-                          className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                            courtMinutes === min
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                          }`}
-                        >
-                          {min >= 60 ? `${min / 60}시간` : `${min}분`}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-500 mb-1 block">게임당 시간</span>
-                    <div className="flex gap-1.5">
-                      {[15, 20, 25, 30].map(min => (
-                        <button
-                          key={min}
-                          onClick={() => setGameMinutes(min)}
-                          className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                            gameMinutes === min
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                          }`}
-                        >
-                          {min}분
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-                    <span className="text-xs text-slate-500">예상 가능 게임</span>
-                    <span className="text-sm font-bold text-blue-600">{Math.floor(courtMinutes / gameMinutes)}게임</span>
-                  </div>
-                  {selectedForMatch.length >= 4 && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-slate-500">1인당 적정</span>
-                      <span className="text-sm font-bold text-green-600">~{Math.round(Math.floor(courtMinutes / gameMinutes) * 4 / selectedForMatch.length)}게임</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Exhibition Toggle */}
-              <div className="mb-4">
-                <button
-                  onClick={() => setIsExhibition(!isExhibition)}
-                  className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
-                    isExhibition
-                      ? 'bg-amber-50 border-amber-400 text-amber-700'
-                      : 'bg-white border-slate-200 text-slate-500'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Flag size={16} />
-                    <span className="font-bold text-sm">시범경기 모드</span>
-                  </div>
-                  <div className={`w-10 h-6 rounded-full transition-colors relative ${isExhibition ? 'bg-amber-400' : 'bg-slate-300'}`}>
-                    <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${isExhibition ? 'translate-x-4.5' : 'translate-x-0.5'}`} />
-                  </div>
-                </button>
-                {isExhibition && (
-                  <p className="text-xs text-amber-600 mt-1 ml-1">랭킹에 반영되지 않습니다</p>
-                )}
-              </div>
-
-              {/* Player Selection */}
-              <div className="mb-6">
-                <label className="block text-xs font-bold text-slate-500 mb-2">참가 선수 선택</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[...guestPlayers, ...players].map(p => {
-                    const isGuest = isGuestPlayer(p.id);
-                    const isSelected = selectedForMatch.includes(p.id);
-                    return (
-                      <button
-                        key={p.id}
-                        onClick={() => toggleMatchPlayer(p.id)}
-                        disabled={isGuest}
-                        className={`p-3 rounded-lg border text-center text-xs font-bold transition-all touch-target ${
-                          isSelected
-                            ? isGuest
-                              ? 'bg-blue-50 border-blue-400 border-dashed text-blue-600 cursor-default'
-                              : 'bg-blue-100 border-blue-500 text-blue-700'
-                            : 'bg-white border-slate-200 hover:bg-slate-50'
-                        }`}
-                        aria-pressed={isSelected}
-                      >
-                        {p.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <button onClick={() => onCreateMatch('MIXED')} className="w-full bg-blue-50 border-2 border-blue-200 text-blue-700 py-3 rounded-xl font-bold touch-target cursor-pointer active:scale-[0.98] transition-transform">
-                  <Shuffle size={16} className="inline -mt-0.5" /> 혼복 풀리그
-                </button>
-                <div className="grid grid-cols-2 gap-2">
-                  <button onClick={() => onCreateMatch('DOUBLES')} className="bg-white border text-slate-600 py-3 rounded-xl font-bold text-sm touch-target cursor-pointer active:scale-[0.98] transition-transform">
-                    <Users size={14} className="inline -mt-0.5" /> 복식
-                  </button>
-                  <button onClick={() => onCreateMatch('SINGLES')} className="bg-white border text-slate-600 py-3 rounded-xl font-bold text-sm touch-target cursor-pointer active:scale-[0.98] transition-transform">
-                    <User size={14} className="inline -mt-0.5" /> 단식
-                  </button>
-                </div>
-                <button onClick={() => onCreateMatch('MANUAL')} className="w-full bg-slate-200 text-slate-600 py-3 rounded-xl font-bold text-sm touch-target cursor-pointer active:scale-[0.98] transition-transform">
-                  <Edit3 size={14} className="inline -mt-0.5" /> 수동
-                </button>
-              </div>
-            </div>
-          )}
-        </section>
-
-        {/* Match List Section */}
-        <section className="space-y-3">
-          {displayedMatches.length === 0 && (
-            <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-              <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm mb-3">{matchDate} 진행된 게임이 없습니다.</p>
-              <button onClick={() => setIsMatchViewOpen(true)} className="text-sm text-blue-600 font-bold hover:underline cursor-pointer">
-                + 게임 등록하기
-              </button>
-            </div>
-          )}
-
-          {displayedMatches.map((m, idx) => {
-            const pending = pendingScores[m.id];
-            const displayScoreA = pending ? pending.scoreA : m.scoreA;
-            const displayScoreB = pending ? pending.scoreB : m.scoreB;
-            const hasPendingScore = !!pending;
-
-            return (
-              <SwipeableItem key={m.id} onDelete={() => setDeleteMatchId(m.id)}>
-                <div className={`p-4 rounded-xl border shadow-sm transition-colors ${m.isFinished ? 'bg-green-50/50 border-green-200' : 'bg-white border-slate-200'}`}>
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-blue-600">GAME {idx + 1}</span>
-                      {m.isExhibition && <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-xs font-bold">시범</span>}
-                    </div>
-                    {m.isFinished && <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">경기종료</span>}
-                  </div>
-
-                  <div className="mb-3">
-                    <div className="text-sm font-bold text-slate-700 mb-2">
-                      {m.teamA.man.name}
-                      {m.teamA.man.id !== m.teamA.woman.id && <span className="text-slate-400"> & {m.teamA.woman.name}</span>}
-                    </div>
-                    <ScoreInput value={displayScoreA} onChange={(score) => updatePendingScore(m.id, 'A', score)} disabled={m.isFinished} />
-                  </div>
-
-                  <div className="flex items-center gap-2 my-2">
-                    <div className="flex-1 border-t border-slate-200" />
-                    <span className="text-xs font-bold text-slate-400">VS</span>
-                    <div className="flex-1 border-t border-slate-200" />
-                  </div>
-
-                  <div className="mb-3">
-                    <div className="text-sm font-bold text-slate-700 mb-2">
-                      {m.teamB.man.name}
-                      {m.teamB.man.id !== m.teamB.woman.id && <span className="text-slate-400"> & {m.teamB.woman.name}</span>}
-                    </div>
-                    <ScoreInput value={displayScoreB} onChange={(score) => updatePendingScore(m.id, 'B', score)} disabled={m.isFinished} />
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-200">
-                    {m.isFinished ? (
-                      <button onClick={() => cancelFinished(m.id)} className="w-full py-2.5 rounded-lg font-bold text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors touch-target">
-                        수정하기
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          if (!hasPendingScore) {
-                            setPendingScores(p => ({ ...p, [m.id]: { scoreA: displayScoreA, scoreB: displayScoreB } }));
-                          }
-                          commitScore(m.id);
-                        }}
-                        disabled={!hasPendingScore}
-                        className={`w-full py-2.5 rounded-lg font-bold text-sm transition-colors touch-target ${hasPendingScore ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
-                      >
-                        완료
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </SwipeableItem>
-            );
-          })}
-        </section>
+        <MatchList
+          matches={displayedMatches}
+          matchDate={matchDate}
+          pendingScores={pendingScores}
+          onUpdateScore={updatePendingScore}
+          onCommitScore={commitScore}
+          onCancelFinished={cancelFinished}
+          onRequestDelete={setDeleteMatchId}
+          onOpenRegistration={() => setIsMatchViewOpen(true)}
+        />
 
         {/* Daily MVP Button + Share Button */}
         {displayedMatches.length > 0 && (
@@ -470,51 +211,11 @@ export default function LeaguePage() {
         </div>
       </div>
 
-      {/* History Modal */}
-      {isHistoryOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl animate-scale-in">
-            <div className="p-4 border-b flex justify-between items-center bg-slate-50 rounded-t-xl">
-              <h3 className="font-bold text-lg flex items-center gap-2">경기 히스토리 (전체)</h3>
-              <button onClick={() => setIsHistoryOpen(false)} className="p-2 hover:bg-slate-200 rounded-full touch-target" aria-label="닫기">
-                <X size={24}/>
-              </button>
-            </div>
-            <div className="overflow-auto p-4 flex-1 space-y-3">
-              {matches.slice(0).reverse().map((m) => {
-                const winner = m.scoreA > m.scoreB ? 'A' : (m.scoreB > m.scoreA ? 'B' : null);
-                return (
-                  <div key={m.id} className="bg-slate-50 rounded-xl p-3 border border-slate-200">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-slate-500 font-medium">{m.date}</span>
-                        {m.isExhibition && <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-bold">시범</span>}
-                      </div>
-                      {m.isFinished && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-bold">완료</span>}
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className={`flex-1 text-right ${winner === 'A' ? 'font-bold text-slate-900' : 'text-slate-600'}`}>
-                        <div className="text-sm">{m.teamA.man.name}</div>
-                        {m.teamA.man.id !== m.teamA.woman.id && <div className="text-xs text-slate-400">{m.teamA.woman.name}</div>}
-                      </div>
-                      <div className="flex-shrink-0 text-center">
-                        <span className={`text-lg font-black ${winner === 'A' ? 'text-blue-600' : 'text-slate-800'}`}>{m.scoreA}</span>
-                        <span className="text-slate-400 mx-1">:</span>
-                        <span className={`text-lg font-black ${winner === 'B' ? 'text-blue-600' : 'text-slate-800'}`}>{m.scoreB}</span>
-                      </div>
-                      <div className={`flex-1 text-left ${winner === 'B' ? 'font-bold text-slate-900' : 'text-slate-600'}`}>
-                        <div className="text-sm">{m.teamB.man.name}</div>
-                        {m.teamB.man.id !== m.teamB.woman.id && <div className="text-xs text-slate-400">{m.teamB.woman.name}</div>}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-              {matches.length === 0 && <div className="text-center py-8 text-slate-400">경기 기록이 없습니다.</div>}
-            </div>
-          </div>
-        </div>
-      )}
+      <MatchHistoryModal
+        isOpen={isHistoryOpen}
+        matches={matches}
+        onClose={() => setIsHistoryOpen(false)}
+      />
 
       {/* Delete Match Confirm Dialog */}
       <ConfirmDialog
@@ -571,59 +272,14 @@ export default function LeaguePage() {
         }}
       />
 
-      {/* MVP Award Dialog */}
-      {showMvpDialog && mvpResult && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl animate-scale-in overflow-hidden">
-            <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 text-center">
-              <Crown className="w-12 h-12 mx-auto text-white mb-2" />
-              <h3 className="text-xl font-bold text-white">{matchDate} 게임 종료</h3>
-            </div>
-            <div className="p-6 space-y-4">
-              {mvpResult.maleMvp && (
-                <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <Crown size={20} className="text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-xs text-blue-600 font-medium">남자 MVP</div>
-                    <div className="font-bold text-slate-900">{mvpResult.maleMvp.name}</div>
-                    <div className="text-xs text-slate-500">승률 {(mvpResult.maleMvp.winRate * 100).toFixed(0)}%</div>
-                  </div>
-                  <span className="text-lg font-bold text-blue-600">+2점</span>
-                </div>
-              )}
-              {mvpResult.femaleMvp && (
-                <div className="flex items-center gap-4 p-4 bg-pink-50 rounded-xl">
-                  <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
-                    <Crown size={20} className="text-pink-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-xs text-pink-600 font-medium">여자 MVP</div>
-                    <div className="font-bold text-slate-900">{mvpResult.femaleMvp.name}</div>
-                    <div className="text-xs text-slate-500">승률 {(mvpResult.femaleMvp.winRate * 100).toFixed(0)}%</div>
-                  </div>
-                  <span className="text-lg font-bold text-pink-600">+2점</span>
-                </div>
-              )}
-            </div>
-            <div className="flex gap-3 p-4 border-t border-slate-200">
-              <button
-                onClick={() => { setShowMvpDialog(false); setMvpResult(null); }}
-                className="flex-1 py-3 px-4 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors touch-target"
-              >
-                취소
-              </button>
-              <button
-                onClick={confirmMvpAward}
-                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors touch-target"
-              >
-                보너스 부여
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <MvpAwardDialog
+        isOpen={showMvpDialog && !!mvpResult}
+        matchDate={matchDate}
+        maleMvp={mvpResult?.maleMvp ?? null}
+        femaleMvp={mvpResult?.femaleMvp ?? null}
+        onConfirm={confirmMvpAward}
+        onCancel={() => { setShowMvpDialog(false); setMvpResult(null); }}
+      />
 
       {/* Manual Match Dialog */}
       <ManualMatchDialog

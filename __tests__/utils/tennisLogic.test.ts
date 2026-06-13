@@ -5,6 +5,9 @@ import {
   generateMixedDoublesSchedule,
   generateFromTemplate,
   getTemplateKey,
+  getSinglesTemplateKey,
+  getTemplateCounts,
+  isSinglesTemplate,
   generateDoubles,
   generateSingles,
   isGuestPlayer,
@@ -762,5 +765,141 @@ describe('isGuestPlayer', () => {
     expect(isGuestPlayer('abc123')).toBe(false);
     expect(isGuestPlayer('player-1')).toBe(false);
     expect(isGuestPlayer('')).toBe(false);
+  });
+});
+
+// --- 단식 포함 템플릿 (S2-3, S3-2) ---
+
+describe('generateFromTemplate (singles-included)', () => {
+  const buildMen = (n: number) =>
+    Array.from({ length: n }, (_, i) => makePlayer(`m${i + 1}`, `M${i + 1}`, 'MALE'));
+  const buildWomen = (n: number) =>
+    Array.from({ length: n }, (_, i) => makePlayer(`w${i + 1}`, `W${i + 1}`, 'FEMALE'));
+
+  const isSinglesMatch = (m: Match) =>
+    m.teamA.man.id === m.teamA.woman.id && m.teamB.man.id === m.teamB.woman.id;
+
+  it('getSinglesTemplateKey maps only 2/3 and 3/2 compositions', () => {
+    expect(getSinglesTemplateKey(2, 3)).toBe('S2-3');
+    expect(getSinglesTemplateKey(3, 2)).toBe('S3-2');
+    expect(getSinglesTemplateKey(2, 2)).toBeNull();
+    expect(getSinglesTemplateKey(3, 3)).toBeNull();
+    expect(getSinglesTemplateKey(2, 4)).toBeNull();
+  });
+
+  it('getTemplateCounts parses singles-included keys', () => {
+    expect(getTemplateCounts('S2-3')).toEqual({ men: 2, women: 3 });
+    expect(getTemplateCounts('S3-2')).toEqual({ men: 3, women: 2 });
+    expect(getTemplateCounts('3-4')).toEqual({ men: 3, women: 4 });
+  });
+
+  it('isSinglesTemplate distinguishes singles-included templates', () => {
+    expect(isSinglesTemplate('S2-3')).toBe(true);
+    expect(isSinglesTemplate('S3-2')).toBe(true);
+    expect(isSinglesTemplate('2-3')).toBe(false);
+  });
+
+  it('S2-3 produces the exact 7-set schedule (singles 1,3,5,7 / doubles 2,4,6)', () => {
+    const matches = generateFromTemplate('S2-3', buildMen(2), buildWomen(3), '2026-01-01');
+    expect(matches).toHaveLength(7);
+
+    // 1세트(단식) 여1 vs 여2
+    expect(isSinglesMatch(matches[0])).toBe(true);
+    expect(matches[0].teamA.man.id).toBe('w1');
+    expect(matches[0].teamB.man.id).toBe('w2');
+    // 2세트(복식) 남1+여2 vs 남2+여3
+    expect(matches[1].teamA.man.id).toBe('m1');
+    expect(matches[1].teamA.woman.id).toBe('w2');
+    expect(matches[1].teamB.man.id).toBe('m2');
+    expect(matches[1].teamB.woman.id).toBe('w3');
+    // 3세트(단식) 여1 vs 여3
+    expect(isSinglesMatch(matches[2])).toBe(true);
+    expect(matches[2].teamA.man.id).toBe('w1');
+    expect(matches[2].teamB.man.id).toBe('w3');
+    // 4세트(복식) 남1+여1 vs 남2+여2
+    expect(matches[3].teamA.man.id).toBe('m1');
+    expect(matches[3].teamA.woman.id).toBe('w1');
+    expect(matches[3].teamB.man.id).toBe('m2');
+    expect(matches[3].teamB.woman.id).toBe('w2');
+    // 5세트(단식) 여2 vs 여3
+    expect(isSinglesMatch(matches[4])).toBe(true);
+    expect(matches[4].teamA.man.id).toBe('w2');
+    expect(matches[4].teamB.man.id).toBe('w3');
+    // 6세트(복식) 남1+여3 vs 남2+여1
+    expect(matches[5].teamA.man.id).toBe('m1');
+    expect(matches[5].teamA.woman.id).toBe('w3');
+    expect(matches[5].teamB.man.id).toBe('m2');
+    expect(matches[5].teamB.woman.id).toBe('w1');
+    // 7세트(단식) 남1 vs 남2
+    expect(isSinglesMatch(matches[6])).toBe(true);
+    expect(matches[6].teamA.man.id).toBe('m1');
+    expect(matches[6].teamB.man.id).toBe('m2');
+  });
+
+  it('S3-2 produces the exact 7-set schedule (singles 1,3,5,7 / doubles 2,4,6)', () => {
+    const matches = generateFromTemplate('S3-2', buildMen(3), buildWomen(2), '2026-01-01');
+    expect(matches).toHaveLength(7);
+
+    // 1세트(단식) 남1 vs 남2
+    expect(isSinglesMatch(matches[0])).toBe(true);
+    expect(matches[0].teamA.man.id).toBe('m1');
+    expect(matches[0].teamB.man.id).toBe('m2');
+    // 2세트(복식) 남2+여1 vs 남3+여2
+    expect(matches[1].teamA.man.id).toBe('m2');
+    expect(matches[1].teamA.woman.id).toBe('w1');
+    expect(matches[1].teamB.man.id).toBe('m3');
+    expect(matches[1].teamB.woman.id).toBe('w2');
+    // 3세트(단식) 남1 vs 남3
+    expect(isSinglesMatch(matches[2])).toBe(true);
+    expect(matches[2].teamA.man.id).toBe('m1');
+    expect(matches[2].teamB.man.id).toBe('m3');
+    // 4세트(복식) 남1+여1 vs 남2+여2
+    expect(matches[3].teamA.man.id).toBe('m1');
+    expect(matches[3].teamA.woman.id).toBe('w1');
+    expect(matches[3].teamB.man.id).toBe('m2');
+    expect(matches[3].teamB.woman.id).toBe('w2');
+    // 5세트(단식) 남2 vs 남3
+    expect(isSinglesMatch(matches[4])).toBe(true);
+    expect(matches[4].teamA.man.id).toBe('m2');
+    expect(matches[4].teamB.man.id).toBe('m3');
+    // 6세트(복식) 남3+여1 vs 남1+여2
+    expect(matches[5].teamA.man.id).toBe('m3');
+    expect(matches[5].teamA.woman.id).toBe('w1');
+    expect(matches[5].teamB.man.id).toBe('m1');
+    expect(matches[5].teamB.woman.id).toBe('w2');
+    // 7세트(단식) 여1 vs 여2
+    expect(isSinglesMatch(matches[6])).toBe(true);
+    expect(matches[6].teamA.man.id).toBe('w1');
+    expect(matches[6].teamB.man.id).toBe('w2');
+  });
+
+  it('every player plays the same number of sets in singles-included templates', () => {
+    (['S2-3', 'S3-2'] as const).forEach(key => {
+      const { men: m, women: w } = getTemplateCounts(key);
+      const matches = generateFromTemplate(key, buildMen(m), buildWomen(w), '2026-01-01');
+      const playCount = new Map<string, number>();
+      matches.forEach(match => {
+        const ids = new Set([
+          match.teamA.man.id, match.teamA.woman.id,
+          match.teamB.man.id, match.teamB.woman.id,
+        ]);
+        ids.forEach(id => playCount.set(id, (playCount.get(id) || 0) + 1));
+      });
+      // 남2/여3(또는 남3/여2) 모두 인당 정확히 4.4세트는 아니지만 출전 수 편차 확인
+      const counts = [...playCount.values()];
+      expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
+    });
+  });
+
+  it('singles-included templates are deterministic and throw on wrong counts', () => {
+    const r1 = generateFromTemplate('S2-3', buildMen(2), buildWomen(3), '2026-01-01');
+    const r2 = generateFromTemplate('S2-3', buildMen(2), buildWomen(3), '2026-01-01');
+    r1.forEach((match, i) => {
+      expect(`${match.teamA.man.id}+${match.teamA.woman.id}`).toBe(`${r2[i].teamA.man.id}+${r2[i].teamA.woman.id}`);
+      expect(`${match.teamB.man.id}+${match.teamB.woman.id}`).toBe(`${r2[i].teamB.man.id}+${r2[i].teamB.woman.id}`);
+    });
+
+    expect(() => generateFromTemplate('S2-3', buildMen(1), buildWomen(3), '2026-01-01')).toThrow();
+    expect(() => generateFromTemplate('S3-2', buildMen(3), buildWomen(1), '2026-01-01')).toThrow();
   });
 });

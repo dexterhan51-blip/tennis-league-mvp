@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Player, Match, SeasonArchive, PlayerStat } from '@/types';
 import { useToast } from '@/contexts/ToastContext';
+import { useUndo } from '@/contexts/UndoContext';
 import { safeGetAsync, safeSetAsync, safeRemoveAsync } from '@/lib/storage';
 import { safeGetString, safeSetString, safeRemove } from '@/lib/storage';
 import { LeagueDataSchema, PreviousRankingsSchema, FinishedDatesSchema, SeasonHistorySchema } from '@/lib/schemas';
@@ -32,6 +33,7 @@ interface UseLeagueDataResult {
 export function useLeagueData(): UseLeagueDataResult {
   const router = useRouter();
   const { showToast } = useToast();
+  const { clearHistory } = useUndo();
 
   const [leagueName, setLeagueName] = useState('');
   const [players, setPlayers] = useState<Player[]>([]);
@@ -96,11 +98,14 @@ export function useLeagueData(): UseLeagueDataResult {
   const handleDeleteLeague = useCallback(() => {
     safeRemoveAsync('current-league');
     if (slotIndex) safeRemoveAsync(`league-slot-${slotIndex}`);
+    clearHistory(); // 삭제된 데이터를 가리키는 undo 항목 제거
     showToast('리그가 삭제되었습니다.', 'success');
     router.push('/');
-  }, [slotIndex, showToast, router]);
+  }, [slotIndex, clearHistory, showToast, router]);
 
   const handleEndSeason = useCallback(async (option: EndSeasonOption) => {
+    clearHistory(); // 지난 시즌 데이터를 복원하는 undo 방지
+
     // Calculate final rankings
     const finalRankings = calculateRanking(players, matches);
     const champion = finalRankings.length > 0 ? finalRankings[0] : null;
@@ -173,7 +178,7 @@ export function useLeagueData(): UseLeagueDataResult {
     if (slotIndex) await safeSetAsync(`league-slot-${slotIndex}`, newData);
 
     showToast('새 시즌이 시작되었습니다!', 'success');
-  }, [players, matches, leagueName, slotIndex, handleDeleteLeague, showToast, router, setPlayers, setMatches, setFinishedDates]);
+  }, [players, matches, leagueName, slotIndex, handleDeleteLeague, clearHistory, showToast, router, setPlayers, setMatches, setFinishedDates]);
 
   return {
     leagueName,

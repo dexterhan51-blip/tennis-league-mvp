@@ -6,10 +6,11 @@ import type { PlayerWithRank } from '@/types';
 
 interface RankingRowProps {
   player: PlayerWithRank;
+  photo?: string;
   onClick?: () => void;
 }
 
-export default function RankingRow({ player, onClick }: RankingRowProps) {
+export default function RankingRow({ player, photo, onClick }: RankingRowProps) {
   const { currentRank, previousRank, rankChange, name, wins, draws, losses, totalPoints, gender, dailyBonus, peakRank } = player;
 
   const getRankChangeDisplay = () => {
@@ -54,6 +55,23 @@ export default function RankingRow({ player, onClick }: RankingRowProps) {
         )}
         {previousRank !== undefined && getRankChangeDisplay()}
       </div>
+
+      {/* Avatar */}
+      {photo ? (
+        <img
+          src={photo}
+          alt={name}
+          className="w-9 h-9 rounded-full object-cover border-2 border-slate-200 flex-shrink-0"
+        />
+      ) : (
+        <div
+          className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+            gender === 'MALE' ? 'bg-blue-50' : 'bg-pink-50'
+          }`}
+        >
+          <span className="text-base">{gender === 'MALE' ? '👨' : '👩'}</span>
+        </div>
+      )}
 
       {/* Player Info */}
       <div className="flex-1 min-w-0">
