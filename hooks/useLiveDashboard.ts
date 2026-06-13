@@ -57,10 +57,10 @@ export function useLiveDashboard(leagueId: string): LiveDashboardData {
 
     async function init() {
       try {
-        // 1. 초기 데이터 로드
+        // 1. 초기 데이터 로드 — pin_code는 가져오지 않는다 (열람자에게 PIN 노출 방지)
         const { data, error: fetchError } = await supabase!
           .from('shared_leagues')
-          .select('*')
+          .select('id, name, players, matches, season_end, created_at, updated_at, is_active')
           .eq('id', leagueId)
           .eq('is_active', true)
           .single();

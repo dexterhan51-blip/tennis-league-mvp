@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { X, Trophy, Target, TrendingUp, Flame, Star, Crown } from 'lucide-react';
+import { X, Trophy, Target, TrendingUp, Flame, Star, Crown, Swords, Sparkles, Skull, Zap } from 'lucide-react';
 import type { Player, Match, PlayerStat, PlayerCareerStats, PlayerWithRank } from '@/types';
-import { GUEST_M_ID, GUEST_F_ID } from '@/utils/tennisLogic';
+import { GUEST_M_ID, GUEST_F_ID, isGuestPlayer } from '@/utils/tennisLogic';
+import { getPlayerCharacter } from '@/lib/playerCharacters';
 import SeasonHistorySection from '@/components/season/SeasonHistorySection';
 
 interface PlayerStatsModalProps {
@@ -68,6 +69,40 @@ export default function PlayerStatsModal({
     return streak;
   }, [recentMatches]);
 
+  // 상대 전적: 상대팀으로 만난 선수별 승/무/패
+  const headToHead = useMemo(() => {
+    if (!player) return [];
+
+    const records = new Map<string, { name: string; wins: number; draws: number; losses: number }>();
+
+    matches.forEach((m) => {
+      if (!m.isFinished || m.isExhibition) return;
+      const teamPlayers = (team: Match['teamA']) =>
+        team.man.id === team.woman.id ? [team.man] : [team.man, team.woman];
+
+      const inA = teamPlayers(m.teamA).some(p => p.id === player.id);
+      const inB = teamPlayers(m.teamB).some(p => p.id === player.id);
+      if (!inA && !inB) return;
+
+      const opponents = teamPlayers(inA ? m.teamB : m.teamA).filter(p => !isGuestPlayer(p.id));
+      const myScore = inA ? m.scoreA : m.scoreB;
+      const oppScore = inA ? m.scoreB : m.scoreA;
+
+      opponents.forEach(opp => {
+        const rec = records.get(opp.id) || { name: opp.name, wins: 0, draws: 0, losses: 0 };
+        if (myScore > oppScore) rec.wins++;
+        else if (myScore < oppScore) rec.losses++;
+        else rec.draws++;
+        records.set(opp.id, rec);
+      });
+    });
+
+    return Array.from(records.values())
+      .sort((a, b) => (b.wins + b.draws + b.losses) - (a.wins + a.draws + a.losses));
+  }, [player, matches]);
+
+  const character = getPlayerCharacter(player?.name);
+
   if (!isOpen || !player) return null;
 
   return (
@@ -116,6 +151,47 @@ export default function PlayerStatsModal({
             </div>
           </div>
         </div>
+
+        {/* Character Section (시즌 데이터 기반 별명/플레이스타일/천적) */}
+        {character && (
+          <div className="px-6 pb-4">
+            <div className="rounded-2xl overflow-hidden border border-slate-200">
+              <div className="bg-gradient-to-r from-slate-900 to-slate-700 px-4 py-4 text-white">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-lime-300 uppercase mb-1">
+                  <Sparkles className="w-3.5 h-3.5" /> 캐릭터
+                </div>
+                <div className="text-xl font-black leading-tight">{character.nickname}</div>
+                {character.proPlayer && (
+                  <div className="text-sm font-bold text-lime-300 mt-0.5">“{character.proPlayer}”</div>
+                )}
+                <div className="text-xs text-slate-300 mt-1.5">{character.tagline}</div>
+              </div>
+              <div className="bg-white p-4 space-y-3">
+                <div className="flex gap-2.5">
+                  <Zap className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <div className="text-xs font-bold text-blue-600 mb-0.5">플레이스타일</div>
+                    <p className="text-sm text-slate-700 leading-relaxed">{character.style}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2.5">
+                  <Skull className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <div className="text-xs font-bold text-red-500 mb-0.5">천적 / 약점</div>
+                    <p className="text-sm text-slate-700 leading-relaxed">{character.nemesis}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2.5">
+                  <Flame className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <div className="text-xs font-bold text-orange-500 mb-0.5">강점 / 케미</div>
+                    <p className="text-sm text-slate-700 leading-relaxed">{character.edge}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Career Section */}
         {(careerStats || currentRank) && (
@@ -257,6 +333,35 @@ export default function PlayerStatsModal({
             </p>
           )}
         </div>
+
+        {/* Head-to-Head */}
+        {headToHead.length > 0 && (
+          <div className="px-6 pb-6">
+            <h3 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5">
+              <Swords className="w-4 h-4 text-slate-500" /> 상대 전적
+            </h3>
+            <div className="space-y-1.5">
+              {headToHead.map((r) => {
+                const total = r.wins + r.draws + r.losses;
+                const dominant = r.wins > r.losses;
+                return (
+                  <div
+                    key={r.name}
+                    className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg"
+                  >
+                    <span className="text-sm font-medium text-slate-800 truncate">vs {r.name}</span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className={`text-sm font-bold ${dominant ? 'text-blue-600' : r.wins < r.losses ? 'text-red-500' : 'text-slate-600'}`}>
+                        {r.wins}승{r.draws > 0 ? ` ${r.draws}무` : ''} {r.losses}패
+                      </span>
+                      <span className="text-xs text-slate-400">({total}경기)</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Season History */}
         {careerStats && careerStats.seasonHistory.length > 0 && (

@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { X, RotateCcw } from 'lucide-react';
 import type { Player } from '@/types';
-import type { TemplateKey } from '@/utils/tennisLogic';
+import { getTemplateCounts, isSinglesTemplate, type TemplateKey } from '@/utils/tennisLogic';
 
 interface SlotAssignmentDialogProps {
   templateKey: TemplateKey;
@@ -20,10 +20,7 @@ export default function SlotAssignmentDialog({
   onConfirm,
   onClose,
 }: SlotAssignmentDialogProps) {
-  const [menCount, womenCount] = (() => {
-    const [m, w] = templateKey.split('-').map(Number);
-    return [m, w] as const;
-  })();
+  const { men: menCount, women: womenCount } = getTemplateCounts(templateKey);
 
   const [maleSlots, setMaleSlots] = useState<(Player | null)[]>(() => Array(menCount).fill(null));
   const [femaleSlots, setFemaleSlots] = useState<(Player | null)[]>(() => Array(womenCount).fill(null));
@@ -171,7 +168,7 @@ export default function SlotAssignmentDialog({
               자리 배정
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              남{menCount} / 여{womenCount} · 가위바위보로 자리를 정하세요
+              남{menCount} / 여{womenCount}{isSinglesTemplate(templateKey) ? ' · 단식 포함' : ''} · 가위바위보로 자리를 정하세요
             </p>
           </div>
           <div className="flex items-center gap-2">

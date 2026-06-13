@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Player, Match, SharedLeague } from '@/types';
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabase';
+import { useToast } from '@/contexts/ToastContext';
 
 interface UseLeagueSyncArgs {
   leagueName: string;
@@ -35,6 +36,8 @@ export function useLeagueSync({
   const [pinCode, setPinCode] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSyncFailedRef = useRef(false);
+  const { showToast } = useToast();
   const isConfigured = isSupabaseConfigured();
 
   // 저장된 공유 상태 복원
@@ -71,7 +74,8 @@ export function useLeagueSync({
 
     setIsSyncing(true);
     try {
-      await supabase
+      // .select()로 실제 갱신된 행을 확인 — PIN 불일치 시 0행 갱신은 에러가 아니므로 직접 검증해야 함
+      const { data, error } = await supabase
         .from('shared_leagues')
         .update({
           name: leagueName,
@@ -81,13 +85,28 @@ export function useLeagueSync({
           updated_at: new Date().toISOString(),
         })
         .eq('id', leagueId)
-        .eq('pin_code', pin);
+        .eq('pin_code', pin)
+        .select('id');
+
+      if (error || !data || data.length === 0) {
+        console.warn('[sync] Failed to sync:', error);
+        if (!lastSyncFailedRef.current) {
+          showToast('실시간 공유 동기화에 실패했습니다. 네트워크 또는 PIN을 확인해주세요.', 'error');
+        }
+        lastSyncFailedRef.current = true;
+      } else {
+        lastSyncFailedRef.current = false;
+      }
     } catch (e) {
       console.warn('[sync] Failed to sync:', e);
+      if (!lastSyncFailedRef.current) {
+        showToast('실시간 공유 동기화에 실패했습니다. 변경사항이 친구들에게 보이지 않을 수 있어요.', 'error');
+      }
+      lastSyncFailedRef.current = true;
     } finally {
       setIsSyncing(false);
     }
-  }, [leagueName, players, matches, seasonEnd]);
+  }, [leagueName, players, matches, seasonEnd, showToast]);
 
   const publish = useCallback(async (pin: string): Promise<{ success: boolean; error?: string }> => {
     const supabase = getSupabase();

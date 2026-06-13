@@ -12,8 +12,9 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 // --- 0. 고정 템플릿 기반 대진 ---
 
 export type SlotKey = 'M1' | 'M2' | 'M3' | 'W1' | 'W2' | 'W3' | 'W4';
+// 단식 세트는 같은 슬롯을 두 번 적는다 (a: ['W1','W1']) → man === woman 인 기존 단식 표현으로 변환됨
 type TemplateSet = { a: [SlotKey, SlotKey]; b: [SlotKey, SlotKey] };
-export type TemplateKey = '2-3' | '3-2' | '2-4' | '3-3' | '3-4';
+export type TemplateKey = '2-3' | '3-2' | '2-4' | '3-3' | '3-4' | 'S2-3' | 'S3-2';
 
 export const TEMPLATES: Record<TemplateKey, TemplateSet[]> = {
   '2-3': [
@@ -56,11 +57,45 @@ export const TEMPLATES: Record<TemplateKey, TemplateSet[]> = {
     { a: ['M1', 'W2'], b: ['M3', 'W3'] },
     { a: ['M2', 'W3'], b: ['M3', 'W4'] },
   ],
+  // 단식 포함 남2/여3: 단식 4세트 + 복식 3세트
+  'S2-3': [
+    { a: ['W1', 'W1'], b: ['W2', 'W2'] }, // 1세트(단식) 여1 vs 여2
+    { a: ['M1', 'W2'], b: ['M2', 'W3'] }, // 2세트(복식) 남1+여2 vs 남2+여3
+    { a: ['W1', 'W1'], b: ['W3', 'W3'] }, // 3세트(단식) 여1 vs 여3
+    { a: ['M1', 'W1'], b: ['M2', 'W2'] }, // 4세트(복식) 남1+여1 vs 남2+여2
+    { a: ['W2', 'W2'], b: ['W3', 'W3'] }, // 5세트(단식) 여2 vs 여3
+    { a: ['M1', 'W3'], b: ['M2', 'W1'] }, // 6세트(복식) 남1+여3 vs 남2+여1
+    { a: ['M1', 'M1'], b: ['M2', 'M2'] }, // 7세트(단식) 남1 vs 남2
+  ],
+  // 단식 포함 남3/여2: 단식 4세트 + 복식 3세트
+  'S3-2': [
+    { a: ['M1', 'M1'], b: ['M2', 'M2'] }, // 1세트(단식) 남1 vs 남2
+    { a: ['M2', 'W1'], b: ['M3', 'W2'] }, // 2세트(복식) 남2+여1 vs 남3+여2
+    { a: ['M1', 'M1'], b: ['M3', 'M3'] }, // 3세트(단식) 남1 vs 남3
+    { a: ['M1', 'W1'], b: ['M2', 'W2'] }, // 4세트(복식) 남1+여1 vs 남2+여2
+    { a: ['M2', 'M2'], b: ['M3', 'M3'] }, // 5세트(단식) 남2 vs 남3
+    { a: ['M3', 'W1'], b: ['M1', 'W2'] }, // 6세트(복식) 남3+여1 vs 남1+여2
+    { a: ['W1', 'W1'], b: ['W2', 'W2'] }, // 7세트(단식) 여1 vs 여2
+  ],
 };
 
 export function getTemplateKey(menCount: number, womenCount: number): TemplateKey | null {
   const key = `${menCount}-${womenCount}` as TemplateKey;
   return key in TEMPLATES ? key : null;
+}
+
+export function getSinglesTemplateKey(menCount: number, womenCount: number): TemplateKey | null {
+  const key = `S${menCount}-${womenCount}` as TemplateKey;
+  return key in TEMPLATES ? key : null;
+}
+
+export function isSinglesTemplate(key: TemplateKey): boolean {
+  return key.startsWith('S');
+}
+
+export function getTemplateCounts(key: TemplateKey): { men: number; women: number } {
+  const [men, women] = key.replace(/^S/, '').split('-').map(Number);
+  return { men, women };
 }
 
 function resolveSlot(slot: SlotKey, men: Player[], women: Player[]): Player {

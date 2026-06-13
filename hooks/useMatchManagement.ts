@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { Player, Match } from '@/types';
 import {
   generateMixedDoublesSchedule, generateDoubles, generateSingles,
-  generateFromTemplate, getTemplateKey, TemplateKey,
+  generateFromTemplate, getTemplateKey, getSinglesTemplateKey, isSinglesTemplate, TemplateKey,
   calculateDailyMvp, recalculateMvpBonuses, isGuestPlayer,
 } from '@/utils/tennisLogic';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,6 +11,8 @@ import { useUndo as useUndoContext } from '@/contexts/UndoContext';
 import { safeSetAsync } from '@/lib/storage';
 
 const FINISHED_DATES_KEY = 'finished-dates';
+
+export type MatchCreationType = 'MIXED' | 'MIXED_SINGLES' | 'DOUBLES' | 'SINGLES' | 'MANUAL';
 
 function buildGuestPlayers(maleCount: number, femaleCount: number): Player[] {
   const guests: Player[] = [];
@@ -71,7 +73,7 @@ export function useMatchManagement({
 
   // Match created dialog state
   const [createdMatches, setCreatedMatches] = useState<Match[] | null>(null);
-  const [createdMatchType, setCreatedMatchType] = useState<'MIXED' | 'DOUBLES' | 'SINGLES' | 'MANUAL' | null>(null);
+  const [createdMatchType, setCreatedMatchType] = useState<MatchCreationType | null>(null);
 
   // Manual match dialog state
   const [showManualDialog, setShowManualDialog] = useState(false);
@@ -129,7 +131,7 @@ export function useMatchManagement({
 
   const maxMatches = Math.floor(courtMinutes / gameMinutes);
 
-  const handleCreateMatch = useCallback((type: 'MIXED' | 'DOUBLES' | 'SINGLES' | 'MANUAL') => {
+  const handleCreateMatch = useCallback((type: MatchCreationType) => {
     if (!matchDate) {
       showToast('날짜를 선택해주세요.', 'warning');
       return;
@@ -138,6 +140,17 @@ export function useMatchManagement({
 
     try {
       let newMatches: Match[] = [];
+      if (type === 'MIXED_SINGLES') {
+        const men = pool.filter(p => p.gender === 'MALE');
+        const women = pool.filter(p => p.gender === 'FEMALE');
+        const templateKey = getSinglesTemplateKey(men.length, women.length);
+        if (!templateKey) {
+          showToast('단식 포함 대진은 남2/여3 또는 남3/여2 구성이 필요합니다.', 'warning');
+          return;
+        }
+        setSlotAssignment({ templateKey, men, women });
+        return;
+      }
       if (type === 'MIXED') {
         const men = pool.filter(p => p.gender === 'MALE');
         const women = pool.filter(p => p.gender === 'FEMALE');
@@ -205,7 +218,9 @@ export function useMatchManagement({
     if (activeTemplateKey) {
       const men = pool.filter(p => p.gender === 'MALE');
       const women = pool.filter(p => p.gender === 'FEMALE');
-      const templateKey = getTemplateKey(men.length, women.length);
+      const templateKey = isSinglesTemplate(activeTemplateKey)
+        ? getSinglesTemplateKey(men.length, women.length)
+        : getTemplateKey(men.length, women.length);
       if (!templateKey) {
         showToast('선수 구성이 변경되어 재배정할 수 없습니다.', 'error');
         return;
@@ -244,7 +259,7 @@ export function useMatchManagement({
       setActiveTemplateKey(slotAssignment.templateKey);
       setPendingMixedMatches(proposedMatches);
       setCreatedMatches(proposedMatches);
-      setCreatedMatchType('MIXED');
+      setCreatedMatchType(isSinglesTemplate(slotAssignment.templateKey) ? 'MIXED_SINGLES' : 'MIXED');
       setSlotAssignment(null);
     } catch (e) {
       showToast(e instanceof Error ? e.message : '대진 생성 실패', 'error');
@@ -299,16 +314,20 @@ export function useMatchManagement({
   const commitScore = useCallback((matchId: string) => {
     const pending = pendingScores[matchId];
     if (!pending) return;
+    if (pending.scoreA === 0 && pending.scoreB === 0) {
+      showToast('점수를 입력해주세요. (0:0은 완료할 수 없습니다)', 'warning');
+      return;
+    }
 
-    setMatches(prev => {
-      const oldMatches = [...prev];
-      const matchIndex = prev.findIndex(m => m.id === matchId);
-      if (matchIndex === -1) return prev;
+    const oldMatch = matches.find(m => m.id === matchId);
+    if (!oldMatch) return;
 
-      const oldMatch = prev[matchIndex];
-      const newMatch = { ...oldMatch, scoreA: pending.scoreA, scoreB: pending.scoreB, isFinished: true };
-      pushAction('점수 입력', oldMatches, () => setMatches(oldMatches));
-      return prev.map(m => m.id === matchId ? newMatch : m);
+    setMatches(prev => prev.map(m =>
+      m.id === matchId ? { ...m, scoreA: pending.scoreA, scoreB: pending.scoreB, isFinished: true } : m
+    ));
+    // 해당 경기만 되돌린다 — 전체 배열 스냅샷 복원은 이후의 다른 변경까지 날려버림
+    pushAction('점수 입력', oldMatch, () => {
+      setMatches(prev => prev.map(m => (m.id === matchId ? oldMatch : m)));
     });
 
     setPendingScores(prev => {
@@ -316,33 +335,37 @@ export function useMatchManagement({
       delete newPending[matchId];
       return newPending;
     });
-  }, [pendingScores, pushAction, setMatches]);
+  }, [pendingScores, matches, showToast, pushAction, setMatches]);
 
   const cancelFinished = useCallback((matchId: string) => {
-    setMatches(prev => {
-      const oldMatches = [...prev];
-      const matchIndex = prev.findIndex(m => m.id === matchId);
-      if (matchIndex === -1) return prev;
+    const oldMatch = matches.find(m => m.id === matchId);
+    if (!oldMatch) return;
 
-      const oldMatch = prev[matchIndex];
-      setPendingScores(p => ({
-        ...p,
-        [matchId]: { scoreA: oldMatch.scoreA, scoreB: oldMatch.scoreB },
-      }));
-
-      const newMatch = { ...oldMatch, isFinished: false };
-      pushAction('점수 수정 취소', oldMatches, () => setMatches(oldMatches));
-      return prev.map(m => m.id === matchId ? newMatch : m);
+    setPendingScores(p => ({
+      ...p,
+      [matchId]: { scoreA: oldMatch.scoreA, scoreB: oldMatch.scoreB },
+    }));
+    setMatches(prev => prev.map(m => (m.id === matchId ? { ...m, isFinished: false } : m)));
+    pushAction('점수 수정 취소', oldMatch, () => {
+      setMatches(prev => prev.map(m => (m.id === matchId ? oldMatch : m)));
     });
-  }, [pushAction, setMatches]);
+  }, [matches, pushAction, setMatches]);
 
   const deleteMatch = useCallback((matchId: string) => {
-    const matchToDelete = matches.find(m => m.id === matchId);
-    if (!matchToDelete) return;
+    const matchIndex = matches.findIndex(m => m.id === matchId);
+    if (matchIndex === -1) return;
+    const matchToDelete = matches[matchIndex];
 
     setMatches(prev => prev.filter(m => m.id !== matchId));
     showToast('경기가 삭제되었습니다.', 'success');
-    pushAction('경기 삭제', matches, () => setMatches(matches));
+    pushAction('경기 삭제', matchToDelete, () => {
+      setMatches(prev => {
+        if (prev.some(m => m.id === matchId)) return prev;
+        const next = [...prev];
+        next.splice(Math.min(matchIndex, next.length), 0, matchToDelete);
+        return next;
+      });
+    });
   }, [matches, showToast, pushAction, setMatches]);
 
   const handleFinishDailyGame = useCallback(() => {
@@ -361,6 +384,12 @@ export function useMatchManagement({
 
   const confirmMvpAward = useCallback(() => {
     if (!mvpResult) return;
+    if (finishedDates.includes(matchDate)) {
+      showToast('이미 이 날짜의 MVP 보너스가 반영되었습니다.', 'warning');
+      setShowMvpDialog(false);
+      setMvpResult(null);
+      return;
+    }
 
     const updatedPlayers = players.map(p => {
       let bonus = p.bonusPoints || 0;
