@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Trophy, Users, Settings, Smartphone } from 'lucide-react';
+import { Home, Trophy, Users, Settings, Smartphone, Sparkles } from 'lucide-react';
 
 interface TabItem {
   href: string;
@@ -35,6 +35,12 @@ const tabs: TabItem[] = [
     label: '선수',
   },
   {
+    href: '/saju',
+    icon: <Sparkles className="w-6 h-6" />,
+    label: '페르소나',
+    matchPaths: ['/saju'],
+  },
+  {
     href: '/settings',
     icon: <Settings className="w-6 h-6" />,
     label: '설정',
@@ -51,8 +57,8 @@ export default function BottomTabBar() {
     return pathname === tab.href;
   };
 
-  // Hide tab bar on scoreboard page for full-screen experience
-  if (pathname === '/scoreboard') {
+  // Hide tab bar on full-screen pages
+  if (pathname === '/scoreboard' || pathname === '/referee') {
     return null;
   }
 

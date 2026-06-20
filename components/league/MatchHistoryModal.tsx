@@ -1,6 +1,6 @@
 'use client';
 
-import { X } from 'lucide-react';
+import { X, Youtube, ExternalLink } from 'lucide-react';
 import type { Match } from '@/types';
 
 interface MatchHistoryModalProps {
@@ -48,6 +48,16 @@ export default function MatchHistoryModal({ isOpen, matches, onClose }: MatchHis
                     {m.teamB.man.id !== m.teamB.woman.id && <div className="text-xs text-slate-400">{m.teamB.woman.name}</div>}
                   </div>
                 </div>
+                {m.videoUrl && (
+                  <a
+                    href={m.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                  >
+                    <Youtube className="w-3.5 h-3.5" /> 영상 보기 <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
               </div>
             );
           })}

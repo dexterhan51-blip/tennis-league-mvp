@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/contexts/ToastContext';
 import { useUndo as useUndoContext } from '@/contexts/UndoContext';
 import { safeSetAsync } from '@/lib/storage';
+import { parseYouTube } from '@/lib/youtube';
 
 const FINISHED_DATES_KEY = 'finished-dates';
 
@@ -351,6 +352,39 @@ export function useMatchManagement({
     });
   }, [matches, pushAction, setMatches]);
 
+  // 경기 영상(유튜브) 링크 연결/수정/삭제. url이 비면 삭제.
+  // 유효하지 않은 유튜브 URL이면 토스트 후 무시. 성공 여부를 반환.
+  const setMatchVideoUrl = useCallback((matchId: string, url: string | undefined): boolean => {
+    const oldMatch = matches.find(m => m.id === matchId);
+    if (!oldMatch) return false;
+
+    let normalized: string | undefined;
+    if (url && url.trim()) {
+      const ref = parseYouTube(url);
+      if (!ref) {
+        showToast('유효한 유튜브 링크가 아닙니다. 주소를 확인해주세요.', 'error');
+        return false;
+      }
+      normalized = ref.watchUrl;
+    }
+
+    setMatches(prev => prev.map(m => {
+      if (m.id !== matchId) return m;
+      if (!normalized) {
+        const next = { ...m };
+        delete next.videoUrl;
+        return next;
+      }
+      return { ...m, videoUrl: normalized };
+    }));
+
+    pushAction(normalized ? '영상 링크 연결' : '영상 링크 삭제', oldMatch, () => {
+      setMatches(prev => prev.map(m => (m.id === matchId ? oldMatch : m)));
+    });
+    showToast(normalized ? '영상 링크가 연결되었습니다.' : '영상 링크가 삭제되었습니다.', 'success');
+    return true;
+  }, [matches, setMatches, pushAction, showToast]);
+
   const deleteMatch = useCallback((matchId: string) => {
     const matchIndex = matches.findIndex(m => m.id === matchId);
     if (matchIndex === -1) return;
@@ -458,6 +492,7 @@ export function useMatchManagement({
     updatePendingScore,
     commitScore,
     cancelFinished,
+    setMatchVideoUrl,
     deleteMatch,
     handleFinishDailyGame,
     confirmMvpAward,

@@ -16,6 +16,14 @@ export const TeamSchema = z.object({
   woman: PlayerSchema,
 });
 
+export const PointLogEntrySchema = z.object({
+  t: z.number(),
+  winner: z.enum(['A', 'B']),
+  scoreA: z.number(),
+  scoreB: z.number(),
+  serverId: z.string().optional(),
+});
+
 export const MatchSchema = z.object({
   id: z.string(),
   date: z.string(),
@@ -25,6 +33,15 @@ export const MatchSchema = z.object({
   scoreB: z.number(),
   isFinished: z.boolean(),
   isExhibition: z.boolean().optional(),
+  videoUrl: z.string().optional(),
+  scoringRule: z.enum(['no-ad', 'deuce']).optional(),
+  serveOrder: z.array(z.string()).optional(),
+  pointLog: z.array(PointLogEntrySchema).optional(),
+});
+
+export const ScoringConfigSchema = z.object({
+  rule: z.enum(['no-ad', 'deuce']),
+  winPoints: z.number().int().min(1).max(10),
 });
 
 export const LeagueDataSchema = z.object({
@@ -109,3 +126,18 @@ export const PlayersArraySchema = z.array(PlayerSchema);
 export const PreviousRankingsSchema = z.record(z.string(), z.number());
 
 export const FinishedDatesSchema = z.array(z.string());
+
+// ── 사주/MBTI 페르소나 (게임 세이브 코드의 seed) ──────────────────────────
+// personaCode.PersonaInputs 와 1:1 미러. localStorage 저장값 검증용.
+// mbti enum 은 personaCode.MBTI_TYPES 와 동일한 16종.
+export const PersonaInputsSchema = z.object({
+  schemaVersion: z.number().int().min(1).max(15),
+  mbti: z.enum(['ESTJ','ESTP','ESFJ','ESFP','ENTJ','ENTP','ENFJ','ENFP','ISTJ','ISTP','ISFJ','ISFP','INTJ','INTP','INFJ','INFP']),
+  gender: z.enum(['male','female']),
+  calendarType: z.enum(['solar','lunar']),
+  birthYear: z.number().int().min(1920).max(2100),
+  birthMonth: z.number().int().min(1).max(12),
+  birthDay: z.number().int().min(1).max(31),
+  birthHour: z.number().int().min(0).max(23).nullable(),
+});
+export type StoredPersonaInputs = z.infer<typeof PersonaInputsSchema>;

@@ -33,6 +33,9 @@ export function generateShareText(
 
       lines.push(`GAME ${idx + 1}: ${teamAPlayers} vs ${teamBPlayers}`);
       lines.push(`결과: ${m.scoreA} : ${m.scoreB} (${winner})`);
+      if (m.videoUrl) {
+        lines.push(`영상: ${m.videoUrl}`);
+      }
       lines.push('');
     });
   } else {

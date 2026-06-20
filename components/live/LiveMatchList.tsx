@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle, Clock } from 'lucide-react';
+import { CheckCircle, Clock, Youtube, ExternalLink } from 'lucide-react';
 import type { Match } from '@/types';
 
 interface LiveMatchListProps {
@@ -95,6 +95,17 @@ export function LiveMatchList({ matches, finished, total }: LiveMatchListProps) 
                   <div className="text-center mt-1">
                     <span className="text-xs font-medium text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">무승부</span>
                   </div>
+                )}
+
+                {match.videoUrl && (
+                  <a
+                    href={match.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                  >
+                    <Youtube className="w-3.5 h-3.5" /> 영상 보기 <ExternalLink className="w-3 h-3" />
+                  </a>
                 )}
               </div>
             );

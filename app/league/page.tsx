@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Player } from '@/types';
-import { Table, Save, Medal, Flag } from 'lucide-react';
+import { Table, Save, Medal, Flag, Film } from 'lucide-react';
+import { useToast } from '@/contexts/ToastContext';
+import { copyToClipboard } from '@/utils/shareUtils';
+import { generateTimelineText, hasTimelineData } from '@/lib/timelineExport';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MatchCreatedDialog from '@/components/match/MatchCreatedDialog';
 import ManualMatchDialog from '@/components/match/ManualMatchDialog';
@@ -23,11 +27,23 @@ import { useLeagueSync } from '@/hooks/useLeagueSync';
 import { usePlayerCareerStats } from '@/hooks/usePlayerCareerStats';
 
 export default function LeaguePage() {
+  const router = useRouter();
+  const { showToast } = useToast();
   const {
     leagueName, players, setPlayers, matches, setMatches,
     slotIndex, previousRankings, finishedDates, setFinishedDates,
     isLoading, handleManualSave, handleEndSeason,
   } = useLeagueData();
+
+  const handleExportTimeline = async () => {
+    const text = generateTimelineText(leagueName, matchDate, matches, players);
+    if (!text) {
+      showToast('내보낼 경기 타임라인이 없습니다.', 'warning');
+      return;
+    }
+    const ok = await copyToClipboard(text);
+    showToast(ok ? '경기 타임라인이 복사되었습니다.' : '복사에 실패했습니다.', ok ? 'success' : 'error');
+  };
 
   const [matchDate, setMatchDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [isExhibition, setIsExhibition] = useState(false);
@@ -62,7 +78,7 @@ export default function LeaguePage() {
     showManualDialog, setShowManualDialog, confirmManualMatch,
     slotAssignment, confirmSlotAssignment, cancelSlotAssignment,
     toggleMatchPlayer, handleCreateMatch, confirmMixedMatchCreation,
-    updatePendingScore, commitScore, cancelFinished, deleteMatch,
+    updatePendingScore, commitScore, cancelFinished, setMatchVideoUrl, deleteMatch,
     handleFinishDailyGame, confirmMvpAward, handleRecalculateMvp,
   } = useMatchManagement({
     players, setPlayers, matches, setMatches,
@@ -177,6 +193,8 @@ export default function LeaguePage() {
           onUpdateScore={updatePendingScore}
           onCommitScore={commitScore}
           onCancelFinished={cancelFinished}
+          onSetVideoUrl={setMatchVideoUrl}
+          onStartLiveScoring={(matchId) => router.push(`/referee?id=${matchId}`)}
           onRequestDelete={setDeleteMatchId}
           onOpenRegistration={() => setIsMatchViewOpen(true)}
         />
@@ -198,6 +216,16 @@ export default function LeaguePage() {
             )}
             <ShareButton leagueName={leagueName} matchDate={matchDate} matches={matches} rankings={rankingsWithChange} />
           </section>
+        )}
+
+        {/* 경기 타임라인 내보내기 (실시간 입력으로 기록된 포인트 로그가 있을 때) */}
+        {hasTimelineData(matchDate, matches) && (
+          <button
+            onClick={handleExportTimeline}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 transition-colors touch-target"
+          >
+            <Film size={18} /> 경기 타임라인 내보내기 (영상 편집용)
+          </button>
         )}
 
         {/* Bottom Action Bar */}
