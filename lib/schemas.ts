@@ -19,8 +19,11 @@ export const TeamSchema = z.object({
 export const PointLogEntrySchema = z.object({
   t: z.number(),
   winner: z.enum(['A', 'B']),
-  scoreA: z.number(),
-  scoreB: z.number(),
+  pointA: z.number(),
+  pointB: z.number(),
+  gameA: z.number(),
+  gameB: z.number(),
+  gameWon: z.enum(['A', 'B']).optional(),
   serverId: z.string().optional(),
 });
 
@@ -43,6 +46,12 @@ export const ScoringConfigSchema = z.object({
   rule: z.enum(['no-ad', 'deuce']),
   winPoints: z.number().int().min(1).max(10),
 });
+
+export const PersonaRosterEntrySchema = z.object({
+  name: z.string(),
+  code: z.string(),
+});
+export const PersonaRosterSchema = z.array(PersonaRosterEntrySchema);
 
 export const LeagueDataSchema = z.object({
   name: z.string(),

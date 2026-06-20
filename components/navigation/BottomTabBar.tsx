@@ -37,7 +37,7 @@ const tabs: TabItem[] = [
   {
     href: '/saju',
     icon: <Sparkles className="w-6 h-6" />,
-    label: '페르소나',
+    label: '궁합',
     matchPaths: ['/saju'],
   },
   {
@@ -77,7 +77,7 @@ export default function BottomTabBar() {
               key={tab.href}
               href={tab.href}
               className={`
-                flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors touch-target
+                flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl transition-colors touch-target
                 ${active
                   ? 'text-blue-600'
                   : 'text-slate-400 hover:text-slate-600'
@@ -88,7 +88,7 @@ export default function BottomTabBar() {
               aria-label={tab.label}
             >
               {tab.icon}
-              <span className="text-xs font-medium">{tab.label}</span>
+              <span className="text-xs font-medium whitespace-nowrap">{tab.label}</span>
             </Link>
           );
         })}

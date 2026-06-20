@@ -14,7 +14,6 @@ import {
   isDeuce,
   isGoldenPoint,
   displayScore,
-  type GamePoints,
   type ScoringConfig,
   type ScoringRule,
 } from "@/lib/liveScoring";
@@ -27,6 +26,16 @@ interface LoadedCtx {
   slotIndex: string | null;
   match: Match;
 }
+
+/** 매치 진행 상태: 현재 게임 포인트(pa/pb) + 누적 게임 수(ga/gb = 매치 스코어) */
+interface Progress {
+  pa: number;
+  pb: number;
+  ga: number;
+  gb: number;
+}
+
+const ZERO: Progress = { pa: 0, pb: 0, ga: 0, gb: 0 };
 
 // teamA.man/woman, teamB.man/woman 에서 중복(단식) 제거한 후보 선수
 function getCandidates(m: Match): Player[] {
@@ -58,8 +67,8 @@ export default function RefereePage() {
   const [serveOrder, setServeOrder] = useState<string[]>([]);
 
   // 진행
-  const [points, setPoints] = useState<GamePoints>({ a: 0, b: 0 });
-  const [history, setHistory] = useState<GamePoints[]>([]);
+  const [progress, setProgress] = useState<Progress>(ZERO);
+  const [history, setHistory] = useState<Progress[]>([]);
   const [pointLog, setPointLog] = useState<PointLogEntry[]>([]);
   const [startTime, setStartTime] = useState<number>(0);
   const [showFinish, setShowFinish] = useState(false);
@@ -122,7 +131,7 @@ export default function RefereePage() {
       showToast("서브 순서를 모두 정해주세요.", "warning");
       return;
     }
-    setPoints({ a: 0, b: 0 });
+    setProgress(ZERO);
     setHistory([]);
     setPointLog([]);
     setStartTime(Date.now());
@@ -130,8 +139,10 @@ export default function RefereePage() {
     setPhase("play");
   }, [serveOrder.length, candidates.length, showToast]);
 
-  // 현재 서버(단일 게임이므로 serveOrder[0])와 서브 팀
-  const serverId = serveOrder[0];
+  // 현재 게임의 서버(게임마다 서브 순서대로 회전)
+  const serverId = serveOrder.length
+    ? serveOrder[(progress.ga + progress.gb) % serveOrder.length]
+    : undefined;
   const servingTeam: "A" | "B" | null = useMemo(() => {
     if (!ctx || !serverId) return null;
     const inA = ctx.match.teamA.man.id === serverId || ctx.match.teamA.woman.id === serverId;
@@ -141,43 +152,55 @@ export default function RefereePage() {
   const handleAddPoint = useCallback(
     (team: "A" | "B") => {
       if (showFinish) return;
-      const next = addPoint(points, team, config);
-      if (next === points) return; // 이미 종료
+      const cur = { a: progress.pa, b: progress.pb };
+      const next = addPoint(cur, team, config);
+      if (next.a === cur.a && next.b === cur.b) return;
+
+      const over = isGameOver(next, config);
+      const w = over ? gameWinner(next, config) : null;
+      const nga = progress.ga + (w === "A" ? 1 : 0);
+      const ngb = progress.gb + (w === "B" ? 1 : 0);
+
       const entry: PointLogEntry = {
         t: Math.round((Date.now() - startTime) / 1000),
         winner: team,
-        scoreA: next.a,
-        scoreB: next.b,
+        pointA: next.a,
+        pointB: next.b,
+        gameA: nga,
+        gameB: ngb,
+        gameWon: w ?? undefined,
         serverId,
       };
-      setHistory((h) => [...h, points]);
-      setPoints(next);
+
+      setHistory((h) => [...h, progress]);
+      // 게임을 따냈으면 포인트 리셋, 게임 수 +1 (매치는 계속 진행)
+      setProgress(
+        over ? { pa: 0, pb: 0, ga: nga, gb: ngb } : { pa: next.a, pb: next.b, ga: progress.ga, gb: progress.gb },
+      );
       setPointLog((l) => [...l, entry]);
-      if (isGameOver(next, config)) setShowFinish(true);
     },
-    [showFinish, points, config, startTime, serverId],
+    [showFinish, progress, config, startTime, serverId],
   );
 
   const undo = useCallback(() => {
     setHistory((h) => {
       if (h.length === 0) return h;
-      setPoints(h[h.length - 1]);
+      setProgress(h[h.length - 1]);
       setPointLog((l) => l.slice(0, -1));
-      setShowFinish(false);
       return h.slice(0, -1);
     });
   }, []);
 
   const reflectResult = useCallback(async () => {
     if (!ctx) return;
-    if (points.a === 0 && points.b === 0) {
-      showToast("점수를 입력해주세요. (0:0은 반영할 수 없습니다)", "warning");
+    if (progress.ga === 0 && progress.gb === 0) {
+      showToast("완료된 게임이 없습니다. 한 게임 이상 진행해주세요.", "warning");
       return;
     }
     const updated: Match = {
       ...ctx.match,
-      scoreA: points.a,
-      scoreB: points.b,
+      scoreA: progress.ga,
+      scoreB: progress.gb,
       isFinished: true,
       scoringRule: config.rule,
       serveOrder,
@@ -189,7 +212,7 @@ export default function RefereePage() {
     if (ctx.slotIndex) await safeSetAsync(`league-slot-${ctx.slotIndex}`, newData);
     showToast("경기 결과가 반영되었습니다.", "success");
     router.push("/league");
-  }, [ctx, points, config.rule, serveOrder, pointLog, showToast, router]);
+  }, [ctx, progress.ga, progress.gb, config.rule, serveOrder, pointLog, showToast, router]);
 
   // ───────────────────────── 렌더 ─────────────────────────
 
@@ -216,7 +239,7 @@ export default function RefereePage() {
   }
 
   const { match } = ctx;
-  const nameById = (id: string) => candidates.find((p) => p.id === id)?.name ?? "?";
+  const nameById = (id?: string) => (id ? candidates.find((p) => p.id === id)?.name ?? "?" : "?");
 
   // ── 설정 단계 ──
   if (phase === "setup") {
@@ -258,14 +281,14 @@ export default function RefereePage() {
           </div>
           <p className="text-[11px] text-slate-500 mt-1.5">
             {config.rule === "no-ad"
-              ? "40-40에서 다음 득점 팀이 승리(골든포인트)"
-              : "40-40 이후 2점차로 승리"}
+              ? "40-40에서 다음 득점 팀이 게임 승리(골든포인트)"
+              : "40-40 이후 2점차로 게임 승리"}
           </p>
         </div>
 
-        {/* 목표 점수 */}
+        {/* 게임당 목표 점수 */}
         <div className="mb-4">
-          <div className="text-xs font-bold text-slate-400 mb-2">목표 점수</div>
+          <div className="text-xs font-bold text-slate-400 mb-2">게임당 목표 점수</div>
           <div className="grid grid-cols-4 gap-2">
             {[3, 4, 5, 7].map((n) => (
               <button
@@ -309,7 +332,7 @@ export default function RefereePage() {
           </div>
           {serveOrder.length > 0 && (
             <p className="text-[11px] text-yellow-300 mt-2">
-              서브: {serveOrder.map(nameById).join(" → ")}
+              서브: {serveOrder.map((id) => nameById(id)).join(" → ")} · 게임마다 순서대로 교대
             </p>
           )}
         </div>
@@ -327,10 +350,10 @@ export default function RefereePage() {
   }
 
   // ── 진행(채점) 단계 ──
-  const disp = displayScore(points, config);
-  const winner = gameWinner(points, config);
-  const deuce = isDeuce(points, config);
-  const golden = isGoldenPoint(points, config);
+  const disp = displayScore({ a: progress.pa, b: progress.pb }, config);
+  const deuce = isDeuce({ a: progress.pa, b: progress.pb }, config);
+  const golden = isGoldenPoint({ a: progress.pa, b: progress.pb }, config);
+  const matchWinner = progress.ga > progress.gb ? "A" : progress.gb > progress.ga ? "B" : null;
 
   return (
     <main className="max-w-md mx-auto min-h-screen bg-slate-900 flex flex-col">
@@ -343,7 +366,7 @@ export default function RefereePage() {
           <ArrowLeft size={20} />
         </button>
         <div className="text-center text-[11px] text-slate-400">
-          {config.rule === "no-ad" ? "노애드" : "듀스"} · {config.winPoints}점
+          {config.rule === "no-ad" ? "노애드" : "듀스"} · 게임당 {config.winPoints}점
           {golden && <span className="ml-1 text-yellow-300 font-bold">· 골든포인트</span>}
           {deuce && <span className="ml-1 text-yellow-300 font-bold">· 듀스</span>}
         </div>
@@ -359,12 +382,20 @@ export default function RefereePage() {
           <button
             onClick={() => setShowFinish(true)}
             className="p-2 hover:bg-slate-700 rounded-full text-slate-400"
-            aria-label="게임 종료"
+            aria-label="경기 종료"
           >
             <Flag size={20} />
           </button>
         </div>
       </header>
+
+      {/* 매치 스코어(게임) */}
+      <div className="bg-slate-800 py-2 flex items-center justify-center gap-3 text-white">
+        <span className="text-xs text-slate-400">매치(게임)</span>
+        <span className="text-2xl font-black text-blue-400">{progress.ga}</span>
+        <span className="text-slate-500">:</span>
+        <span className="text-2xl font-black text-rose-400">{progress.gb}</span>
+      </div>
 
       <div className="flex-1 flex flex-col">
         {/* 팀 A */}
@@ -380,7 +411,7 @@ export default function RefereePage() {
           )}
           <div className="text-white/70 text-base font-medium mb-1 px-4 text-center">{teamName(match, "A")}</div>
           <span className="text-8xl font-black text-white">{disp.a}</span>
-          <span className="text-white/50 text-xs mt-2">{points.a}점</span>
+          <span className="text-white/60 text-sm mt-2 font-bold">{progress.ga} 게임</span>
         </button>
 
         <div className="h-px bg-slate-700" />
@@ -398,22 +429,30 @@ export default function RefereePage() {
           )}
           <div className="text-white/70 text-base font-medium mb-1 px-4 text-center">{teamName(match, "B")}</div>
           <span className="text-8xl font-black text-white">{disp.b}</span>
-          <span className="text-white/50 text-xs mt-2">{points.b}점</span>
+          <span className="text-white/60 text-sm mt-2 font-bold">{progress.gb} 게임</span>
         </button>
       </div>
 
-      {/* 결과 반영 오버레이 */}
+      {/* 결과 반영 오버레이 (수동 종료) */}
       {showFinish && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-6 animate-fade-in">
           <div className="bg-white rounded-2xl w-full max-w-sm p-6 animate-scale-in text-center">
             <Trophy className="w-10 h-10 text-amber-500 mx-auto mb-2" />
             <h2 className="text-lg font-bold text-slate-800 mb-1">
-              {winner ? `${winner === "A" ? teamName(match, "A") : teamName(match, "B")} 승리!` : "경기 종료"}
+              {matchWinner
+                ? `${matchWinner === "A" ? teamName(match, "A") : teamName(match, "B")} 승리!`
+                : "경기 종료"}
             </h2>
             <div className="text-3xl font-black text-slate-900 my-3">
-              {points.a} : {points.b}
+              {progress.ga} : {progress.gb}
+              <span className="text-sm font-medium text-slate-400 ml-1">게임</span>
             </div>
-            <p className="text-sm text-slate-500 mb-5">이 결과를 경기 기록에 반영할까요?</p>
+            {(progress.pa > 0 || progress.pb > 0) && (
+              <p className="text-xs text-amber-600 mb-2">
+                진행 중인 게임({disp.a}:{disp.b})은 집계되지 않습니다.
+              </p>
+            )}
+            <p className="text-sm text-slate-500 mb-5">이 게임 스코어를 경기 기록에 반영할까요?</p>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowFinish(false)}

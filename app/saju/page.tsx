@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Sparkles,
   Zap,
@@ -10,6 +11,8 @@ import {
   Heart,
   Trophy,
   Info,
+  Users,
+  ChevronRight,
 } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { copyToClipboard } from "@/utils/shareUtils";
@@ -272,6 +275,19 @@ export default function SajuPage() {
       </header>
 
       <div className="space-y-4">
+        {/* 우리 리그 궁합 관계도 진입 */}
+        <Link
+          href="/saju/relations"
+          className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-sm active:scale-[0.99] transition-transform"
+        >
+          <Users className="w-6 h-6 shrink-0" />
+          <div className="flex-1">
+            <div className="font-bold">우리 리그 궁합 관계도</div>
+            <div className="text-xs text-white/80">멤버 코드를 모아 서로의 궁합을 한눈에</div>
+          </div>
+          <ChevronRight className="w-5 h-5 shrink-0" />
+        </Link>
+
         {/* ───────── (A) 입력 폼 ───────── */}
         <SectionCard title="내 정보 입력" icon={<Sparkles className="w-4 h-4 text-blue-500" />}>
           <div className="space-y-4">

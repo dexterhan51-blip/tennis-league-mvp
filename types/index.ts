@@ -18,8 +18,11 @@ export interface Team {
 export interface PointLogEntry {
   t: number;          // 경기 시작 기준 상대 초
   winner: 'A' | 'B';  // 이 포인트를 가져간 팀
-  scoreA: number;     // 이 포인트 직후 누적 점수
-  scoreB: number;
+  pointA: number;     // 이 포인트 직후 현재 게임 포인트
+  pointB: number;
+  gameA: number;      // 이 포인트 직후 누적 게임 수 (매치 스코어)
+  gameB: number;
+  gameWon?: 'A' | 'B'; // 이 포인트로 게임을 따냈으면 그 팀
   serverId?: string;  // 이 포인트의 서버(선수 id)
 }
 

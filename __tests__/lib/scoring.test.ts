@@ -86,9 +86,9 @@ function mkMatch(over: Partial<Match> = {}): Match {
     scoringRule: 'no-ad',
     serveOrder: ['a1', 'b1', 'a2', 'b2'],
     pointLog: [
-      { t: 0, winner: 'A', scoreA: 1, scoreB: 0, serverId: 'a1' },
-      { t: 65, winner: 'B', scoreA: 1, scoreB: 1, serverId: 'a1' },
-      { t: 130, winner: 'A', scoreA: 4, scoreB: 2, serverId: 'a1' },
+      { t: 0, winner: 'A', pointA: 1, pointB: 0, gameA: 0, gameB: 0, serverId: 'a1' },
+      { t: 65, winner: 'B', pointA: 1, pointB: 1, gameA: 0, gameB: 0, serverId: 'a1' },
+      { t: 130, winner: 'A', pointA: 4, pointB: 1, gameA: 1, gameB: 0, gameWon: 'A', serverId: 'a1' },
     ],
     ...over,
   };
@@ -103,6 +103,7 @@ describe('timelineExport', () => {
     expect(text).toContain('최종 4 : 2');
     expect(text).toContain('서브 순서: 민수 → 철수 → 지영 → 영희');
     expect(text).toContain('1:05'); // t=65초 → 1:05
+    expect(text).toContain('게임 획득'); // 게임 따낸 포인트 표시
     expect(text).toContain('민수 & 지영'); // 팀 A 라벨
   });
 

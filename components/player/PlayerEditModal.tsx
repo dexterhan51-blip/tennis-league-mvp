@@ -162,7 +162,6 @@ export default function PlayerEditModal({
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
-                capture="user"
                 onChange={handlePhotoChange}
                 className="hidden"
               />

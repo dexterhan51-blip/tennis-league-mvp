@@ -30,7 +30,7 @@ function matchBlock(m: Match, idx: number, players: Player[]): string {
   const winner = m.scoreA > m.scoreB ? 'A팀 승' : m.scoreB > m.scoreA ? 'B팀 승' : '무승부';
 
   lines.push(`GAME ${idx + 1}: ${a} vs ${b}`);
-  lines.push(`최종 ${m.scoreA} : ${m.scoreB} (${winner}, ${ruleLabel})`);
+  lines.push(`최종 ${m.scoreA} : ${m.scoreB} 게임 (${winner}, ${ruleLabel})`);
 
   if (m.serveOrder && m.serveOrder.length > 0) {
     const order = m.serveOrder.map((id) => nameOf(players, id) ?? '?').join(' → ');
@@ -45,7 +45,14 @@ function matchBlock(m: Match, idx: number, players: Player[]): string {
       const who = pt.winner === 'A' ? a : b;
       const server = nameOf(players, pt.serverId);
       const serverTag = server ? ` [서브 ${server}]` : '';
-      lines.push(`${mmss(pt.t)}  ● ${who} 득점  →  ${pt.scoreA}:${pt.scoreB}${serverTag}`);
+      if (pt.gameWon) {
+        const gw = pt.gameWon === 'A' ? a : b;
+        lines.push(
+          `${mmss(pt.t)}  ★ ${gw} 게임 획득! (포인트 ${pt.pointA}:${pt.pointB}) → 게임 ${pt.gameA}:${pt.gameB}${serverTag}`,
+        );
+      } else {
+        lines.push(`${mmss(pt.t)}  ● ${who} 득점  포인트 ${pt.pointA}:${pt.pointB}${serverTag}`);
+      }
     });
   }
 

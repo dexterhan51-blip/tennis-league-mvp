@@ -121,7 +121,7 @@ export default function EndSeasonDialog({
                 </div>
                 <div className="flex-1">
                   <div className="font-bold text-slate-900 text-sm">아카이브 후 새 시즌</div>
-                  <div className="text-xs text-slate-500">선수 유지, 기록 초기화</div>
+                  <div className="text-xs text-slate-500">선수·통산 기록은 유지 · 이번 시즌 순위만 새로 시작</div>
                 </div>
               </button>
 
@@ -137,6 +137,10 @@ export default function EndSeasonDialog({
                   <div className="text-xs text-slate-500">홈으로 돌아가기</div>
                 </div>
               </button>
+
+              <p className="text-[11px] text-slate-400 text-center px-2 leading-relaxed">
+                통산 기록(최고 순위 · 우승 횟수 · 시즌별 성적)은 선수 프로필에 계속 누적됩니다.
+              </p>
 
               <div className="pt-2 text-center">
                 <button
