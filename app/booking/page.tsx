@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, MapPin, Trash2, ExternalLink, Clock, Info, Share2, Wifi, WifiOff, Loader2, Link2, LogOut, CalendarCheck } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { useBookingSync } from "@/hooks/useBookingSync";
+import AppLogo from "@/components/ui/AppLogo";
 
 // --- Types ---
 type BookingStatus = "trying" | "confirmed";
@@ -373,6 +374,7 @@ export default function BookingPage() {
             <button onClick={() => router.push("/")} className="p-1 -ml-1 text-slate-500 hover:text-slate-700">
               <ArrowLeft size={20} />
             </button>
+            <AppLogo size={24} />
             <span className="text-lg font-extrabold text-slate-900">{year}년 {month + 1}월</span>
           </div>
           <div className="flex items-center gap-1">

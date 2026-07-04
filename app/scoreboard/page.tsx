@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { RotateCcw, Undo2, Circle, ArrowLeft } from 'lucide-react';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import AppLogo from '@/components/ui/AppLogo';
 
 type PointValue = 0 | 15 | 30 | 40;
 
@@ -145,7 +146,9 @@ export default function ScoreboardPage() {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-white font-bold">스코어보드</h1>
+          <h1 className="text-white font-bold flex items-center gap-2">
+            <AppLogo size={22} /> 스코어보드
+          </h1>
         </div>
         <div className="flex gap-2">
           <button

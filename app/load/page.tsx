@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Trash2, CheckCircle, Gamepad2, Calendar, Users } from "lucide-react";
+import { Save, Trash2, CheckCircle, Calendar, Users } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
+import AppLogo from "@/components/ui/AppLogo";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import type { LeagueData } from "@/types";
 import { safeGetAsync, safeSetAsync, safeRemoveAsync } from "@/lib/storage";
@@ -76,7 +77,7 @@ export default function LoadPage() {
     <main className="max-w-md mx-auto min-h-screen bg-slate-900 text-white pb-32">
       <header className="p-6 mb-2">
         <h1 className="text-xl font-bold flex items-center gap-2">
-          <Gamepad2 className="text-blue-400" /> 리그 불러오기
+          <AppLogo size={26} /> 리그 불러오기
         </h1>
       </header>
 

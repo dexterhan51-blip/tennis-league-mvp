@@ -6,6 +6,7 @@ import { ArrowLeft, Undo2, Circle, Flag, Check, Trophy } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { safeGetAsync, safeSetAsync, safeGetString } from "@/lib/storage";
 import { LeagueDataSchema } from "@/lib/schemas";
+import AppLogo from "@/components/ui/AppLogo";
 import type { LeagueData, Match, Player, PointLogEntry } from "@/types";
 import {
   addPoint,
@@ -253,7 +254,9 @@ export default function RefereePage() {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="font-bold text-lg">실시간 점수 입력 설정</h1>
+          <h1 className="font-bold text-lg flex items-center gap-2">
+            <AppLogo size={22} /> 실시간 점수 입력 설정
+          </h1>
         </header>
 
         {/* 대진 */}

@@ -7,6 +7,7 @@ import {
 import { useTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/contexts/ToastContext';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import AppLogo from '@/components/ui/AppLogo';
 import type { AppSettings, ExportData, Player, LeagueData, SeasonArchive, PlayerCareerStats } from '@/types';
 import { safeGetAsync, safeSetAsync, safeRemoveAsync } from '@/lib/storage';
 import { safeGetString, safeSetString, safeRemove } from '@/lib/storage';
@@ -176,7 +177,9 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-slate-50 pb-24">
       <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
         <div className="max-w-md mx-auto px-4 py-4">
-          <h1 className="text-lg font-bold text-slate-900">설정</h1>
+          <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <AppLogo size={26} /> 설정
+          </h1>
         </div>
       </div>
 

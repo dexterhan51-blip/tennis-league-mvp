@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { Trophy, PlayCircle, FolderOpen, Users, Smartphone, CalendarDays } from "lucide-react";
+import { PlayCircle, FolderOpen, Users, Smartphone, CalendarDays } from "lucide-react";
+import AppLogo from "@/components/ui/AppLogo";
 
 export default function Home() {
   return (
     <main className="max-w-md mx-auto min-h-screen bg-slate-50 flex flex-col justify-center p-6">
       
-      {/* 1. 로고 영역: [ MY TENNIS ] */}
+      {/* 1. 로고 영역 */}
       <div className="text-center mb-12 space-y-2">
-        <div className="inline-flex justify-center items-center w-20 h-20 bg-blue-600 rounded-3xl shadow-lg shadow-blue-200 mb-4 transform rotate-3">
-            <Trophy size={40} className="text-white" />
+        <div className="inline-flex justify-center items-center mb-4 drop-shadow-lg">
+            <AppLogo size={112} />
         </div>
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">러브포티 테니스</h1>
         <p className="text-slate-500 font-medium">러브포티 테니스 리그 매니저</p>

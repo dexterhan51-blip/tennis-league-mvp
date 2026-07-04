@@ -1,6 +1,7 @@
 'use client';
 
 import { Wifi, WifiOff, Loader2, AlertTriangle } from 'lucide-react';
+import AppLogo from '@/components/ui/AppLogo';
 
 type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
@@ -36,7 +37,7 @@ export function LiveHeader({ leagueName, connectionStatus, updatedAt }: LiveHead
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
-          <span className="text-lg">🎾</span>
+          <AppLogo size={28} />
           <h1 className="text-xl font-black text-slate-900 truncate">{leagueName || '리그'}</h1>
         </div>
         <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${color}`}>

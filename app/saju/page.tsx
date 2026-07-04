@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import AppLogo from "@/components/ui/AppLogo";
 import {
   Sparkles,
   Zap,
@@ -267,7 +268,7 @@ export default function SajuPage() {
     <main className="max-w-md mx-auto min-h-screen bg-slate-50 p-4 pb-24">
       <header className="mb-5">
         <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-blue-600" /> 테니스 페르소나 &amp; 궁합
+          <AppLogo size={26} /> 테니스 페르소나 &amp; 궁합
         </h1>
         <p className="text-xs text-slate-500 mt-1">
           MBTI와 사주로 보는 내 혼복 스타일 · 닮은 프로 · 궁합 — 재미로 보는 콘텐츠예요 🎾

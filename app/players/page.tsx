@@ -5,6 +5,7 @@ import { Gender } from "@/types";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import PlayerSearch, { highlightMatch } from "@/components/player/PlayerSearch";
 import PlayerEditModal from "@/components/player/PlayerEditModal";
+import AppLogo from "@/components/ui/AppLogo";
 import { useDragSort } from "@/hooks/useDragSort";
 import { usePlayerManagement } from "@/hooks/usePlayerManagement";
 import { useToast } from "@/contexts/ToastContext";
@@ -34,7 +35,9 @@ export default function PlayersPage() {
   return (
     <main className="max-w-md mx-auto min-h-screen bg-slate-50 p-4 pb-24">
       <header className="mb-6">
-        <h1 className="text-xl font-bold text-slate-800">선수 관리</h1>
+        <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <AppLogo size={26} /> 선수 관리
+        </h1>
       </header>
 
       <div className="mb-4">

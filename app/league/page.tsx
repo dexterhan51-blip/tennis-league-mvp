@@ -8,6 +8,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { copyToClipboard, generateBracketText } from '@/utils/shareUtils';
 import { generateTimelineText, hasTimelineData } from '@/lib/timelineExport';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import AppLogo from '@/components/ui/AppLogo';
 import MatchCreatedDialog from '@/components/match/MatchCreatedDialog';
 import ManualMatchDialog from '@/components/match/ManualMatchDialog';
 import SlotAssignmentDialog from '@/components/match/SlotAssignmentDialog';
@@ -140,6 +141,7 @@ export default function LeaguePage() {
     <main className="max-w-md mx-auto min-h-screen bg-white pb-40 relative">
       <header className="p-4 flex items-center justify-between sticky top-0 bg-white z-10 border-b border-slate-100 shadow-sm">
         <div className="flex items-center gap-2">
+          <AppLogo size={28} />
           {slotIndex && <span className="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded font-bold">SLOT {slotIndex}</span>}
         </div>
         <div className="flex items-center gap-2">
