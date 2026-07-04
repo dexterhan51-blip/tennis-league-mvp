@@ -32,13 +32,13 @@ export function LiveDatePicker({ dates, selectedDate, onSelect }: LiveDatePicker
             onClick={() => onSelect(date)}
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               isSelected
-                ? 'bg-blue-600 text-white'
+                ? 'bg-clay-600 text-white'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             {formatDateShort(date)}
             {isToday && !isSelected && (
-              <span className="ml-1 w-1.5 h-1.5 bg-blue-500 rounded-full inline-block" />
+              <span className="ml-1 w-1.5 h-1.5 bg-clay-500 rounded-full inline-block" />
             )}
           </button>
         );

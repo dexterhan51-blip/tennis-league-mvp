@@ -231,7 +231,7 @@ export default function RefereePage() {
         <p>경기를 찾을 수 없습니다.</p>
         <button
           onClick={() => router.push("/league")}
-          className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold touch-target"
+          className="px-4 py-2 rounded-xl bg-clay-600 text-white font-bold touch-target"
         >
           리그로 돌아가기
         </button>
@@ -275,7 +275,7 @@ export default function RefereePage() {
                 key={r}
                 onClick={() => setRule(r)}
                 className={`py-3 rounded-xl font-bold transition-colors touch-target ${
-                  config.rule === r ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-400"
+                  config.rule === r ? "bg-clay-600 text-white" : "bg-slate-800 text-slate-400"
                 }`}
               >
                 {lbl}
@@ -298,7 +298,7 @@ export default function RefereePage() {
                 key={n}
                 onClick={() => setWinPoints(n)}
                 className={`py-2.5 rounded-xl font-bold transition-colors touch-target ${
-                  config.winPoints === n ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-400"
+                  config.winPoints === n ? "bg-clay-600 text-white" : "bg-slate-800 text-slate-400"
                 }`}
               >
                 {n}점
@@ -344,7 +344,7 @@ export default function RefereePage() {
 
         <button
           onClick={startGame}
-          className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg touch-target"
+          className="w-full py-4 rounded-2xl bg-clay-600 hover:bg-clay-700 text-white font-bold text-lg shadow-lg touch-target"
         >
           경기 시작
         </button>

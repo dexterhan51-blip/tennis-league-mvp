@@ -76,7 +76,7 @@ const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 const SELECT_CLASS =
-  "w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+  "w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-clay-500 focus:border-clay-500";
 
 // ─────────────────────────── 보조 컴포넌트 ───────────────────────────
 
@@ -279,7 +279,7 @@ export default function SajuPage() {
         {/* 우리 리그 궁합 관계도 진입 */}
         <Link
           href="/saju/relations"
-          className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-sm active:scale-[0.99] transition-transform"
+          className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-clay-600 text-white shadow-sm active:scale-[0.99] transition-transform"
         >
           <Users className="w-6 h-6 shrink-0" />
           <div className="flex-1">
@@ -290,7 +290,7 @@ export default function SajuPage() {
         </Link>
 
         {/* ───────── (A) 입력 폼 ───────── */}
-        <SectionCard title="내 정보 입력" icon={<Sparkles className="w-4 h-4 text-blue-500" />}>
+        <SectionCard title="내 정보 입력" icon={<Sparkles className="w-4 h-4 text-clay-500" />}>
           <div className="space-y-4">
             {/* MBTI 4축 토글 */}
             <div>
@@ -314,7 +314,7 @@ export default function SajuPage() {
                             aria-pressed={active}
                             className={`py-2.5 rounded-xl text-sm font-bold transition-colors touch-target ${
                               active
-                                ? "bg-blue-600 text-white"
+                                ? "bg-clay-600 text-white"
                                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                             }`}
                           >
@@ -327,7 +327,7 @@ export default function SajuPage() {
                 })}
               </div>
               {mbti.length === 4 && (
-                <p className="text-xs text-blue-600 font-bold mt-2">선택: {mbti}</p>
+                <p className="text-xs text-clay-600 font-bold mt-2">선택: {mbti}</p>
               )}
             </div>
 
@@ -343,7 +343,7 @@ export default function SajuPage() {
                       onClick={() => setGender(g)}
                       aria-pressed={gender === g}
                       className={`py-2.5 rounded-xl text-sm font-bold transition-colors touch-target ${
-                        gender === g ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        gender === g ? "bg-clay-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                     >
                       {lbl}
@@ -361,7 +361,7 @@ export default function SajuPage() {
                       onClick={() => setCalendarType(c)}
                       aria-pressed={calendarType === c}
                       className={`py-2.5 rounded-xl text-sm font-bold transition-colors touch-target ${
-                        calendarType === c ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        calendarType === c ? "bg-clay-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                     >
                       {lbl}
@@ -411,7 +411,7 @@ export default function SajuPage() {
             <button
               type="button"
               onClick={handleSubmit}
-              className="w-full py-3.5 px-4 rounded-xl font-bold text-base bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-colors touch-target"
+              className="w-full py-3.5 px-4 rounded-xl font-bold text-base bg-clay-600 hover:bg-clay-700 text-white shadow-md transition-colors touch-target"
             >
               결과 보기
             </button>
@@ -439,9 +439,9 @@ export default function SajuPage() {
               {/* 화이트 바디 */}
               <div className="bg-white p-4 space-y-3">
                 <div className="flex gap-2.5">
-                  <Zap className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                  <Zap className="w-4 h-4 text-clay-500 shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-bold text-blue-600 mb-0.5">플레이스타일</div>
+                    <div className="text-xs font-bold text-clay-600 mb-0.5">플레이스타일</div>
                     <p className="text-sm text-slate-700 leading-relaxed">{result.persona.mbtiProfile.playstyle}</p>
                   </div>
                 </div>
@@ -539,13 +539,13 @@ export default function SajuPage() {
                   onChange={(e) => setFriendCode(e.target.value)}
                   placeholder="SAJU1-XXXX-XXXX"
                   aria-label="친구 코드 입력"
-                  className="flex-1 px-3 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 font-mono text-sm tracking-wider focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="flex-1 px-3 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 font-mono text-sm tracking-wider focus:outline-none focus:ring-2 focus:ring-clay-500 focus:border-clay-500"
                 />
                 <button
                   type="button"
                   onClick={handleCompat}
                   aria-label="궁합 보기"
-                  className="px-4 py-2.5 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors touch-target shrink-0"
+                  className="px-4 py-2.5 rounded-xl font-bold text-sm bg-clay-600 hover:bg-clay-700 text-white shadow-sm transition-colors touch-target shrink-0"
                 >
                   궁합 보기
                 </button>
@@ -575,8 +575,8 @@ export default function SajuPage() {
                       <div className="text-xs font-bold text-purple-600">사주(오행) 궁합</div>
                       <div className="text-2xl font-black text-slate-900">{compat.breakdown.ohaengScore}</div>
                     </div>
-                    <div className="p-3 bg-blue-50 rounded-xl text-center">
-                      <div className="text-xs font-bold text-blue-600">소통(MBTI) 궁합</div>
+                    <div className="p-3 bg-clay-50 rounded-xl text-center">
+                      <div className="text-xs font-bold text-clay-600">소통(MBTI) 궁합</div>
                       <div className="text-2xl font-black text-slate-900">{compat.breakdown.mbtiScore}</div>
                     </div>
                   </div>
@@ -585,7 +585,7 @@ export default function SajuPage() {
                   <div className="space-y-1.5">
                     {compat.breakdown.reasons.map((reason, i) => (
                       <div key={i} className="flex gap-2">
-                        <Sparkles className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />
+                        <Sparkles className="w-3.5 h-3.5 text-clay-500 shrink-0 mt-0.5" />
                         <p className="text-sm text-slate-700 leading-relaxed">{reason}</p>
                       </div>
                     ))}

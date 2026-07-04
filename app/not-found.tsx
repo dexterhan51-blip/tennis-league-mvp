@@ -7,7 +7,7 @@ export default function NotFound() {
       <p className="text-lg text-slate-500">페이지를 찾을 수 없습니다.</p>
       <Link
         href="/"
-        className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
+        className="px-6 py-3 bg-clay-600 text-white rounded-xl font-bold hover:bg-clay-700 transition-colors"
       >
         홈으로 돌아가기
       </Link>

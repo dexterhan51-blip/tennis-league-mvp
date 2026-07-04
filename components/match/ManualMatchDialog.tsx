@@ -100,7 +100,7 @@ export default function ManualMatchDialog({
         onClick={() => handleSlotTap(slotKey)}
         className={`w-full px-3 py-2.5 rounded-lg border-2 border-dashed text-sm font-bold transition-all text-left ${
           player
-            ? 'bg-blue-50 border-blue-300 text-blue-700'
+            ? 'bg-clay-50 border-clay-300 text-clay-700'
             : isActive
               ? 'bg-yellow-50 border-yellow-400 text-yellow-700 animate-pulse'
               : 'bg-slate-50 border-slate-300 text-slate-400'
@@ -181,7 +181,7 @@ export default function ManualMatchDialog({
                   onClick={() => handlePlayerTap(p)}
                   className={`p-3 rounded-lg border text-center text-xs font-bold transition-all touch-target ${
                     isAssigned
-                      ? 'bg-blue-100 border-blue-400 text-blue-700'
+                      ? 'bg-clay-100 border-clay-400 text-clay-700'
                       : isGuest
                         ? 'bg-slate-50 border-dashed border-slate-300 text-slate-500'
                         : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
@@ -189,7 +189,7 @@ export default function ManualMatchDialog({
                 >
                   {p.name}
                   {isAssigned && (
-                    <span className="block text-[10px] text-blue-500 mt-0.5">
+                    <span className="block text-[10px] text-clay-500 mt-0.5">
                       {Object.entries(slots).find(([, v]) => v?.id === p.id)?.[0]?.startsWith('a') ? '팀A' : '팀B'}
                     </span>
                   )}
@@ -210,7 +210,7 @@ export default function ManualMatchDialog({
           <button
             onClick={handleConfirm}
             disabled={!isFull}
-            className="flex-1 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors touch-target"
+            className="flex-1 py-3 rounded-xl font-bold text-white bg-clay-600 hover:bg-clay-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors touch-target"
           >
             경기 생성
           </button>

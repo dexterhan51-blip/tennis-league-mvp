@@ -79,7 +79,7 @@ export default function BottomTabBar() {
               className={`
                 flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl transition-colors touch-target
                 ${active
-                  ? 'text-blue-600'
+                  ? 'text-clay-600'
                   : 'text-slate-400 hover:text-slate-600'
                 }
               `}

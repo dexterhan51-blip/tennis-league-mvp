@@ -39,9 +39,9 @@ export default function MatchHistoryModal({ isOpen, matches, onClose }: MatchHis
                     {m.teamA.man.id !== m.teamA.woman.id && <div className="text-xs text-slate-400">{m.teamA.woman.name}</div>}
                   </div>
                   <div className="flex-shrink-0 text-center">
-                    <span className={`text-lg font-black ${winner === 'A' ? 'text-blue-600' : 'text-slate-800'}`}>{m.scoreA}</span>
+                    <span className={`text-lg font-black ${winner === 'A' ? 'text-clay-600' : 'text-slate-800'}`}>{m.scoreA}</span>
                     <span className="text-slate-400 mx-1">:</span>
-                    <span className={`text-lg font-black ${winner === 'B' ? 'text-blue-600' : 'text-slate-800'}`}>{m.scoreB}</span>
+                    <span className={`text-lg font-black ${winner === 'B' ? 'text-clay-600' : 'text-slate-800'}`}>{m.scoreB}</span>
                   </div>
                   <div className={`flex-1 text-left ${winner === 'B' ? 'font-bold text-slate-900' : 'text-slate-600'}`}>
                     <div className="text-sm">{m.teamB.man.name}</div>

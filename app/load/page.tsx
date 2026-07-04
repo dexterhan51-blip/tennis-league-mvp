@@ -93,7 +93,7 @@ export default function LoadPage() {
               disabled={!hasData}
               className={`relative w-full p-5 rounded-2xl border-2 text-left transition-all touch-target ${
                 isSelected
-                  ? 'bg-slate-800 border-blue-500'
+                  ? 'bg-slate-800 border-clay-500'
                   : hasData
                   ? 'bg-slate-900/50 border-slate-700 hover:border-slate-600'
                   : 'bg-slate-900/30 border-slate-800 cursor-not-allowed'
@@ -101,17 +101,17 @@ export default function LoadPage() {
               aria-pressed={isSelected}
             >
               <div className="flex justify-between items-start mb-3">
-                <span className={`text-xs font-bold px-2 py-1 rounded ${isSelected ? 'bg-blue-600' : 'bg-slate-700'}`}>
+                <span className={`text-xs font-bold px-2 py-1 rounded ${isSelected ? 'bg-clay-600' : 'bg-slate-700'}`}>
                   SLOT {index + 1}
                 </span>
-                {isSelected && <CheckCircle className="text-blue-500" size={20} />}
+                {isSelected && <CheckCircle className="text-clay-500" size={20} />}
               </div>
 
               {slot ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
-                      <Save size={24} className="text-blue-400" />
+                      <Save size={24} className="text-clay-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h2 className="text-lg font-bold truncate">{slot.name}</h2>
@@ -153,7 +153,7 @@ export default function LoadPage() {
           disabled={selectedIdx === null}
           className={`w-full py-4 rounded-xl font-bold text-lg transition-all touch-target ${
             selectedIdx !== null
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              ? 'bg-clay-600 text-white hover:bg-clay-700'
               : 'bg-slate-800 text-slate-500 cursor-not-allowed'
           }`}
         >

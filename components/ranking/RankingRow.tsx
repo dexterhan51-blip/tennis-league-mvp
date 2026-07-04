@@ -112,7 +112,7 @@ export default function RankingRow({ player, photo, onClick }: RankingRowProps) 
 
       {/* Points */}
       <div className="text-right">
-        <span className="text-lg font-bold text-blue-600 animate-score-bump">
+        <span className="text-lg font-bold text-clay-600 animate-score-bump">
           {totalPoints}
         </span>
         <span className="text-xs text-slate-400 ml-0.5">점</span>

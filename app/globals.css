@@ -13,6 +13,20 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* 러브포티 브랜드 클레이 팔레트 (로고 배경색 #BF633A 기준) */
+@theme {
+  --color-clay-50: #faf1ec;
+  --color-clay-100: #f4e0d5;
+  --color-clay-200: #e9c2ac;
+  --color-clay-300: #dda283;
+  --color-clay-400: #d0815b;
+  --color-clay-500: #c56f45;
+  --color-clay-600: #bf633a;
+  --color-clay-700: #a0522f;
+  --color-clay-800: #814226;
+  --color-clay-900: #66351f;
+}
+
 /* Light theme */
 :root,
 html.light {

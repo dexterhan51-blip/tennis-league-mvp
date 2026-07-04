@@ -54,7 +54,7 @@ export default function ConfirmDialog({
   const isDanger = variant === 'danger';
   const confirmButtonClass = isDanger
     ? 'bg-red-500 hover:bg-red-600 text-white'
-    : 'bg-blue-600 hover:bg-blue-700 text-white';
+    : 'bg-clay-600 hover:bg-clay-700 text-white';
 
   return (
     <div

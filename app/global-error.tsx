@@ -18,7 +18,7 @@ export default function GlobalError({
           <p className="text-sm text-slate-500">앱을 다시 시작해주세요.</p>
           <button
             onClick={reset}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold"
+            className="px-6 py-3 bg-clay-600 text-white rounded-xl font-bold"
           >
             다시 시도
           </button>

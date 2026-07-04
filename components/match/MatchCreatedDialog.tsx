@@ -70,7 +70,7 @@ export default function MatchCreatedDialog({
         <div className="overflow-auto flex-1 p-4 space-y-3">
           {matches.map((m, idx) => (
             <div key={m.id} className="bg-slate-50 rounded-xl p-3 border border-slate-200">
-              <div className="text-xs font-bold text-blue-600 mb-2">GAME {idx + 1}</div>
+              <div className="text-xs font-bold text-clay-600 mb-2">GAME {idx + 1}</div>
               <div className="flex items-center gap-3">
                 <div className="flex-1 text-right">
                   <div className="text-sm font-bold text-slate-800">{m.teamA.man.name}</div>
@@ -106,7 +106,7 @@ export default function MatchCreatedDialog({
               )}
               <button
                 onClick={onConfirm}
-                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors touch-target"
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 transition-colors touch-target"
               >
                 생성
               </button>
@@ -123,7 +123,7 @@ export default function MatchCreatedDialog({
               )}
               <button
                 onClick={onClose}
-                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors touch-target"
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 transition-colors touch-target"
               >
                 확인
               </button>

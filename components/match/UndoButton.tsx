@@ -50,7 +50,7 @@ export default function UndoButton() {
       {/* Progress bar */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-600 rounded-b-xl overflow-hidden">
         <div
-          className="h-full bg-blue-400 transition-all duration-50 ease-linear"
+          className="h-full bg-clay-400 transition-all duration-50 ease-linear"
           style={{ width: `${progress}%` }}
         />
       </div>

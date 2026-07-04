@@ -114,10 +114,10 @@ export default function EndSeasonDialog({
             <div className="p-4 space-y-3">
               <button
                 onClick={() => handleOption('archive-and-new')}
-                className="w-full flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors touch-target text-left"
+                className="w-full flex items-center gap-3 p-4 bg-clay-50 hover:bg-clay-100 rounded-xl transition-colors touch-target text-left"
               >
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <Plus size={20} className="text-blue-600" />
+                <div className="w-10 h-10 rounded-full bg-clay-100 flex items-center justify-center flex-shrink-0">
+                  <Plus size={20} className="text-clay-600" />
                 </div>
                 <div className="flex-1">
                   <div className="font-bold text-slate-900 text-sm">아카이브 후 새 시즌</div>

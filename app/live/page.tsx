@@ -50,7 +50,7 @@ function LiveDashboardView({ leagueId }: { leagueId: string }) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3" />
+          <Loader2 className="w-8 h-8 text-clay-500 animate-spin mx-auto mb-3" />
           <p className="text-sm text-slate-500">대시보드 연결 중...</p>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function LiveDashboardPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-clay-500 animate-spin" />
       </div>
     }>
       <LiveDashboardContent />

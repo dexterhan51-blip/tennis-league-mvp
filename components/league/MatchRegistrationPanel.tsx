@@ -55,7 +55,7 @@ export default function MatchRegistrationPanel({
     <section>
       <button
         onClick={onToggle}
-        className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-md touch-target ${isOpen ? 'bg-slate-100 text-slate-600' : 'bg-blue-600 text-white'}`}
+        className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-md touch-target ${isOpen ? 'bg-slate-100 text-slate-600' : 'bg-clay-600 text-white'}`}
         aria-expanded={isOpen}
       >
         {isOpen ? <XCircle size={20}/> : <PlusCircle size={20}/>}
@@ -133,7 +133,7 @@ export default function MatchRegistrationPanel({
                       onClick={() => setCourtMinutes(min)}
                       className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                         courtMinutes === min
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-clay-600 text-white'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       }`}
                     >
@@ -151,7 +151,7 @@ export default function MatchRegistrationPanel({
                       onClick={() => setGameMinutes(min)}
                       className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                         gameMinutes === min
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-clay-600 text-white'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       }`}
                     >
@@ -162,7 +162,7 @@ export default function MatchRegistrationPanel({
               </div>
               <div className="flex items-center justify-between pt-1 border-t border-slate-100">
                 <span className="text-xs text-slate-500">예상 가능 게임</span>
-                <span className="text-sm font-bold text-blue-600">{Math.floor(courtMinutes / gameMinutes)}게임</span>
+                <span className="text-sm font-bold text-clay-600">{Math.floor(courtMinutes / gameMinutes)}게임</span>
               </div>
               {selectedForMatch.length >= 4 && (
                 <div className="flex items-center justify-between">
@@ -211,8 +211,8 @@ export default function MatchRegistrationPanel({
                     className={`p-3 rounded-lg border text-center text-xs font-bold transition-all touch-target ${
                       isSelected
                         ? isGuest
-                          ? 'bg-blue-50 border-blue-400 border-dashed text-blue-600 cursor-default'
-                          : 'bg-blue-100 border-blue-500 text-blue-700'
+                          ? 'bg-clay-50 border-clay-400 border-dashed text-clay-600 cursor-default'
+                          : 'bg-clay-100 border-clay-500 text-clay-700'
                         : 'bg-white border-slate-200 hover:bg-slate-50'
                     }`}
                     aria-pressed={isSelected}
@@ -226,7 +226,7 @@ export default function MatchRegistrationPanel({
 
           {/* Match Type Buttons */}
           <div className="space-y-2">
-            <button onClick={() => onCreateMatch('MIXED')} className="w-full bg-blue-50 border-2 border-blue-200 text-blue-700 py-3 rounded-xl font-bold touch-target cursor-pointer active:scale-[0.98] transition-transform">
+            <button onClick={() => onCreateMatch('MIXED')} className="w-full bg-clay-50 border-2 border-clay-200 text-clay-700 py-3 rounded-xl font-bold touch-target cursor-pointer active:scale-[0.98] transition-transform">
               <Shuffle size={16} className="inline -mt-0.5" /> 혼복 풀리그
             </button>
             <button onClick={() => onCreateMatch('MIXED_SINGLES')} className="w-full bg-purple-50 border-2 border-purple-200 text-purple-700 py-3 rounded-xl font-bold touch-target cursor-pointer active:scale-[0.98] transition-transform">

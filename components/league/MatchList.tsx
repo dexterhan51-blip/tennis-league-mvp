@@ -117,7 +117,7 @@ export default function MatchList({
         <div className="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-300">
           <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm mb-3">{matchDate} 진행된 게임이 없습니다.</p>
-          <button onClick={onOpenRegistration} className="text-sm text-blue-600 font-bold hover:underline cursor-pointer">
+          <button onClick={onOpenRegistration} className="text-sm text-clay-600 font-bold hover:underline cursor-pointer">
             + 게임 등록하기
           </button>
         </div>
@@ -135,7 +135,7 @@ export default function MatchList({
             <div className={`p-4 rounded-xl border shadow-sm transition-colors ${m.isFinished ? 'bg-green-50/50 border-green-200' : 'bg-white border-slate-200'}`}>
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-blue-600">GAME {idx + 1}</span>
+                  <span className="text-xs font-bold text-clay-600">GAME {idx + 1}</span>
                   {isSingles && <span className="bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded text-xs font-bold">단식</span>}
                   {m.isExhibition && <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-xs font-bold">시범</span>}
                 </div>
@@ -187,7 +187,7 @@ export default function MatchList({
                     <button
                       onClick={() => onCommitScore(m.id)}
                       disabled={!hasPendingScore}
-                      className={`w-full py-2.5 rounded-lg font-bold text-sm transition-colors touch-target ${hasPendingScore ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
+                      className={`w-full py-2.5 rounded-lg font-bold text-sm transition-colors touch-target ${hasPendingScore ? 'bg-clay-600 text-white hover:bg-clay-700' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
                     >
                       완료
                     </button>

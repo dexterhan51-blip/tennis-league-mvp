@@ -22,7 +22,7 @@ export default function LoadingSpinner({
   const spinner = (
     <div className="flex flex-col items-center gap-3">
       <div
-        className={`${sizeClasses[size]} border-blue-600 border-t-transparent rounded-full animate-spin`}
+        className={`${sizeClasses[size]} border-clay-600 border-t-transparent rounded-full animate-spin`}
         role="status"
         aria-label="로딩 중"
       />

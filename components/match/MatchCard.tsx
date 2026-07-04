@@ -40,10 +40,10 @@ export default function MatchCard({
       </div>
 
       {/* Team A */}
-      <div className={`mb-4 ${teamAWon ? 'ring-2 ring-blue-200 rounded-lg p-2 -m-2' : ''}`}>
+      <div className={`mb-4 ${teamAWon ? 'ring-2 ring-clay-200 rounded-lg p-2 -m-2' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
           {teamAWon && (
-            <span className="text-xs font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">
+            <span className="text-xs font-bold text-clay-600 bg-clay-100 px-1.5 py-0.5 rounded">
               WIN
             </span>
           )}
@@ -70,10 +70,10 @@ export default function MatchCard({
       </div>
 
       {/* Team B */}
-      <div className={`${teamBWon ? 'ring-2 ring-blue-200 rounded-lg p-2 -m-2' : ''}`}>
+      <div className={`${teamBWon ? 'ring-2 ring-clay-200 rounded-lg p-2 -m-2' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
           {teamBWon && (
-            <span className="text-xs font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">
+            <span className="text-xs font-bold text-clay-600 bg-clay-100 px-1.5 py-0.5 rounded">
               WIN
             </span>
           )}

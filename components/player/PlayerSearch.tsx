@@ -46,7 +46,7 @@ export default function PlayerSearch({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-10 pr-10 py-3 bg-slate-100 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder-slate-400"
+        className="w-full pl-10 pr-10 py-3 bg-slate-100 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-clay-500 text-slate-900 placeholder-slate-400"
         aria-label="선수 검색"
       />
       {query && (

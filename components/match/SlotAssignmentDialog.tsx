@@ -122,7 +122,7 @@ export default function SlotAssignmentDialog({
         className={`w-full px-3 py-2.5 rounded-lg border-2 border-dashed text-sm font-bold transition-all flex items-center gap-2 ${
           player
             ? gender === 'M'
-              ? 'bg-blue-50 border-blue-300 text-blue-700'
+              ? 'bg-clay-50 border-clay-300 text-clay-700'
               : 'bg-pink-50 border-pink-300 text-pink-700'
             : isActive
               ? 'bg-yellow-50 border-yellow-400 text-yellow-700 animate-pulse'
@@ -134,7 +134,7 @@ export default function SlotAssignmentDialog({
           className={`flex-shrink-0 w-9 text-center text-xs font-black ${
             player
               ? gender === 'M'
-                ? 'text-blue-500'
+                ? 'text-clay-500'
                 : 'text-pink-500'
               : 'text-slate-400'
           }`}
@@ -294,7 +294,7 @@ export default function SlotAssignmentDialog({
           <button
             onClick={handleConfirm}
             disabled={!isFull}
-            className="flex-1 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors touch-target"
+            className="flex-1 py-3 rounded-xl font-bold text-white bg-clay-600 hover:bg-clay-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors touch-target"
           >
             대진 생성
           </button>

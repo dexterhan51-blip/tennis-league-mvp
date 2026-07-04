@@ -193,14 +193,14 @@ export default function SettingsPage() {
                 onClick={() => setTheme(option.value)}
                 className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all touch-target ${
                   theme === option.value
-                    ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-500'
+                    ? 'bg-clay-100 text-clay-600 ring-2 ring-clay-500'
                     : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
                 }`}
                 aria-pressed={theme === option.value}
               >
                 {option.icon}
                 <span className="text-xs font-medium">{option.label}</span>
-                {theme === option.value && <CheckCircle className="w-4 h-4 text-blue-600" />}
+                {theme === option.value && <CheckCircle className="w-4 h-4 text-clay-600" />}
               </button>
             ))}
           </div>
@@ -218,7 +218,7 @@ export default function SettingsPage() {
                 onClick={() => handleFontSizeChange(option.value)}
                 className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all touch-target ${
                   fontSize === option.value
-                    ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-500'
+                    ? 'bg-clay-100 text-clay-600 ring-2 ring-clay-500'
                     : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
                 }`}
                 aria-pressed={fontSize === option.value}
@@ -236,7 +236,7 @@ export default function SettingsPage() {
           <h2 className="text-sm font-bold text-slate-700 mb-4">데이터 관리</h2>
           <div className="space-y-3">
             <button onClick={handleExport} className="w-full flex items-center gap-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors touch-target">
-              <Download className="w-5 h-5 text-blue-600" />
+              <Download className="w-5 h-5 text-clay-600" />
               <div className="flex-1 text-left">
                 <div className="font-medium text-slate-900">데이터 내보내기</div>
                 <div className="text-xs text-slate-500">선수, 리그 데이터를 JSON 파일로 백업</div>
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                   onClick={() => handleCopySeasonReport(archive)}
                   className="w-full flex items-center gap-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors touch-target"
                 >
-                  <Copy className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                  <Copy className="w-5 h-5 text-clay-600 flex-shrink-0" />
                   <div className="flex-1 text-left min-w-0">
                     <div className="font-medium text-slate-900 truncate">{archive.leagueName}</div>
                     <div className="text-xs text-slate-500">

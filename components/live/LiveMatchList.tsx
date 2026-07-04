@@ -93,10 +93,10 @@ export function LiveMatchList({ matches, finished, total, players }: LiveMatchLi
                 {/* 팀 A */}
                 <div className={`flex items-center justify-between py-1 ${aWon ? 'opacity-100' : isFinished ? 'opacity-60' : ''}`}>
                   <div className="flex items-center gap-2">
-                    {aWon && <span className="text-xs font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">WIN</span>}
+                    {aWon && <span className="text-xs font-bold bg-clay-100 text-clay-600 px-1.5 py-0.5 rounded">WIN</span>}
                     <TeamDisplay man={match.teamA.man} woman={match.teamA.woman} photoOf={photoOf} />
                   </div>
-                  <span className={`text-lg font-black ${aWon ? 'text-blue-600' : 'text-slate-500'}`}>
+                  <span className={`text-lg font-black ${aWon ? 'text-clay-600' : 'text-slate-500'}`}>
                     {isFinished ? match.scoreA : '-'}
                   </span>
                 </div>
@@ -107,10 +107,10 @@ export function LiveMatchList({ matches, finished, total, players }: LiveMatchLi
                 {/* 팀 B */}
                 <div className={`flex items-center justify-between py-1 ${bWon ? 'opacity-100' : isFinished ? 'opacity-60' : ''}`}>
                   <div className="flex items-center gap-2">
-                    {bWon && <span className="text-xs font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">WIN</span>}
+                    {bWon && <span className="text-xs font-bold bg-clay-100 text-clay-600 px-1.5 py-0.5 rounded">WIN</span>}
                     <TeamDisplay man={match.teamB.man} woman={match.teamB.woman} photoOf={photoOf} />
                   </div>
-                  <span className={`text-lg font-black ${bWon ? 'text-blue-600' : 'text-slate-500'}`}>
+                  <span className={`text-lg font-black ${bWon ? 'text-clay-600' : 'text-slate-500'}`}>
                     {isFinished ? match.scoreB : '-'}
                   </span>
                 </div>

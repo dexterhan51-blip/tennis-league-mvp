@@ -144,7 +144,7 @@ export default function RelationsPage() {
           <ArrowLeft size={20} />
         </button>
         <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <Users className="w-5 h-5 text-blue-600" /> 우리 리그 궁합 관계도
+          <Users className="w-5 h-5 text-clay-600" /> 우리 리그 궁합 관계도
         </h1>
       </header>
 
@@ -158,12 +158,12 @@ export default function RelationsPage() {
           onChange={(e) => setBulkText(e.target.value)}
           rows={3}
           placeholder={"지윤 - SAJU1-228C-TBR7\n빛나 - SAJU1-3A82-83W5"}
-          className="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-clay-500 focus:border-clay-500"
         />
         <div className="flex gap-2 mt-2">
           <button
             onClick={handleAdd}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-colors touch-target"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-sm bg-clay-600 text-white hover:bg-clay-700 transition-colors touch-target"
           >
             <Plus className="w-4 h-4" /> 명단에 추가
           </button>
@@ -193,7 +193,7 @@ export default function RelationsPage() {
                 type="checkbox"
                 checked={strongOnly}
                 onChange={(e) => setStrongOnly(e.target.checked)}
-                className="accent-blue-600"
+                className="accent-clay-600"
               />
               좋은 궁합만
             </label>

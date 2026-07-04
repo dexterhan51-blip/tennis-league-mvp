@@ -74,7 +74,7 @@ export function LiveRanking({ rankings, players }: LiveRankingProps) {
                   </span>
                 </div>
               </div>
-              <span className="text-sm font-bold text-blue-600 text-center">{stat.wins}</span>
+              <span className="text-sm font-bold text-clay-600 text-center">{stat.wins}</span>
               <span className="text-sm text-slate-400 text-center">{stat.draws}</span>
               <span className="text-sm text-slate-500 text-center">{stat.losses}</span>
               <span className="text-xs font-medium text-slate-600 text-center">{winRatePercent}%</span>

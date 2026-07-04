@@ -70,7 +70,7 @@ export default function MvpAwardDialog({
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors touch-target"
+            className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 transition-colors touch-target"
           >
             MVP 확정
           </button>

@@ -168,9 +168,9 @@ export default function PlayerStatsModal({
               </div>
               <div className="bg-white p-4 space-y-3">
                 <div className="flex gap-2.5">
-                  <Zap className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <Zap className="w-4 h-4 text-clay-500 flex-shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-bold text-blue-600 mb-0.5">플레이스타일</div>
+                    <div className="text-xs font-bold text-clay-600 mb-0.5">플레이스타일</div>
                     <p className="text-sm text-slate-700 leading-relaxed">{character.style}</p>
                   </div>
                 </div>
@@ -235,10 +235,10 @@ export default function PlayerStatsModal({
         {stats && (
           <div className="px-6 pb-4">
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-blue-50 rounded-xl">
+              <div className="p-4 bg-clay-50 rounded-xl">
                 <div className="flex items-center gap-2 mb-1">
-                  <Trophy className="w-4 h-4 text-blue-600" />
-                  <span className="text-xs font-medium text-blue-600">총 경기</span>
+                  <Trophy className="w-4 h-4 text-clay-600" />
+                  <span className="text-xs font-medium text-clay-600">총 경기</span>
                 </div>
                 <span className="text-2xl font-bold text-slate-900">
                   {stats.matchesPlayed}
@@ -286,7 +286,7 @@ export default function PlayerStatsModal({
               </div>
               <div className="h-2 bg-slate-200 rounded-full overflow-hidden flex">
                 <div
-                  className="h-full bg-blue-500 transition-all"
+                  className="h-full bg-clay-500 transition-all"
                   style={{
                     width: `${stats.matchesPlayed > 0 ? (stats.wins / stats.matchesPlayed) * 100 : 0}%`,
                   }}
@@ -311,12 +311,12 @@ export default function PlayerStatsModal({
                 <div
                   key={i}
                   className={`flex-1 p-3 rounded-xl text-center ${
-                    r.won ? 'bg-blue-100' : r.draw ? 'bg-slate-100' : 'bg-red-100'
+                    r.won ? 'bg-clay-100' : r.draw ? 'bg-slate-100' : 'bg-red-100'
                   }`}
                 >
                   <div
                     className={`text-xs font-bold mb-1 ${
-                      r.won ? 'text-blue-600' : r.draw ? 'text-slate-500' : 'text-red-600'
+                      r.won ? 'text-clay-600' : r.draw ? 'text-slate-500' : 'text-red-600'
                     }`}
                   >
                     {r.won ? '승' : r.draw ? '무' : '패'}
@@ -351,7 +351,7 @@ export default function PlayerStatsModal({
                   >
                     <span className="text-sm font-medium text-slate-800 truncate">vs {r.name}</span>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`text-sm font-bold ${dominant ? 'text-blue-600' : r.wins < r.losses ? 'text-red-500' : 'text-slate-600'}`}>
+                      <span className={`text-sm font-bold ${dominant ? 'text-clay-600' : r.wins < r.losses ? 'text-red-500' : 'text-slate-600'}`}>
                         {r.wins}승{r.draws > 0 ? ` ${r.draws}무` : ''} {r.losses}패
                       </span>
                       <span className="text-xs text-slate-400">({total}경기)</span>
@@ -371,7 +371,7 @@ export default function PlayerStatsModal({
         {/* Total Points */}
         {stats && (
           <div className="px-6 pb-6">
-            <div className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl text-white">
+            <div className="p-4 bg-gradient-to-r from-clay-500 to-clay-600 rounded-xl text-white">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium opacity-90">총 점수</span>
                 <span className="text-3xl font-bold">{stats.totalPoints}</span>

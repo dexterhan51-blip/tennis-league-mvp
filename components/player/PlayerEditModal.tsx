@@ -175,7 +175,7 @@ export default function PlayerEditModal({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-clay-500 focus:border-clay-500"
               placeholder="선수 이름"
             />
           </div>
@@ -222,7 +222,7 @@ export default function PlayerEditModal({
           <button
             onClick={handleSave}
             disabled={!name.trim()}
-            className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
+            className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
           >
             저장
           </button>

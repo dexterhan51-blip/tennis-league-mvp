@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Player } from '@/types';
-import { Table, Save, Medal, Flag, Film } from 'lucide-react';
+import { Table, Save, Medal, Flag, Film, Pencil } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
 import { copyToClipboard, generateBracketText } from '@/utils/shareUtils';
 import { generateTimelineText, hasTimelineData } from '@/lib/timelineExport';
@@ -33,7 +33,7 @@ export default function LeaguePage() {
   const {
     leagueName, players, setPlayers, matches, setMatches,
     slotIndex, previousRankings, finishedDates, setFinishedDates,
-    isLoading, handleManualSave, handleEndSeason,
+    isLoading, handleManualSave, handleEndSeason, handleRenameLeague,
   } = useLeagueData();
 
   const handleExportTimeline = async () => {
@@ -56,6 +56,8 @@ export default function LeaguePage() {
   const [showEndSeasonDialog, setShowEndSeasonDialog] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
+  const [showRenameDialog, setShowRenameDialog] = useState(false);
+  const [renameInput, setRenameInput] = useState('');
 
   const { careerStats, getPlayerCareer, reload: reloadCareerStats } = usePlayerCareerStats();
   const { rankings, rankingsWithChange, matchDates } = useLeagueRankings(players, matches, previousRankings, careerStats);
@@ -166,7 +168,14 @@ export default function LeaguePage() {
       <div className="px-4 space-y-6 pt-4">
         <div className="text-center">
           <h1 className="text-2xl font-black text-slate-800 flex justify-center items-center gap-2">
-            <span className="text-blue-600">-</span> {leagueName} <span className="text-blue-600">-</span>
+            <span className="text-clay-600">-</span> {leagueName} <span className="text-clay-600">-</span>
+            <button
+              onClick={() => { setRenameInput(leagueName); setShowRenameDialog(true); }}
+              className="p-1.5 text-slate-300 hover:text-clay-600 transition-colors touch-target"
+              aria-label="시즌 이름 변경"
+            >
+              <Pencil size={16} />
+            </button>
           </h1>
         </div>
 
@@ -246,7 +255,7 @@ export default function LeaguePage() {
 
         {/* Bottom Action Bar */}
         <div className="fixed bottom-20 left-0 right-0 p-4 bg-white border-t border-slate-100 max-w-md mx-auto flex gap-2 z-30">
-          <button onClick={() => handleManualSave(rankings)} className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg touch-target">
+          <button onClick={() => handleManualSave(rankings)} className="flex-1 bg-clay-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg touch-target">
             <Save size={18}/> 저장하기
           </button>
           <button onClick={() => setShowEndSeasonDialog(true)} className="px-4 bg-amber-50 text-amber-600 border border-amber-200 rounded-xl font-bold touch-target" aria-label="시즌 종료">
@@ -271,6 +280,50 @@ export default function LeaguePage() {
         onConfirm={() => { if (deleteMatchId) { deleteMatch(deleteMatchId); setDeleteMatchId(null); } }}
         onCancel={() => setDeleteMatchId(null)}
       />
+
+      {/* Rename Season Dialog */}
+      {showRenameDialog && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="rename-season-title"
+        >
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl animate-scale-in p-5">
+            <h3 id="rename-season-title" className="font-bold text-lg text-slate-900 mb-1">시즌 이름 변경</h3>
+            <p className="text-xs text-slate-500 mb-4">진행 중인 시즌의 이름만 바뀌고 기록은 그대로 유지됩니다.</p>
+            <input
+              type="text"
+              value={renameInput}
+              onChange={(e) => setRenameInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && renameInput.trim()) {
+                  handleRenameLeague(renameInput);
+                  setShowRenameDialog(false);
+                }
+              }}
+              placeholder="예: 2026 7~8월 리그"
+              autoFocus
+              className="w-full px-4 py-3 border border-slate-300 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-clay-500 focus:border-clay-500"
+            />
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => setShowRenameDialog(false)}
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors touch-target"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => { handleRenameLeague(renameInput); setShowRenameDialog(false); }}
+                disabled={!renameInput.trim()}
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
+              >
+                변경
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* End Season Dialog */}
       <EndSeasonDialog

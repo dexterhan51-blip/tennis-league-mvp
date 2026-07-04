@@ -43,7 +43,7 @@ export default function SeasonHistorySection({ seasonHistory }: SeasonHistorySec
               <span className={`text-sm font-bold ${record.finalRank === 1 ? 'text-amber-600' : 'text-slate-700'}`}>
                 {record.finalRank}위
               </span>
-              <span className="text-sm font-bold text-blue-600">
+              <span className="text-sm font-bold text-clay-600">
                 {record.totalPoints}점
               </span>
             </div>

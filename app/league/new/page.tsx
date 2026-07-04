@@ -106,7 +106,7 @@ export default function NewLeaguePage() {
               value={leagueName}
               onChange={(e) => setLeagueName(e.target.value)}
               placeholder="예: 2026 수요테니스"
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none font-bold text-slate-800"
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-clay-500 focus:ring-2 focus:ring-clay-100 outline-none font-bold text-slate-800"
               aria-label="리그 이름"
             />
           </div>
@@ -121,7 +121,7 @@ export default function NewLeaguePage() {
                 onClick={() => setTargetSlot(num)}
                 className={`flex-1 py-3 rounded-xl border-2 flex flex-col items-center justify-center transition-all touch-target ${
                   targetSlot === num
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    ? 'border-clay-600 bg-clay-50 text-clay-700'
                     : 'border-slate-200 bg-white text-slate-400'
                 }`}
                 role="radio"
@@ -144,7 +144,7 @@ export default function NewLeaguePage() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none font-medium"
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-clay-500 focus:ring-2 focus:ring-clay-100 outline-none font-medium"
               aria-label="시즌 종료일"
             />
           </div>
@@ -154,10 +154,10 @@ export default function NewLeaguePage() {
           <div className="flex justify-between items-end mb-3">
             <label className="text-sm font-bold text-slate-500">선수 풀 (터치하여 참가)</label>
             <div className="flex items-center gap-2">
-              <button onClick={selectAll} className="text-xs font-medium text-blue-600 hover:text-blue-700 touch-target">
+              <button onClick={selectAll} className="text-xs font-medium text-clay-600 hover:text-clay-700 touch-target">
                 {selectedIds.length === allPlayers.length ? '전체 해제' : '전체 선택'}
               </button>
-              <span className="text-blue-600 font-bold text-sm bg-blue-50 px-2 py-1 rounded-lg">
+              <span className="text-clay-600 font-bold text-sm bg-clay-50 px-2 py-1 rounded-lg">
                 현재 {selectedIds.length}명
               </span>
             </div>
@@ -167,7 +167,7 @@ export default function NewLeaguePage() {
             <div className="text-center py-10 bg-white rounded-xl border border-dashed border-slate-300">
               <User size={40} className="mx-auto mb-2 text-slate-300" />
               <p className="text-slate-400 text-sm">등록된 선수가 없습니다.</p>
-              <Link href="/players" className="inline-block mt-3 text-blue-600 font-medium text-sm hover:underline">
+              <Link href="/players" className="inline-block mt-3 text-clay-600 font-medium text-sm hover:underline">
                 선수 등록하러 가기 →
               </Link>
             </div>
@@ -180,12 +180,12 @@ export default function NewLeaguePage() {
                     key={player.id}
                     onClick={() => togglePlayer(player.id)}
                     className={`p-3 rounded-xl border-2 transition-all flex items-center gap-3 touch-target ${
-                      isSelected ? 'border-blue-500 bg-blue-50/50' : 'border-transparent bg-white hover:bg-slate-50'
+                      isSelected ? 'border-clay-500 bg-clay-50/50' : 'border-transparent bg-white hover:bg-slate-50'
                     }`}
                     aria-pressed={isSelected}
                   >
                     {isSelected ? (
-                      <CheckCircle className="text-blue-500 flex-shrink-0" size={20} />
+                      <CheckCircle className="text-clay-500 flex-shrink-0" size={20} />
                     ) : (
                       <Circle className="text-slate-300 flex-shrink-0" size={20} />
                     )}
@@ -198,7 +198,7 @@ export default function NewLeaguePage() {
                         <User size={16} />
                       </div>
                     )}
-                    <span className={`font-bold truncate ${isSelected ? 'text-blue-700' : 'text-slate-600'}`}>
+                    <span className={`font-bold truncate ${isSelected ? 'text-clay-700' : 'text-slate-600'}`}>
                       {player.name}
                     </span>
                   </button>

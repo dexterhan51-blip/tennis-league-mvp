@@ -28,6 +28,7 @@ interface UseLeagueDataResult {
   handleManualSave: (rankings: { playerId: string }[]) => void;
   handleDeleteLeague: () => void;
   handleEndSeason: (option: EndSeasonOption) => void;
+  handleRenameLeague: (newName: string) => void;
 }
 
 export function useLeagueData(): UseLeagueDataResult {
@@ -94,6 +95,17 @@ export function useLeagueData(): UseLeagueDataResult {
       showToast('저장되었습니다.', 'success');
     }
   }, [slotIndex, leagueName, players, matches, showToast]);
+
+  const handleRenameLeague = useCallback((newName: string) => {
+    const trimmed = newName.trim();
+    if (!trimmed) {
+      showToast('리그 이름을 입력하세요.', 'warning');
+      return;
+    }
+    // 저장은 auto-save effect가 처리 (current-league + slot 동시 반영)
+    setLeagueName(trimmed);
+    showToast('시즌 이름이 변경되었습니다.', 'success');
+  }, [showToast]);
 
   const handleDeleteLeague = useCallback(() => {
     safeRemoveAsync('current-league');
@@ -194,5 +206,6 @@ export function useLeagueData(): UseLeagueDataResult {
     handleManualSave,
     handleDeleteLeague,
     handleEndSeason,
+    handleRenameLeague,
   };
 }

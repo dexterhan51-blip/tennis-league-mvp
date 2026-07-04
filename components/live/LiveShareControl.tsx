@@ -116,7 +116,7 @@ export function LiveShareControl({
     <>
       <button
         onClick={() => setShowDialog(true)}
-        className="flex items-center gap-1 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg font-bold text-xs border border-blue-200 touch-target cursor-pointer active:scale-[0.98] transition-transform"
+        className="flex items-center gap-1 bg-clay-50 text-clay-600 px-3 py-1.5 rounded-lg font-bold text-xs border border-clay-200 touch-target cursor-pointer active:scale-[0.98] transition-transform"
         aria-label="실시간 공유"
       >
         <Radio size={14} /> 실시간 공유
@@ -129,7 +129,7 @@ export function LiveShareControl({
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Radio size={20} className="text-blue-600" /> 실시간 공유
+                  <Radio size={20} className="text-clay-600" /> 실시간 공유
                 </h3>
                 <button onClick={() => { setShowDialog(false); setErrorMsg(''); }} className="p-1 hover:bg-slate-100 rounded-full touch-target">
                   <X size={20} className="text-slate-400" />
@@ -153,7 +153,7 @@ export function LiveShareControl({
                     setErrorMsg('');
                   }}
                   placeholder="0000"
-                  className="w-full text-center text-2xl font-black tracking-[0.5em] py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full text-center text-2xl font-black tracking-[0.5em] py-3 border-2 border-slate-200 rounded-xl focus:border-clay-500 focus:outline-none transition-colors"
                 />
                 {errorMsg && <p className="text-xs text-red-500 mt-2">{errorMsg}</p>}
               </div>
@@ -173,7 +173,7 @@ export function LiveShareControl({
               <button
                 onClick={handlePublish}
                 disabled={isSubmitting || pinInput.length !== 4}
-                className="flex-1 py-3 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors touch-target flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors touch-target flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>

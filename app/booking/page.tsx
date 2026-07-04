@@ -435,7 +435,7 @@ export default function BookingPage() {
                   onClick={() => { if (cell.cur) { setSel(cell); setOpenVenue(null); setSelectedHours([]); } }}
                   className={`border-none min-h-[64px] flex flex-col items-center gap-0.5 pt-1.5 pb-1 px-0.5 transition-colors relative ${
                     cell.cur ? "cursor-pointer" : "cursor-default opacity-25"
-                  } ${isSel ? "bg-blue-50 border-l-2 border-l-blue-500" : ""}`}
+                  } ${isSel ? "bg-clay-50 border-l-2 border-l-clay-500" : ""}`}
                 >
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[13px] ${
                     isT ? "bg-slate-900 text-white font-bold"
@@ -530,7 +530,7 @@ export default function BookingPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {venueBkCount > 0 && (
-                      <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{venueBkCount}건</span>
+                      <span className="text-[11px] font-semibold text-clay-600 bg-clay-50 px-2 py-0.5 rounded-full">{venueBkCount}건</span>
                     )}
                     <ChevronDown size={16} className={`text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
                   </div>
@@ -583,7 +583,7 @@ export default function BookingPage() {
                               past
                                 ? "bg-slate-50 border-slate-100 opacity-35 cursor-not-allowed"
                                 : isSelected
-                                ? "bg-blue-100 border-blue-500 cursor-pointer ring-1 ring-blue-300"
+                                ? "bg-clay-100 border-clay-500 cursor-pointer ring-1 ring-clay-300"
                                 : entry && c
                                 ? isTrying
                                   ? `${c.bg} border-dashed border-amber-300 cursor-pointer hover:opacity-80`
@@ -592,7 +592,7 @@ export default function BookingPage() {
                             }`}
                           >
                             <div className={`text-[10px] font-semibold mb-0.5 ${
-                              isSelected ? "text-blue-600" : entry && c ? c.text : "text-slate-300"
+                              isSelected ? "text-clay-600" : entry && c ? c.text : "text-slate-300"
                             }`}>
                               {shortHour(hour)}
                             </div>
@@ -606,7 +606,7 @@ export default function BookingPage() {
                                 </div>
                               </div>
                             ) : isSelected ? (
-                              <div className="text-[10px] text-blue-500 font-bold">선택</div>
+                              <div className="text-[10px] text-clay-500 font-bold">선택</div>
                             ) : (
                               <div className="text-[11px] text-slate-200">—</div>
                             )}
@@ -626,7 +626,7 @@ export default function BookingPage() {
                           value={member}
                           onChange={(e) => setMember(e.target.value)}
                           placeholder="이름을 입력하세요"
-                          className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 mb-2"
+                          className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 outline-none focus:border-clay-400 focus:ring-2 focus:ring-clay-100 mb-2"
                         />
                         <div className="flex gap-2">
                           <button
@@ -737,7 +737,7 @@ export default function BookingPage() {
                   <tfoot>
                     <tr className="border-t-2 border-slate-300">
                       <td colSpan={5} className="py-2.5 px-2 text-right font-bold text-slate-700 text-xs">합계</td>
-                      <td className="py-2.5 px-2 text-right font-extrabold text-blue-700 text-sm">{formatPrice(confirmedTotal)}</td>
+                      <td className="py-2.5 px-2 text-right font-extrabold text-clay-700 text-sm">{formatPrice(confirmedTotal)}</td>
                     </tr>
                   </tfoot>
                 ) : null;
@@ -817,10 +817,10 @@ export default function BookingPage() {
                     <div className="text-xs font-semibold text-slate-500 mb-1.5">PIN 코드 설정 (4자리 숫자)</div>
                     <input type="text" inputMode="numeric" maxLength={4} value={pinInput}
                       onChange={(e) => setPinInput(e.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="예: 1234"
-                      className="w-full px-3.5 py-3 text-center text-2xl font-extrabold tracking-[0.3em] rounded-xl border-2 border-slate-200 bg-slate-50 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                      className="w-full px-3.5 py-3 text-center text-2xl font-extrabold tracking-[0.3em] rounded-xl border-2 border-slate-200 bg-slate-50 outline-none focus:border-clay-400 focus:ring-2 focus:ring-clay-100" />
                     <button onClick={async () => { if (pinInput.length !== 4) { showToast("4자리 PIN을 입력하세요", "error"); return; } const r = await sync.publish(pinInput); if (r.success) showToast("공유가 시작되었습니다!", "success"); else showToast(r.error || "공유 실패", "error"); }}
                       disabled={pinInput.length !== 4 || sync.isSyncing}
-                      className={`w-full mt-3 py-3 rounded-xl border-none text-sm font-bold ${pinInput.length === 4 ? "bg-blue-600 text-white cursor-pointer hover:bg-blue-700" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}>
+                      className={`w-full mt-3 py-3 rounded-xl border-none text-sm font-bold ${pinInput.length === 4 ? "bg-clay-600 text-white cursor-pointer hover:bg-clay-700" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}>
                       {sync.isSyncing ? "처리 중..." : "공유 시작하기"}
                     </button>
                   </div>
@@ -829,7 +829,7 @@ export default function BookingPage() {
                     <div className="text-xs font-semibold text-slate-500 mb-1.5">공유 PIN 입력</div>
                     <input type="text" inputMode="numeric" maxLength={4} value={pinInput}
                       onChange={(e) => setPinInput(e.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="PIN 코드 4자리"
-                      className="w-full px-3.5 py-3 text-center text-2xl font-extrabold tracking-[0.3em] rounded-xl border-2 border-slate-200 bg-slate-50 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                      className="w-full px-3.5 py-3 text-center text-2xl font-extrabold tracking-[0.3em] rounded-xl border-2 border-slate-200 bg-slate-50 outline-none focus:border-clay-400 focus:ring-2 focus:ring-clay-100" />
                     <button onClick={async () => { if (pinInput.length !== 4) { showToast("4자리 PIN을 입력하세요", "error"); return; } const r = await sync.subscribe(pinInput); if (r.success) showToast("참여 완료! 실시간 동기화 중", "success"); else showToast(r.error || "참여 실패", "error"); }}
                       disabled={pinInput.length !== 4}
                       className={`w-full mt-3 py-3 rounded-xl border-none text-sm font-bold ${pinInput.length === 4 ? "bg-green-600 text-white cursor-pointer hover:bg-green-700" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}>참여하기</button>

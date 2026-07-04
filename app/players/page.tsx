@@ -89,7 +89,7 @@ export default function PlayersPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="이름 입력"
-            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all font-medium"
+            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-clay-500 focus:ring-2 focus:ring-clay-100 transition-all font-medium"
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
             aria-label="선수 이름"
           />
@@ -122,7 +122,7 @@ export default function PlayersPage() {
       <div className="space-y-3">
         <div className="flex justify-between items-end px-1">
           <h2 className="text-lg font-bold text-slate-800">
-            등록된 선수 <span className="text-blue-600">{players.length}</span>명
+            등록된 선수 <span className="text-clay-600">{players.length}</span>명
             {searchQuery && (
               <span className="text-sm font-normal text-slate-500 ml-2">({filteredPlayers.length}명 표시)</span>
             )}
@@ -134,7 +134,7 @@ export default function PlayersPage() {
             <UserPlus size={48} className="mx-auto mb-2 opacity-20" />
             <p className="mb-3">{searchQuery ? '검색 결과가 없습니다.' : '아직 등록된 선수가 없습니다.'}</p>
             {!searchQuery && (
-              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-sm text-blue-600 font-bold hover:underline cursor-pointer">
+              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-sm text-clay-600 font-bold hover:underline cursor-pointer">
                 위에서 새 멤버를 등록해주세요
               </button>
             )}

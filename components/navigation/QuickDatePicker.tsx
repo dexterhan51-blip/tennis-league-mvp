@@ -86,7 +86,7 @@ export default function QuickDatePicker({
           onClick={() => onChange(today)}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors touch-target ${
             selectedDate === today
-              ? 'bg-blue-600 text-white'
+              ? 'bg-clay-600 text-white'
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
         >
@@ -96,7 +96,7 @@ export default function QuickDatePicker({
           onClick={() => onChange(yesterday)}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors touch-target ${
             selectedDate === yesterday
-              ? 'bg-blue-600 text-white'
+              ? 'bg-clay-600 text-white'
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
         >
@@ -140,9 +140,9 @@ export default function QuickDatePicker({
               className={`
                 flex-shrink-0 flex flex-col items-center px-3 py-2 rounded-xl transition-all touch-target
                 ${isSelected
-                  ? 'bg-blue-600 text-white shadow-md'
+                  ? 'bg-clay-600 text-white shadow-md'
                   : hasMatch
-                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  ? 'bg-clay-50 text-clay-700 border border-clay-200'
                   : isFuture
                   ? 'bg-purple-50 text-purple-600 border border-purple-200 hover:bg-purple-100'
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
@@ -154,7 +154,7 @@ export default function QuickDatePicker({
               <span className="text-xs font-medium">{getDayName(date)}</span>
               <span className="text-sm font-bold">{formatDate(date)}</span>
               {hasMatch && !isSelected && (
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1" />
+                <div className="w-1.5 h-1.5 rounded-full bg-clay-500 mt-1" />
               )}
               {isToday && !isSelected && (
                 <Calendar className="w-3 h-3 mt-1 text-slate-400" />

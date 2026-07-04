@@ -22,14 +22,14 @@ export default function Home() {
         
         {/* 버튼 1: [ + 새 리그 만들기 ] (가장 강조) */}
         <Link href="/league/new" className="group block w-full">
-            <div className="bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-2xl shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-between">
+            <div className="bg-clay-600 hover:bg-clay-700 text-white p-5 rounded-2xl shadow-xl shadow-clay-200 transition-all active:scale-95 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <div className="bg-white/20 p-2 rounded-lg">
                         <PlayCircle size={24} />
                     </div>
                     <div className="text-left">
                         <div className="font-bold text-lg">+ 새 리그 만들기</div>
-                        <div className="text-blue-100 text-xs font-medium">새로운 매치 생성 및 시작</div>
+                        <div className="text-clay-100 text-xs font-medium">새로운 매치 생성 및 시작</div>
                     </div>
                 </div>
             </div>
