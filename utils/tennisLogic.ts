@@ -418,8 +418,10 @@ export const generateSingles = (players: Player[], date: string): Match[] => {
   return matches;
 };
 
-// --- 2. 랭킹 계산 (보너스 점수 반영) ---
-// 점수 체계: 참석 1점(하루 1회) + 승리 1점 / 패배 0점 / 무승부 0점 / MVP 보너스 2점
+// --- 2. 랭킹 계산 ---
+// 점수 체계: 참석 1점(하루 1회) + 승리 1점 / 패배 0점 / 무승부 0점
+// MVP는 횟수(mvpCount)만 누적하고 점수에 반영하지 않는다.
+// bonusPoints는 구 시즌 데이터 호환용 — 값이 남아 있으면 그대로 합산한다.
 export const calculateRanking = (players: Player[], matches: Match[]): PlayerStat[] => {
   const statsMap = new Map<string, PlayerStat>();
   const attendanceDates = new Map<string, Set<string>>();
@@ -434,6 +436,7 @@ export const calculateRanking = (players: Player[], matches: Match[]): PlayerSta
       matchesPlayed: 0, wins: 0, draws: 0, losses: 0,
       totalPoints: bonus,
       winRate: 0, avgPoints: 0, dailyBonus: false,
+      mvpCount: p.mvpCount || 0,
     });
     attendanceDates.set(p.id, new Set());
   });
@@ -532,16 +535,17 @@ export const calculateDailyMvp = (players: Player[], matches: Match[], date: str
     };
 };
 
-// --- 4. MVP 보너스 점수 재계산 (소급 적용) ---
-// finishedDates의 모든 날짜에 대해 MVP를 다시 계산하여 bonusPoints를 재설정
-export const recalculateMvpBonuses = (
+// --- 4. MVP 횟수 재계산 (소급 적용) ---
+// finishedDates의 모든 날짜에 대해 MVP를 다시 계산하여 mvpCount를 재설정.
+// 점수(bonusPoints)는 건드리지 않는다 — MVP는 횟수만 누적한다.
+export const recalculateMvpCounts = (
     players: Player[],
     matches: Match[],
     finishedDates: string[]
 ): { updatedPlayers: Player[]; mvpLog: { date: string; male: string | null; female: string | null }[] } => {
-    // 1. 모든 선수의 bonusPoints를 0으로 초기화
-    const bonusMap = new Map<string, number>();
-    players.forEach(p => bonusMap.set(p.id, 0));
+    // 1. 모든 선수의 mvpCount를 0으로 초기화
+    const countMap = new Map<string, number>();
+    players.forEach(p => countMap.set(p.id, 0));
 
     // 2. 각 완료된 날짜에 대해 MVP 재계산
     const mvpLog: { date: string; male: string | null; female: string | null }[] = [];
@@ -551,12 +555,12 @@ export const recalculateMvpBonuses = (
         const result = calculateDailyMvp(players, matches, date);
 
         if (result.maleMvp) {
-            const current = bonusMap.get(result.maleMvp.id) || 0;
-            bonusMap.set(result.maleMvp.id, current + 2);
+            const current = countMap.get(result.maleMvp.id) || 0;
+            countMap.set(result.maleMvp.id, current + 1);
         }
         if (result.femaleMvp) {
-            const current = bonusMap.get(result.femaleMvp.id) || 0;
-            bonusMap.set(result.femaleMvp.id, current + 2);
+            const current = countMap.get(result.femaleMvp.id) || 0;
+            countMap.set(result.femaleMvp.id, current + 1);
         }
 
         mvpLog.push({
@@ -569,7 +573,7 @@ export const recalculateMvpBonuses = (
     // 3. 선수 데이터에 반영
     const updatedPlayers = players.map(p => ({
         ...p,
-        bonusPoints: bonusMap.get(p.id) || 0,
+        mvpCount: countMap.get(p.id) || 0,
     }));
 
     return { updatedPlayers, mvpLog };

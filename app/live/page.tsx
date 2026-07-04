@@ -114,13 +114,14 @@ function LiveDashboardView({ leagueId }: { leagueId: string }) {
         />
 
         {/* 랭킹 */}
-        <LiveRanking rankings={dashboard.rankings} />
+        <LiveRanking rankings={dashboard.rankings} players={dashboard.players} />
 
         {/* 경기 목록 */}
         <LiveMatchList
           matches={displayMatches}
           finished={displayFinished}
           total={displayTotal}
+          players={dashboard.players}
         />
 
         {/* 푸터 */}

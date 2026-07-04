@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
-  Sun, Moon, Monitor, Type, Download, Upload, Trash2, CheckCircle, AlertTriangle,
+  Sun, Moon, Monitor, Type, Download, Upload, Trash2, CheckCircle, AlertTriangle, FileText, Copy,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -11,6 +11,8 @@ import type { AppSettings, ExportData, Player, LeagueData, SeasonArchive, Player
 import { safeGetAsync, safeSetAsync, safeRemoveAsync } from '@/lib/storage';
 import { safeGetString, safeSetString, safeRemove } from '@/lib/storage';
 import { PlayersArraySchema, LeagueDataSchema, SeasonHistorySchema, PlayerCareerStatsArraySchema } from '@/lib/schemas';
+import { generateSeasonReportText } from '@/lib/seasonReport';
+import { copyToClipboard } from '@/utils/shareUtils';
 
 const FONT_SIZE_KEY = 'tennis-app-font-size';
 
@@ -22,6 +24,18 @@ export default function SettingsPage() {
   const [fontSize, setFontSizeState] = useState<AppSettings['fontSize']>('normal');
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
+  const [seasonHistory, setSeasonHistory] = useState<SeasonArchive[]>([]);
+
+  useEffect(() => {
+    safeGetAsync('season-history', SeasonHistorySchema).then(history => {
+      if (history) setSeasonHistory(history);
+    });
+  }, []);
+
+  const handleCopySeasonReport = useCallback(async (archive: SeasonArchive) => {
+    const ok = await copyToClipboard(generateSeasonReportText(archive));
+    showToast(ok ? '시즌 리포트가 복사되었습니다' : '복사에 실패했습니다', ok ? 'success' : 'error');
+  }, [showToast]);
 
   useEffect(() => {
     const saved = safeGetString(FONT_SIZE_KEY) as AppSettings['fontSize'] | undefined;
@@ -141,6 +155,7 @@ export default function SettingsPage() {
     await safeRemoveAsync('current-season-peaks');
     safeRemove('current-slot-index');
 
+    setSeasonHistory([]);
     setShowResetDialog(false);
     showToast('모든 데이터가 초기화되었습니다', 'success');
   }, [showToast]);
@@ -250,6 +265,35 @@ export default function SettingsPage() {
             </button>
           </div>
         </section>
+
+        {seasonHistory.length > 0 && (
+          <section className="bg-white rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-1">
+              <FileText className="w-5 h-5 text-slate-600" />
+              <h2 className="text-sm font-bold text-slate-700">시즌 리포트</h2>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">
+              최종 순위와 선수별 파트너 케미·상대 전적을 텍스트로 복사합니다
+            </p>
+            <div className="space-y-2">
+              {[...seasonHistory].reverse().map((archive) => (
+                <button
+                  key={archive.id}
+                  onClick={() => handleCopySeasonReport(archive)}
+                  className="w-full flex items-center gap-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors touch-target"
+                >
+                  <Copy className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="font-medium text-slate-900 truncate">{archive.leagueName}</div>
+                    <div className="text-xs text-slate-500">
+                      {archive.seasonStart} ~ {archive.seasonEnd} · 정규 {archive.totalMatches}경기
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="text-center text-sm text-slate-400 py-4">
           <p>러브포티 테니스 리그 매니저 v2.0</p>

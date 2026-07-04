@@ -8,6 +8,7 @@ export const PlayerSchema = z.object({
   gender: GenderSchema,
   photo: z.string().optional(),
   bonusPoints: z.number().optional(),
+  mvpCount: z.number().optional(),
 });
 
 export const TeamSchema = z.object({

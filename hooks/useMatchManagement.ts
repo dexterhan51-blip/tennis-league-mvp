@@ -3,7 +3,7 @@ import { Player, Match } from '@/types';
 import {
   generateMixedDoublesSchedule, generateDoubles, generateSingles,
   generateFromTemplate, getTemplateKey, getSinglesTemplateKey, isSinglesTemplate, TemplateKey,
-  calculateDailyMvp, recalculateMvpBonuses, isGuestPlayer,
+  calculateDailyMvp, recalculateMvpCounts, isGuestPlayer,
 } from '@/utils/tennisLogic';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/contexts/ToastContext';
@@ -419,17 +419,18 @@ export function useMatchManagement({
   const confirmMvpAward = useCallback(() => {
     if (!mvpResult) return;
     if (finishedDates.includes(matchDate)) {
-      showToast('이미 이 날짜의 MVP 보너스가 반영되었습니다.', 'warning');
+      showToast('이미 이 날짜의 MVP가 반영되었습니다.', 'warning');
       setShowMvpDialog(false);
       setMvpResult(null);
       return;
     }
 
+    // MVP는 횟수만 누적 — 보너스 점수는 부여하지 않는다
     const updatedPlayers = players.map(p => {
-      let bonus = p.bonusPoints || 0;
-      if (mvpResult.maleMvp && p.id === mvpResult.maleMvp.id) bonus += 2;
-      if (mvpResult.femaleMvp && p.id === mvpResult.femaleMvp.id) bonus += 2;
-      return { ...p, bonusPoints: bonus };
+      const isMvp =
+        (mvpResult.maleMvp && p.id === mvpResult.maleMvp.id) ||
+        (mvpResult.femaleMvp && p.id === mvpResult.femaleMvp.id);
+      return isMvp ? { ...p, mvpCount: (p.mvpCount || 0) + 1 } : p;
     });
     setPlayers(updatedPlayers);
 
@@ -439,7 +440,7 @@ export function useMatchManagement({
 
     setShowMvpDialog(false);
     setMvpResult(null);
-    showToast('MVP 보너스 점수가 반영되었습니다! 👑', 'success');
+    showToast('오늘의 MVP가 기록되었습니다! 👑', 'success');
   }, [mvpResult, players, setPlayers, finishedDates, setFinishedDates, matchDate, showToast]);
 
   const handleRecalculateMvp = useCallback(() => {
@@ -448,11 +449,11 @@ export function useMatchManagement({
       return;
     }
 
-    const { updatedPlayers, mvpLog } = recalculateMvpBonuses(players, matches, finishedDates);
+    const { updatedPlayers, mvpLog } = recalculateMvpCounts(players, matches, finishedDates);
     setPlayers(updatedPlayers);
 
     const totalMvps = mvpLog.filter(l => l.male || l.female).length;
-    showToast(`${finishedDates.length}일치 MVP 보너스를 재계산했습니다. (${totalMvps}일 MVP 반영)`, 'success');
+    showToast(`${finishedDates.length}일치 MVP 횟수를 재계산했습니다. (${totalMvps}일 MVP 반영)`, 'success');
   }, [finishedDates, players, matches, setPlayers, showToast]);
 
   return {

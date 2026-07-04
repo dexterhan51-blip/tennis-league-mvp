@@ -11,6 +11,7 @@ import {
   generateDoubles,
   generateSingles,
   isGuestPlayer,
+  recalculateMvpCounts,
   GUEST_M_ID,
   GUEST_F_ID,
 } from '@/utils/tennisLogic';
@@ -901,5 +902,51 @@ describe('generateFromTemplate (singles-included)', () => {
 
     expect(() => generateFromTemplate('S2-3', buildMen(1), buildWomen(3), '2026-01-01')).toThrow();
     expect(() => generateFromTemplate('S3-2', buildMen(3), buildWomen(1), '2026-01-01')).toThrow();
+  });
+});
+
+// --- recalculateMvpCounts ---
+
+describe('recalculateMvpCounts', () => {
+  const m1 = makePlayer('m1', 'M1', 'MALE');
+  const m2 = makePlayer('m2', 'M2', 'MALE');
+  const w1 = makePlayer('w1', 'W1', 'FEMALE');
+  const w2 = makePlayer('w2', 'W2', 'FEMALE');
+
+  const winMatch = (id: string, date: string): Match => makeMatch({
+    id,
+    date,
+    teamA: { id: `ta-${id}`, man: m1, woman: w1 },
+    teamB: { id: `tb-${id}`, man: m2, woman: w2 },
+    scoreA: 6,
+    scoreB: 3,
+    isFinished: true,
+  });
+
+  it('완료된 날짜별 MVP를 mvpCount로 누적한다', () => {
+    const matches = [winMatch('d1', '2026-07-01'), winMatch('d2', '2026-07-02')];
+    const { updatedPlayers, mvpLog } = recalculateMvpCounts(
+      [m1, m2, w1, w2],
+      matches,
+      ['2026-07-01', '2026-07-02']
+    );
+
+    const p1 = updatedPlayers.find(p => p.id === 'm1');
+    const p2 = updatedPlayers.find(p => p.id === 'm2');
+    expect(p1?.mvpCount).toBe(2);
+    expect(p2?.mvpCount).toBe(0);
+    expect(mvpLog).toHaveLength(2);
+  });
+
+  it('보너스 점수는 변경하지 않는다', () => {
+    const withBonus = makePlayer('m1', 'M1', 'MALE', 4);
+    const matches = [winMatch('d1', '2026-07-01')];
+    const { updatedPlayers } = recalculateMvpCounts(
+      [withBonus, m2, w1, w2],
+      matches,
+      ['2026-07-01']
+    );
+
+    expect(updatedPlayers.find(p => p.id === 'm1')?.bonusPoints).toBe(4);
   });
 });

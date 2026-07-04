@@ -44,7 +44,7 @@ export default function MvpAwardDialog({
                 <div className="font-bold text-slate-900">{maleMvp.name}</div>
                 <div className="text-xs text-slate-500">승률 {(maleMvp.winRate * 100).toFixed(0)}%</div>
               </div>
-              <span className="text-lg font-bold text-blue-600">+2점</span>
+              <span className="text-sm font-bold text-blue-600">MVP +1회</span>
             </div>
           )}
           {femaleMvp && (
@@ -57,7 +57,7 @@ export default function MvpAwardDialog({
                 <div className="font-bold text-slate-900">{femaleMvp.name}</div>
                 <div className="text-xs text-slate-500">승률 {(femaleMvp.winRate * 100).toFixed(0)}%</div>
               </div>
-              <span className="text-lg font-bold text-pink-600">+2점</span>
+              <span className="text-sm font-bold text-pink-600">MVP +1회</span>
             </div>
           )}
         </div>
@@ -72,7 +72,7 @@ export default function MvpAwardDialog({
             onClick={onConfirm}
             className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors touch-target"
           >
-            보너스 부여
+            MVP 확정
           </button>
         </div>
       </div>

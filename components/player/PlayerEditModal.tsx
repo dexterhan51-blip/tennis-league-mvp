@@ -20,7 +20,6 @@ export default function PlayerEditModal({
   const [name, setName] = useState('');
   const [gender, setGender] = useState<Gender>('MALE');
   const [photo, setPhoto] = useState<string | undefined>();
-  const [bonusPoints, setBonusPoints] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -28,7 +27,6 @@ export default function PlayerEditModal({
       setName(player.name);
       setGender(player.gender);
       setPhoto(player.photo);
-      setBonusPoints(player.bonusPoints || 0);
     }
   }, [player]);
 
@@ -85,14 +83,14 @@ export default function PlayerEditModal({
   const handleSave = useCallback(() => {
     if (!player || !name.trim()) return;
 
+    // bonusPoints 등 나머지 필드는 ...player 스프레드로 기존 값 유지
     onSave({
       ...player,
       name: name.trim(),
       gender,
       photo,
-      bonusPoints,
     });
-  }, [player, name, gender, photo, bonusPoints, onSave]);
+  }, [player, name, gender, photo, onSave]);
 
   if (!isOpen || !player) return null;
 
@@ -211,31 +209,6 @@ export default function PlayerEditModal({
             </div>
           </div>
 
-          {/* Bonus Points */}
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">
-              보너스 점수
-            </label>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setBonusPoints((p) => Math.max(0, p - 1))}
-                className="w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold text-lg transition-colors touch-target"
-                aria-label="보너스 점수 감소"
-              >
-                -
-              </button>
-              <span className="flex-1 text-center text-2xl font-bold text-slate-900">
-                {bonusPoints}
-              </span>
-              <button
-                onClick={() => setBonusPoints((p) => p + 1)}
-                className="w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold text-lg transition-colors touch-target"
-                aria-label="보너스 점수 증가"
-              >
-                +
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}

@@ -11,7 +11,7 @@ interface RankingRowProps {
 }
 
 export default function RankingRow({ player, photo, onClick }: RankingRowProps) {
-  const { currentRank, previousRank, rankChange, name, wins, draws, losses, totalPoints, gender, dailyBonus, peakRank } = player;
+  const { currentRank, previousRank, rankChange, name, wins, draws, losses, totalPoints, gender, dailyBonus, peakRank, careerRank, mvpCount } = player;
 
   const getRankChangeDisplay = () => {
     if (rankChange > 0) {
@@ -77,6 +77,14 @@ export default function RankingRow({ player, photo, onClick }: RankingRowProps) 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-bold text-slate-900 truncate">{name}</span>
+          {careerRank !== undefined && (
+            <span
+              className="px-1.5 py-0.5 bg-slate-800 text-white text-[10px] font-bold rounded flex-shrink-0"
+              title={`통산 랭킹 ${careerRank}위 (아카이브된 전체 시즌 누적 포인트 기준)`}
+            >
+              ATP {careerRank}
+            </span>
+          )}
           {dailyBonus && (
             <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded">
               MVP
@@ -87,6 +95,11 @@ export default function RankingRow({ player, photo, onClick }: RankingRowProps) 
           <span className="text-xs text-slate-500">
             {wins}승 {draws > 0 ? `${draws}무 ` : ''}{losses}패
           </span>
+          {(mvpCount ?? 0) > 0 && (
+            <span className="text-xs text-yellow-600" title={`이번 시즌 MVP ${mvpCount}회`}>
+              👑{mvpCount}
+            </span>
+          )}
           {peakRank !== undefined && (
             peakRank === currentRank ? (
               <Star className="w-3 h-3 text-amber-400 fill-amber-400" />

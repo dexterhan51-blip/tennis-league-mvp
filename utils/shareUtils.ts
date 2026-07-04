@@ -1,4 +1,39 @@
-import { Match, PlayerWithRank } from '@/types';
+import { Match, PlayerWithRank, Team } from '@/types';
+
+/** 단식이면 선수 이름, 복식이면 "이름 & 이름" */
+function teamLabel(team: Team): string {
+  return team.man.id === team.woman.id
+    ? team.man.name
+    : `${team.man.name} & ${team.woman.name}`;
+}
+
+/**
+ * 대진표 공유용 텍스트 생성 (경기 생성 직후 단톡방 공유용).
+ * 리그가 라이브 공유 중이면 liveUrl을 넘겨 실시간 현황 링크를 함께 붙인다.
+ */
+export function generateBracketText(
+  leagueName: string,
+  matchDate: string,
+  matches: Match[],
+  liveUrl?: string | null
+): string {
+  const lines: string[] = [];
+
+  lines.push(`[러브포티 테니스 리그 - ${leagueName}]`);
+  lines.push(`${matchDate} 대진표`);
+  lines.push('');
+
+  matches.forEach((m, idx) => {
+    lines.push(`GAME ${idx + 1}: ${teamLabel(m.teamA)} vs ${teamLabel(m.teamB)}`);
+  });
+
+  if (liveUrl) {
+    lines.push('');
+    lines.push(`실시간 현황: ${liveUrl}`);
+  }
+
+  return lines.join('\n');
+}
 
 /**
  * 경기 결과 공유용 텍스트 생성
@@ -22,16 +57,9 @@ export function generateShareText(
   if (finishedMatches.length > 0) {
     lines.push('=== 경기 결과 ===');
     finishedMatches.forEach((m, idx) => {
-      const teamAPlayers = m.teamA.man.id === m.teamA.woman.id
-        ? m.teamA.man.name
-        : `${m.teamA.man.name} & ${m.teamA.woman.name}`;
-      const teamBPlayers = m.teamB.man.id === m.teamB.woman.id
-        ? m.teamB.man.name
-        : `${m.teamB.man.name} & ${m.teamB.woman.name}`;
-
       const winner = m.scoreA > m.scoreB ? 'A팀 승' : (m.scoreB > m.scoreA ? 'B팀 승' : '무승부');
 
-      lines.push(`GAME ${idx + 1}: ${teamAPlayers} vs ${teamBPlayers}`);
+      lines.push(`GAME ${idx + 1}: ${teamLabel(m.teamA)} vs ${teamLabel(m.teamB)}`);
       lines.push(`결과: ${m.scoreA} : ${m.scoreB} (${winner})`);
       if (m.videoUrl) {
         lines.push(`영상: ${m.videoUrl}`);

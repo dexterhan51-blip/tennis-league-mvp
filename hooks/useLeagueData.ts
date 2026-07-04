@@ -157,7 +157,7 @@ export function useLeagueData(): UseLeagueDataResult {
     }
 
     // archive-and-new: Reset matches, keep players, start fresh
-    const resetPlayers = players.map(p => ({ ...p, bonusPoints: 0 }));
+    const resetPlayers = players.map(p => ({ ...p, bonusPoints: 0, mvpCount: 0 }));
     setPlayers(resetPlayers);
     setMatches([]);
     setFinishedDates([]);

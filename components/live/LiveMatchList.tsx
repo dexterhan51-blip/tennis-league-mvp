@@ -1,26 +1,50 @@
 'use client';
 
 import { CheckCircle, Clock, Youtube, ExternalLink } from 'lucide-react';
-import type { Match } from '@/types';
+import type { Match, Player } from '@/types';
+import { PlayerAvatar } from '@/components/live/PlayerAvatar';
 
 interface LiveMatchListProps {
   matches: Match[];
   finished: number;
   total: number;
+  players?: Player[];
 }
 
-function TeamDisplay({ man, woman }: { man: { name: string; id: string }; woman: { name: string; id: string } }) {
-  if (man.id === woman.id) {
-    return <span className="text-sm font-medium text-slate-900">{man.name}</span>;
-  }
+type PhotoMap = Map<string, string | undefined>;
+
+function PlayerLabel({ player, photoOf }: { player: Player; photoOf: PhotoMap }) {
   return (
-    <span className="text-sm font-medium text-slate-900">
-      {man.name} & {woman.name}
+    <span className="inline-flex items-center gap-1">
+      <PlayerAvatar
+        photo={photoOf.get(player.id) ?? player.photo}
+        gender={player.gender}
+        name={player.name}
+        sizeClass="w-5 h-5"
+        emojiClass="text-[10px]"
+      />
+      <span className="text-sm font-medium text-slate-900">{player.name}</span>
     </span>
   );
 }
 
-export function LiveMatchList({ matches, finished, total }: LiveMatchListProps) {
+function TeamDisplay({ man, woman, photoOf }: { man: Player; woman: Player; photoOf: PhotoMap }) {
+  if (man.id === woman.id) {
+    return <PlayerLabel player={man} photoOf={photoOf} />;
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <PlayerLabel player={man} photoOf={photoOf} />
+      <span className="text-xs text-slate-400">&</span>
+      <PlayerLabel player={woman} photoOf={photoOf} />
+    </span>
+  );
+}
+
+export function LiveMatchList({ matches, finished, total, players }: LiveMatchListProps) {
+  // 경기에 박제된 선수 스냅샷에는 사진이 없을 수 있으므로 최신 선수 목록의 사진을 우선 사용
+  const photoOf: PhotoMap = new Map((players ?? []).map(p => [p.id, p.photo]));
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
       <div className="flex items-center justify-between mb-3">
@@ -70,7 +94,7 @@ export function LiveMatchList({ matches, finished, total }: LiveMatchListProps) 
                 <div className={`flex items-center justify-between py-1 ${aWon ? 'opacity-100' : isFinished ? 'opacity-60' : ''}`}>
                   <div className="flex items-center gap-2">
                     {aWon && <span className="text-xs font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">WIN</span>}
-                    <TeamDisplay man={match.teamA.man} woman={match.teamA.woman} />
+                    <TeamDisplay man={match.teamA.man} woman={match.teamA.woman} photoOf={photoOf} />
                   </div>
                   <span className={`text-lg font-black ${aWon ? 'text-blue-600' : 'text-slate-500'}`}>
                     {isFinished ? match.scoreA : '-'}
@@ -84,7 +108,7 @@ export function LiveMatchList({ matches, finished, total }: LiveMatchListProps) 
                 <div className={`flex items-center justify-between py-1 ${bWon ? 'opacity-100' : isFinished ? 'opacity-60' : ''}`}>
                   <div className="flex items-center gap-2">
                     {bWon && <span className="text-xs font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">WIN</span>}
-                    <TeamDisplay man={match.teamB.man} woman={match.teamB.woman} />
+                    <TeamDisplay man={match.teamB.man} woman={match.teamB.woman} photoOf={photoOf} />
                   </div>
                   <span className={`text-lg font-black ${bWon ? 'text-blue-600' : 'text-slate-500'}`}>
                     {isFinished ? match.scoreB : '-'}

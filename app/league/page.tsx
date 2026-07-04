@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Player } from '@/types';
 import { Table, Save, Medal, Flag, Film } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
-import { copyToClipboard } from '@/utils/shareUtils';
+import { copyToClipboard, generateBracketText } from '@/utils/shareUtils';
 import { generateTimelineText, hasTimelineData } from '@/lib/timelineExport';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import MatchCreatedDialog from '@/components/match/MatchCreatedDialog';
@@ -56,7 +56,7 @@ export default function LeaguePage() {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
 
-  const { careerStats, getPlayerCareer } = usePlayerCareerStats();
+  const { careerStats, getPlayerCareer, reload: reloadCareerStats } = usePlayerCareerStats();
   const { rankings, rankingsWithChange, matchDates } = useLeagueRankings(players, matches, previousRankings, careerStats);
 
   const {
@@ -87,6 +87,20 @@ export default function LeaguePage() {
     courtMinutes,
     gameMinutes,
   });
+
+  const handleCopyBracket = async () => {
+    const text = generateBracketText(
+      leagueName,
+      matchDate,
+      createdMatches || [],
+      isPublished ? shareUrl : null
+    );
+    const ok = await copyToClipboard(text);
+    showToast(
+      ok ? '대진표가 복사되었습니다. 단톡방에 붙여넣으세요!' : '복사에 실패했습니다.',
+      ok ? 'success' : 'error'
+    );
+  };
 
   const handlePlayerClick = (playerId: string) => {
     const player = players.find(p => p.id === playerId);
@@ -263,9 +277,11 @@ export default function LeaguePage() {
         totalMatchDays={seasonMatchDays}
         totalMatches={seasonTotalMatches}
         champion={seasonChampion}
-        onConfirm={(option) => {
+        onConfirm={async (option) => {
           setShowEndSeasonDialog(false);
-          handleEndSeason(option);
+          await handleEndSeason(option);
+          // 방금 아카이브된 시즌까지 반영된 통산 랭킹(ATP 배지)을 즉시 갱신
+          reloadCareerStats();
         }}
         onCancel={() => setShowEndSeasonDialog(false)}
       />
@@ -292,6 +308,7 @@ export default function LeaguePage() {
         isPending={!!pendingMixedMatches}
         onConfirm={onConfirmMixedMatch}
         onReshuffle={handleReshuffle}
+        onCopyBracket={handleCopyBracket}
         onClose={() => {
           if (pendingMixedMatches) {
             setPendingMixedMatches(null);

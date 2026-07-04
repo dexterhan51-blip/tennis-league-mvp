@@ -5,7 +5,8 @@ export interface Player {
   name: string;
   gender: Gender;
   photo?: string;
-  bonusPoints?: number; // 👈 보너스 점수 필드 추가!
+  bonusPoints?: number; // 구 시즌 MVP 보너스 점수 (새 시즌부터는 부여하지 않음, 과거 데이터 호환용)
+  mvpCount?: number;    // 이번 시즌 누적 MVP 횟수 (점수 미반영)
 }
 
 export interface Team {
@@ -56,6 +57,8 @@ export interface PlayerStat {
   winRate: number;
   avgPoints: number;
   dailyBonus: boolean;
+  /** 이번 시즌 누적 MVP 횟수 (점수에는 반영되지 않음) */
+  mvpCount?: number;
 }
 
 export interface PlayerWithRank extends PlayerStat {
@@ -64,6 +67,8 @@ export interface PlayerWithRank extends PlayerStat {
   rankChange: number;
   peakRank?: number;
   seasonPeakRank?: number;
+  /** 아카이브된 전체 시즌 누적 포인트 기준 ATP식 통산 랭킹 (시즌 기록 없으면 undefined) */
+  careerRank?: number;
 }
 
 export interface AppSettings {

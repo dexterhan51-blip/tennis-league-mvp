@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useRef } from 'react';
 import { Player, Match, PlayerStat, PlayerWithRank, PlayerCareerStats } from '@/types';
 import { calculateRanking } from '@/utils/tennisLogic';
+import { calculateCareerRanking } from '@/utils/careerStats';
 import { safeGetAsync, safeSetAsync } from '@/lib/storage';
 import { z } from 'zod';
 
@@ -56,6 +57,7 @@ export function useLeagueRankings(
     const careerMap = new Map(
       (careerStats ?? []).map(c => [c.playerId, c])
     );
+    const careerRankMap = calculateCareerRanking(careerStats ?? []);
 
     return rankings.map((r, idx) => {
       const currentRank = idx + 1;
@@ -76,6 +78,7 @@ export function useLeagueRankings(
         rankChange,
         peakRank: overallPeak,
         seasonPeakRank: seasonPeak,
+        careerRank: careerRankMap.get(r.playerId),
       };
     });
   }, [rankings, previousRankings, careerStats]);

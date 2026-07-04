@@ -31,7 +31,7 @@ export default function RankingSection({
           <button
             onClick={onRecalculateMvp}
             className="text-xs text-slate-400 hover:text-blue-600 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors"
-            title="MVP 보너스 점수를 경기 기록 기반으로 재계산합니다"
+            title="MVP 횟수를 경기 기록 기반으로 재계산합니다"
           >
             <RefreshCw size={12} /> MVP 재계산
           </button>

@@ -1,7 +1,7 @@
 'use client';
 
 import { Match } from '@/types';
-import { X, Shuffle } from 'lucide-react';
+import { X, Shuffle, Copy } from 'lucide-react';
 import type { MatchCreationType } from '@/hooks/useMatchManagement';
 
 interface MatchCreatedDialogProps {
@@ -11,6 +11,8 @@ interface MatchCreatedDialogProps {
   isPending: boolean;
   onConfirm: () => void;
   onReshuffle?: () => void;
+  /** 생성 완료 상태에서 대진표를 클립보드로 복사 (단톡방 공유용) */
+  onCopyBracket?: () => void;
   onClose: () => void;
 }
 
@@ -29,6 +31,7 @@ export default function MatchCreatedDialog({
   isPending,
   onConfirm,
   onReshuffle,
+  onCopyBracket,
   onClose,
 }: MatchCreatedDialogProps) {
   if (!isOpen || matches.length === 0) return null;
@@ -109,12 +112,22 @@ export default function MatchCreatedDialog({
               </button>
             </>
           ) : (
-            <button
-              onClick={onClose}
-              className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors touch-target"
-            >
-              확인
-            </button>
+            <>
+              {onCopyBracket && (
+                <button
+                  onClick={onCopyBracket}
+                  className="flex-1 py-3 px-4 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors touch-target flex items-center justify-center gap-1.5"
+                >
+                  <Copy size={16} /> 대진표 복사
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors touch-target"
+              >
+                확인
+              </button>
+            </>
           )}
         </div>
       </div>
