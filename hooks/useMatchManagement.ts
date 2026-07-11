@@ -157,7 +157,7 @@ export function useMatchManagement({
         const women = pool.filter(p => p.gender === 'FEMALE');
         const templateKey = getTemplateKey(men.length, women.length);
 
-        // 5가지 고정 시나리오에 해당하면 슬롯 배정 다이얼로그 오픈
+        // 고정 템플릿 시나리오(2-3, 3-2, 2-4, 3-3, 3-4, 4-5)에 해당하면 슬롯 배정 다이얼로그 오픈
         if (templateKey) {
           setSlotAssignment({ templateKey, men, women });
           return;

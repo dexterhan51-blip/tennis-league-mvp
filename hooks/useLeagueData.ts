@@ -5,7 +5,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { useUndo } from '@/contexts/UndoContext';
 import { safeGetAsync, safeSetAsync, safeRemoveAsync } from '@/lib/storage';
 import { safeGetString, safeSetString, safeRemove } from '@/lib/storage';
-import { LeagueDataSchema, PreviousRankingsSchema, FinishedDatesSchema, SeasonHistorySchema } from '@/lib/schemas';
+import { LeagueDataSchema, PreviousRankingsSchema, FinishedDatesSchema, SeasonHistorySchema, PlayersArraySchema } from '@/lib/schemas';
 import { calculateRanking } from '@/utils/tennisLogic';
 import { updatePlayerCareerStats } from '@/utils/careerStats';
 import { v4 as uuidv4 } from 'uuid';
@@ -58,7 +58,16 @@ export function useLeagueData(): UseLeagueDataResult {
       }
 
       setLeagueName(data.name);
-      setPlayers(data.players || []);
+
+      // 리그 선수는 생성 시점 스냅샷이라 이후 선수 관리에서 등록한 사진이 없다.
+      // 전역 선수 풀의 사진을 우선 적용해 최신 프로필 사진이 보이게 한다.
+      const globalPlayers = (await safeGetAsync('tennis-players', PlayersArraySchema)) ?? [];
+      const globalPhotoOf = new Map(globalPlayers.map(p => [p.id, p.photo]));
+      const enrichedPlayers = (data.players || []).map(p => {
+        const photo = globalPhotoOf.get(p.id) ?? p.photo;
+        return photo === p.photo ? p : { ...p, photo };
+      });
+      setPlayers(enrichedPlayers);
       setMatches(data.matches || []);
 
       const savedPrev = await safeGetAsync(PREVIOUS_RANKINGS_KEY, PreviousRankingsSchema);

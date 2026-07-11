@@ -11,10 +11,10 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 
 // --- 0. 고정 템플릿 기반 대진 ---
 
-export type SlotKey = 'M1' | 'M2' | 'M3' | 'W1' | 'W2' | 'W3' | 'W4';
+export type SlotKey = 'M1' | 'M2' | 'M3' | 'M4' | 'W1' | 'W2' | 'W3' | 'W4' | 'W5';
 // 단식 세트는 같은 슬롯을 두 번 적는다 (a: ['W1','W1']) → man === woman 인 기존 단식 표현으로 변환됨
 type TemplateSet = { a: [SlotKey, SlotKey]; b: [SlotKey, SlotKey] };
-export type TemplateKey = '2-3' | '3-2' | '2-4' | '3-3' | '3-4' | 'S2-3' | 'S3-2';
+export type TemplateKey = '2-3' | '3-2' | '2-4' | '3-3' | '3-4' | '4-5' | 'S2-3' | 'S3-2';
 
 export const TEMPLATES: Record<TemplateKey, TemplateSet[]> = {
   '2-3': [
@@ -56,6 +56,19 @@ export const TEMPLATES: Record<TemplateKey, TemplateSet[]> = {
     { a: ['M1', 'W1'], b: ['M2', 'W4'] },
     { a: ['M1', 'W2'], b: ['M3', 'W3'] },
     { a: ['M2', 'W3'], b: ['M3', 'W4'] },
+  ],
+  // 남4/여5: 혼복 10세트 (남자 5경기, 여자 4경기씩)
+  '4-5': [
+    { a: ['M1', 'W1'], b: ['M2', 'W2'] },  // 1세트
+    { a: ['M3', 'W3'], b: ['M4', 'W4'] },  // 2세트
+    { a: ['M1', 'W5'], b: ['M3', 'W1'] },  // 3세트
+    { a: ['M2', 'W4'], b: ['M4', 'W2'] },  // 4세트
+    { a: ['M1', 'W3'], b: ['M4', 'W5'] },  // 5세트
+    { a: ['M2', 'W1'], b: ['M3', 'W4'] },  // 6세트
+    { a: ['M3', 'W2'], b: ['M4', 'W3'] },  // 7세트
+    { a: ['M1', 'W4'], b: ['M2', 'W5'] },  // 8세트
+    { a: ['M2', 'W3'], b: ['M4', 'W1'] },  // 9세트
+    { a: ['M1', 'W2'], b: ['M3', 'W5'] },  // 10세트
   ],
   // 단식 포함 남2/여3: 단식 4세트 + 복식 3세트
   'S2-3': [

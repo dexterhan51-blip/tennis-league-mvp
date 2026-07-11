@@ -507,12 +507,13 @@ describe('generateMixedDoublesSchedule', () => {
 // --- getTemplateKey ---
 
 describe('getTemplateKey', () => {
-  it('returns the matching key for the 5 supported scenarios', () => {
+  it('returns the matching key for the 6 supported scenarios', () => {
     expect(getTemplateKey(2, 3)).toBe('2-3');
     expect(getTemplateKey(3, 2)).toBe('3-2');
     expect(getTemplateKey(2, 4)).toBe('2-4');
     expect(getTemplateKey(3, 3)).toBe('3-3');
     expect(getTemplateKey(3, 4)).toBe('3-4');
+    expect(getTemplateKey(4, 5)).toBe('4-5');
   });
 
   it('returns null for unsupported combinations', () => {
@@ -547,6 +548,39 @@ describe('generateFromTemplate', () => {
         expect(match.scoreB).toBe(0);
       });
     });
+  });
+
+  it('produces the exact 4-5 schedule (10 sets, 남자 5경기·여자 4경기씩)', () => {
+    const men = buildMen(4);
+    const women = buildWomen(5);
+    const matches = generateFromTemplate('4-5', men, women, '2026-01-01');
+    const expected: Array<[string, string]> = [
+      ['m1+w1', 'm2+w2'],
+      ['m3+w3', 'm4+w4'],
+      ['m1+w5', 'm3+w1'],
+      ['m2+w4', 'm4+w2'],
+      ['m1+w3', 'm4+w5'],
+      ['m2+w1', 'm3+w4'],
+      ['m3+w2', 'm4+w3'],
+      ['m1+w4', 'm2+w5'],
+      ['m2+w3', 'm4+w1'],
+      ['m1+w2', 'm3+w5'],
+    ];
+    expect(matches).toHaveLength(10);
+    matches.forEach((match, i) => {
+      expect(pair(match.teamA)).toBe(expected[i][0]);
+      expect(pair(match.teamB)).toBe(expected[i][1]);
+    });
+
+    // 출전 수 검증: 남자 5경기, 여자 4경기씩
+    const counts: Record<string, number> = {};
+    matches.forEach(m => {
+      [m.teamA.man, m.teamA.woman, m.teamB.man, m.teamB.woman].forEach(p => {
+        counts[p.id] = (counts[p.id] || 0) + 1;
+      });
+    });
+    ['m1', 'm2', 'm3', 'm4'].forEach(id => expect(counts[id]).toBe(5));
+    ['w1', 'w2', 'w3', 'w4', 'w5'].forEach(id => expect(counts[id]).toBe(4));
   });
 
   it('produces the exact 2-3 schedule (M1 always team A, M2 always team B)', () => {
