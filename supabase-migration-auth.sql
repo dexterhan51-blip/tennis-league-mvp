@@ -57,7 +57,7 @@ BEGIN
   INSERT INTO profiles (id, name, role)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)),
+    COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1), ''),
     'member'
   )
   ON CONFLICT (id) DO NOTHING;
@@ -69,9 +69,9 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
--- 기존에 만든 계정이 있다면 프로필 소급 생성
+-- 기존에 만든 계정이 있다면 프로필 소급 생성 (이메일 없는 계정은 빈 이름)
 INSERT INTO profiles (id, name, role)
-SELECT u.id, split_part(u.email, '@', 1), 'member'
+SELECT u.id, COALESCE(split_part(u.email, '@', 1), ''), 'member'
 FROM auth.users u
 ON CONFLICT (id) DO NOTHING;
 
