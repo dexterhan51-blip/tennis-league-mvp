@@ -3,8 +3,17 @@
 import Link from "next/link";
 import { PlayCircle, FolderOpen, Users, Smartphone, CalendarDays } from "lucide-react";
 import AppLogo from "@/components/ui/AppLogo";
+import MemberHome from "@/components/home/MemberHome";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
+  const { isAdmin, isConfigured, session } = useAuth();
+
+  // 일반 회원은 서버 데이터 기반 홈 (리그 생성 등 관리 기능은 관리자 전용)
+  if (isConfigured && session && !isAdmin) {
+    return <MemberHome />;
+  }
+
   return (
     <main className="max-w-md mx-auto min-h-screen bg-slate-50 flex flex-col justify-center p-6">
       

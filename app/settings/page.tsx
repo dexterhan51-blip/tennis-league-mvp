@@ -211,6 +211,15 @@ export default function SettingsPage() {
                 <LogOut className="w-4 h-4" /> 로그아웃
               </button>
             </div>
+            {isAdmin && (
+              <a
+                href="/members"
+                className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-sm font-medium text-slate-700 hover:text-clay-600 transition-colors"
+              >
+                회원 관리
+                <span className="text-xs text-slate-400">이름·역할 변경</span>
+              </a>
+            )}
           </section>
         )}
 

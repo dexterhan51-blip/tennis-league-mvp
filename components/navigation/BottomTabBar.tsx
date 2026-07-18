@@ -25,6 +25,7 @@ const tabs: TabItem[] = [
     icon: <Trophy className="w-6 h-6" />,
     label: '리그',
     matchPaths: ['/league', '/league/new'],
+    adminOnly: true, // 회원의 리그 열람은 홈/라이브에서 서버 데이터로 제공
   },
   {
     href: '/live',
