@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Youtube, Video, AlertTriangle } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { parseYouTube } from '@/lib/youtube';
+import { useAuth } from '@/contexts/AuthContext';
+import AdminVideoManager from '@/components/videos/AdminVideoManager';
 import type { Player, Match } from '@/types';
 
 interface LeagueRow {
@@ -84,6 +86,8 @@ function VideoCard({ entry }: { entry: VideoEntry }) {
 }
 
 export default function VideosPage() {
+  const { isAdmin } = useAuth();
+  const [mode, setMode] = useState<'view' | 'manage'>('view');
   const [leagues, setLeagues] = useState<LeagueRow[] | null>(null);
   const [error, setError] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
@@ -187,15 +191,42 @@ export default function VideosPage() {
   return (
     <div className="min-h-screen bg-slate-50 pb-24">
       <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
-        <div className="max-w-md mx-auto px-4 py-4">
+        <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Video className="w-5 h-5 text-clay-600" /> 경기 영상
           </h1>
+          {isAdmin && (
+            <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs font-bold">
+              <button
+                onClick={() => setMode('view')}
+                className={`px-3 py-1.5 transition-colors touch-target ${
+                  mode === 'view' ? 'bg-clay-600 text-white' : 'bg-white text-slate-500'
+                }`}
+              >
+                보기
+              </button>
+              <button
+                onClick={() => setMode('manage')}
+                className={`px-3 py-1.5 transition-colors touch-target ${
+                  mode === 'manage' ? 'bg-clay-600 text-white' : 'bg-white text-slate-500'
+                }`}
+              >
+                등록
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="max-w-md mx-auto p-4 space-y-5">
-        {videos.length === 0 ? (
+        {isAdmin && mode === 'manage' ? (
+          <AdminVideoManager
+            leagues={leagues}
+            onSaved={(leagueId, matches) =>
+              setLeagues((prev) => (prev ? prev.map((l) => (l.id === leagueId ? { ...l, matches } : l)) : prev))
+            }
+          />
+        ) : videos.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 text-center">
             <Youtube className="w-10 h-10 text-slate-200 mx-auto mb-3" />
             <p className="text-sm text-slate-500 leading-relaxed">
