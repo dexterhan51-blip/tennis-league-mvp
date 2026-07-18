@@ -74,21 +74,17 @@ export function useLeagueSync({
 
     setIsSyncing(true);
     try {
-      // .select()로 실제 갱신된 행을 확인 — PIN 불일치 시 0행 갱신은 에러가 아니므로 직접 검증해야 함
-      const { data, error } = await supabase
-        .from('shared_leagues')
-        .update({
-          name: leagueName,
-          players,
-          matches,
-          season_end: seasonEnd || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', leagueId)
-        .eq('pin_code', pin)
-        .select('id');
+      // PIN 검증은 DB의 sync_shared_league RPC 내부에서 수행 (해시 비교)
+      const { data, error } = await supabase.rpc('sync_shared_league', {
+        p_id: leagueId,
+        p_pin: pin,
+        p_name: leagueName,
+        p_players: players,
+        p_matches: matches,
+        p_season_end: seasonEnd || null,
+      });
 
-      if (error || !data || data.length === 0) {
+      if (error || data !== true) {
         console.warn('[sync] Failed to sync:', error);
         if (!lastSyncFailedRef.current) {
           showToast('실시간 공유 동기화에 실패했습니다. 네트워크 또는 PIN을 확인해주세요.', 'error');
@@ -114,22 +110,17 @@ export function useLeagueSync({
 
     setIsSyncing(true);
     try {
-      const { data, error } = await supabase
-        .from('shared_leagues')
-        .insert({
-          name: leagueName,
-          pin_code: pin,
-          players,
-          matches,
-          season_end: seasonEnd || null,
-          is_active: true,
-        })
-        .select('id')
-        .single();
+      const { data, error } = await supabase.rpc('publish_shared_league', {
+        p_name: leagueName,
+        p_pin: pin,
+        p_players: players,
+        p_matches: matches,
+        p_season_end: seasonEnd || null,
+      });
 
-      if (error) throw error;
+      if (error || !data) throw error ?? new Error('리그 발행에 실패했습니다.');
 
-      const id = data.id;
+      const id = data as string;
       setSharedLeagueId(id);
       setPinCode(pin);
       localStorage.setItem(SHARED_LEAGUE_ID_KEY, id);
@@ -149,11 +140,10 @@ export function useLeagueSync({
     if (!supabase || !sharedLeagueId || !pinCode) return;
 
     try {
-      await supabase
-        .from('shared_leagues')
-        .update({ is_active: false })
-        .eq('id', sharedLeagueId)
-        .eq('pin_code', pinCode);
+      await supabase.rpc('unpublish_shared_league', {
+        p_id: sharedLeagueId,
+        p_pin: pinCode,
+      });
     } catch (e) {
       console.warn('[sync] Unpublish failed:', e);
     }
