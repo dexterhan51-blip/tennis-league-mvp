@@ -7,6 +7,8 @@ import "./globals.css";
 import { ToastProvider } from "@/contexts/ToastContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { UndoProvider } from "@/contexts/UndoContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import AuthGuard from "@/components/auth/AuthGuard";
 import ToastContainer from "@/components/ui/Toast";
 import BottomTabBar from "@/components/navigation/BottomTabBar";
 import UndoButton from "@/components/match/UndoButton";
@@ -47,13 +49,17 @@ export default function RootLayout({
         <ThemeProvider>
           <ToastProvider>
             <UndoProvider>
-              <StorageMigration />
-              <main className="pb-16">
-                {children}
-              </main>
-              <BottomTabBar />
-              <UndoButton />
-              <ToastContainer />
+              <AuthProvider>
+                <StorageMigration />
+                <AuthGuard>
+                  <main className="pb-16">
+                    {children}
+                  </main>
+                  <BottomTabBar />
+                </AuthGuard>
+                <UndoButton />
+                <ToastContainer />
+              </AuthProvider>
             </UndoProvider>
           </ToastProvider>
         </ThemeProvider>

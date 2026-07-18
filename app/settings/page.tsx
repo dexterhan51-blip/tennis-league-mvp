@@ -2,10 +2,11 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
-  Sun, Moon, Monitor, Type, Download, Upload, Trash2, CheckCircle, AlertTriangle, FileText, Copy,
+  Sun, Moon, Monitor, Type, Download, Upload, Trash2, CheckCircle, AlertTriangle, FileText, Copy, LogOut, UserCircle,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/contexts/ToastContext';
+import { useAuth } from '@/contexts/AuthContext';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import AppLogo from '@/components/ui/AppLogo';
 import type { AppSettings, ExportData, Player, LeagueData, SeasonArchive, PlayerCareerStats } from '@/types';
@@ -20,6 +21,7 @@ const FONT_SIZE_KEY = 'tennis-app-font-size';
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const { showToast } = useToast();
+  const { session, profile, isAdmin, isConfigured, signOut } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fontSize, setFontSizeState] = useState<AppSettings['fontSize']>('normal');
@@ -184,6 +186,34 @@ export default function SettingsPage() {
       </div>
 
       <div className="max-w-md mx-auto p-4 space-y-6">
+        {isConfigured && session && (
+          <section className="bg-white rounded-xl p-4 shadow-sm">
+            <h2 className="text-sm font-bold text-slate-700 mb-4">계정</h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <UserCircle className="w-9 h-9 text-slate-300" />
+                <div>
+                  <div className="font-medium text-slate-900">
+                    {profile?.name || session.user.email}
+                    {isAdmin && (
+                      <span className="ml-2 text-[10px] font-bold text-clay-600 bg-clay-50 border border-clay-200 rounded px-1.5 py-0.5 align-middle">
+                        관리자
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-slate-500">{session.user.email}</div>
+                </div>
+              </div>
+              <button
+                onClick={() => signOut()}
+                className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors touch-target"
+              >
+                <LogOut className="w-4 h-4" /> 로그아웃
+              </button>
+            </div>
+          </section>
+        )}
+
         <section className="bg-white rounded-xl p-4 shadow-sm">
           <h2 className="text-sm font-bold text-slate-700 mb-4">테마</h2>
           <div className="grid grid-cols-3 gap-2">

@@ -3,13 +3,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Trophy, Users, Settings, Smartphone, Sparkles } from 'lucide-react';
+import { Home, Trophy, Users, Settings, Smartphone, Radio } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface TabItem {
   href: string;
   icon: React.ReactNode;
   label: string;
   matchPaths?: string[];
+  adminOnly?: boolean;
 }
 
 const tabs: TabItem[] = [
@@ -22,23 +24,24 @@ const tabs: TabItem[] = [
     href: '/league',
     icon: <Trophy className="w-6 h-6" />,
     label: '리그',
-    matchPaths: ['/league', '/league/new', '/load'],
+    matchPaths: ['/league', '/league/new'],
+  },
+  {
+    href: '/live',
+    icon: <Radio className="w-6 h-6" />,
+    label: '라이브',
   },
   {
     href: '/scoreboard',
     icon: <Smartphone className="w-6 h-6" />,
     label: '스코어',
+    adminOnly: true,
   },
   {
     href: '/players',
     icon: <Users className="w-6 h-6" />,
     label: '선수',
-  },
-  {
-    href: '/saju',
-    icon: <Sparkles className="w-6 h-6" />,
-    label: '궁합',
-    matchPaths: ['/saju'],
+    adminOnly: true,
   },
   {
     href: '/settings',
@@ -49,6 +52,8 @@ const tabs: TabItem[] = [
 
 export default function BottomTabBar() {
   const pathname = usePathname();
+  const { isAdmin } = useAuth();
+  const visibleTabs = tabs.filter((tab) => !tab.adminOnly || isAdmin);
 
   const isActive = (tab: TabItem) => {
     if (tab.matchPaths) {
@@ -57,8 +62,8 @@ export default function BottomTabBar() {
     return pathname === tab.href;
   };
 
-  // Hide tab bar on full-screen pages
-  if (pathname === '/scoreboard' || pathname === '/referee') {
+  // Hide tab bar on full-screen pages and the login screen
+  if (pathname === '/scoreboard' || pathname === '/referee' || pathname === '/login') {
     return null;
   }
 
@@ -70,7 +75,7 @@ export default function BottomTabBar() {
       aria-label="하단 내비게이션"
     >
       <div className="max-w-md mx-auto h-14 flex items-center justify-around bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] pointer-events-auto">
-        {tabs.map((tab) => {
+        {visibleTabs.map((tab) => {
           const active = isActive(tab);
           return (
             <Link

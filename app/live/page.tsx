@@ -1,29 +1,107 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useLiveDashboard } from '@/hooks/useLiveDashboard';
 import { LiveHeader } from '@/components/live/LiveHeader';
 import { LiveRanking } from '@/components/live/LiveRanking';
 import { LiveMatchList } from '@/components/live/LiveMatchList';
 import { LiveDatePicker } from '@/components/live/LiveDatePicker';
 import { LiveMvp } from '@/components/live/LiveMvp';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { AlertTriangle, Loader2, Radio, ChevronRight } from 'lucide-react';
+import { getSupabase } from '@/lib/supabase';
+
+interface ActiveLeague {
+  id: string;
+  name: string;
+  updated_at: string;
+}
+
+// id 없이 접속하면 진행 중인 리그 목록에서 선택
+function LiveLeaguePicker() {
+  const [leagues, setLeagues] = useState<ActiveLeague[] | null>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase) {
+      setError(true);
+      return;
+    }
+    supabase
+      .from('shared_leagues')
+      .select('id, name, updated_at')
+      .eq('is_active', true)
+      .order('updated_at', { ascending: false })
+      .then(({ data, error: err }) => {
+        if (err) setError(true);
+        else setLeagues((data as ActiveLeague[]) ?? []);
+      });
+  }, []);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 max-w-sm w-full text-center">
+          <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <h2 className="text-lg font-bold text-slate-900 mb-2">리그 목록을 불러올 수 없습니다</h2>
+          <p className="text-sm text-slate-500">네트워크 상태를 확인해주세요.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!leagues) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-clay-600 animate-spin" aria-label="로딩 중" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-4 pt-8">
+      <div className="max-w-md mx-auto">
+        <h1 className="text-xl font-bold text-slate-900 mb-1 flex items-center gap-2">
+          <Radio className="w-5 h-5 text-clay-600" /> 라이브
+        </h1>
+        <p className="text-sm text-slate-500 mb-6">진행 중인 리그를 선택하세요.</p>
+
+        {leagues.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center">
+            <p className="text-sm text-slate-500">아직 공개된 리그가 없습니다.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {leagues.map((league) => (
+              <Link
+                key={league.id}
+                href={`/live?id=${league.id}`}
+                className="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-100 p-4 hover:border-clay-300 transition-colors"
+              >
+                <div>
+                  <div className="font-bold text-slate-900">{league.name}</div>
+                  <div className="text-xs text-slate-400 mt-0.5">
+                    마지막 업데이트 {new Date(league.updated_at).toLocaleDateString('ko-KR')}
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-slate-300" />
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function LiveDashboardContent() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
 
   if (!id) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 max-w-sm w-full text-center">
-          <AlertTriangle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-          <h2 className="text-lg font-bold text-slate-900 mb-2">리그 ID가 필요합니다</h2>
-          <p className="text-sm text-slate-500">공유받은 URL을 확인해주세요.</p>
-        </div>
-      </div>
-    );
+    return <LiveLeaguePicker />;
   }
 
   return <LiveDashboardView leagueId={id} />;

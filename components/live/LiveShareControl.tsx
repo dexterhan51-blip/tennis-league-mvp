@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { Radio, Copy, Check, X, Loader2, LinkIcon, Unlink } from 'lucide-react';
 import { copyToClipboard } from '@/utils/shareUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LiveShareControlProps {
   isConfigured: boolean;
   isPublished: boolean;
   isSyncing: boolean;
   shareUrl: string | null;
-  onPublish: (pin: string) => Promise<{ success: boolean; error?: string }>;
+  onPublish: () => Promise<{ success: boolean; error?: string }>;
   onUnpublish: () => Promise<void>;
 }
 
@@ -21,29 +22,25 @@ export function LiveShareControl({
   onPublish,
   onUnpublish,
 }: LiveShareControlProps) {
+  const { isAdmin } = useAuth();
   const [showDialog, setShowDialog] = useState(false);
-  const [pinInput, setPinInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [copied, setCopied] = useState(false);
   const [showUnpublishConfirm, setShowUnpublishConfirm] = useState(false);
 
-  if (!isConfigured) return null;
+  // 온라인 공개는 관리자 전용
+  if (!isConfigured || !isAdmin) return null;
 
   const handlePublish = async () => {
-    if (pinInput.length !== 4) {
-      setErrorMsg('4자리 PIN을 입력하세요.');
-      return;
-    }
     setIsSubmitting(true);
     setErrorMsg('');
-    const result = await onPublish(pinInput);
+    const result = await onPublish();
     setIsSubmitting(false);
     if (result.success) {
       setShowDialog(false);
-      setPinInput('');
     } else {
-      setErrorMsg(result.error || '공유에 실패했습니다.');
+      setErrorMsg(result.error || '온라인 공개에 실패했습니다.');
     }
   };
 
@@ -61,7 +58,7 @@ export function LiveShareControl({
     setShowUnpublishConfirm(false);
   };
 
-  // 이미 공유 중인 상태
+  // 이미 공개 중인 상태
   if (isPublished) {
     return (
       <>
@@ -78,18 +75,18 @@ export function LiveShareControl({
           <button
             onClick={() => setShowUnpublishConfirm(true)}
             className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors touch-target"
-            aria-label="공유 중지"
+            aria-label="온라인 공개 중지"
           >
             <Unlink size={14} />
           </button>
         </div>
 
-        {/* 공유 중지 확인 */}
+        {/* 공개 중지 확인 */}
         {showUnpublishConfirm && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl animate-scale-in p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">실시간 공유 중지</h3>
-              <p className="text-sm text-slate-500 mb-6">공유를 중지하면 대시보드 URL이 비활성화됩니다.</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">온라인 공개 중지</h3>
+              <p className="text-sm text-slate-500 mb-6">공개를 중지하면 회원들이 이 리그를 볼 수 없게 됩니다.</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowUnpublishConfirm(false)}
@@ -111,25 +108,25 @@ export function LiveShareControl({
     );
   }
 
-  // 공유 시작 버튼
+  // 공개 시작 버튼
   return (
     <>
       <button
         onClick={() => setShowDialog(true)}
         className="flex items-center gap-1 bg-clay-50 text-clay-600 px-3 py-1.5 rounded-lg font-bold text-xs border border-clay-200 touch-target cursor-pointer active:scale-[0.98] transition-transform"
-        aria-label="실시간 공유"
+        aria-label="온라인 공개"
       >
-        <Radio size={14} /> 실시간 공유
+        <Radio size={14} /> 온라인 공개
       </button>
 
-      {/* PIN 입력 다이얼로그 */}
+      {/* 공개 확인 다이얼로그 */}
       {showDialog && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl animate-scale-in overflow-hidden">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Radio size={20} className="text-clay-600" /> 실시간 공유
+                  <Radio size={20} className="text-clay-600" /> 온라인 공개
                 </h3>
                 <button onClick={() => { setShowDialog(false); setErrorMsg(''); }} className="p-1 hover:bg-slate-100 rounded-full touch-target">
                   <X size={20} className="text-slate-400" />
@@ -137,30 +134,10 @@ export function LiveShareControl({
               </div>
 
               <p className="text-sm text-slate-500 mb-4">
-                리그 데이터를 실시간으로 공유합니다. 관리용 4자리 PIN을 설정하세요.
+                이 리그를 서버에 올려 로그인한 회원 누구나 실시간으로 볼 수 있게 합니다.
+                이후 경기 기록은 자동으로 동기화됩니다.
               </p>
-
-              <div className="mb-4">
-                <label className="block text-xs font-bold text-slate-500 mb-2">관리 PIN (4자리 숫자)</label>
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  maxLength={4}
-                  value={pinInput}
-                  onChange={(e) => {
-                    const v = e.target.value.slice(0, 4);
-                    setPinInput(v);
-                    setErrorMsg('');
-                  }}
-                  placeholder="0000"
-                  className="w-full text-center text-2xl font-black tracking-[0.5em] py-3 border-2 border-slate-200 rounded-xl focus:border-clay-500 focus:outline-none transition-colors"
-                />
-                {errorMsg && <p className="text-xs text-red-500 mt-2">{errorMsg}</p>}
-              </div>
-
-              <p className="text-[10px] text-slate-400 mb-4">
-                PIN은 리그 데이터 수정 시 사용됩니다. 대시보드는 누구나 URL로 열람 가능합니다.
-              </p>
+              {errorMsg && <p className="text-xs text-red-500 mb-4">{errorMsg}</p>}
             </div>
 
             <div className="flex gap-3 p-4 border-t border-slate-200">
@@ -172,16 +149,16 @@ export function LiveShareControl({
               </button>
               <button
                 onClick={handlePublish}
-                disabled={isSubmitting || pinInput.length !== 4}
+                disabled={isSubmitting}
                 className="flex-1 py-3 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors touch-target flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 size={16} className="animate-spin" /> 생성 중...
+                    <Loader2 size={16} className="animate-spin" /> 공개 중...
                   </>
                 ) : (
                   <>
-                    <LinkIcon size={16} /> 공유 시작
+                    <LinkIcon size={16} /> 공개 시작
                   </>
                 )}
               </button>
