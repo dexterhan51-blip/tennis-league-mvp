@@ -1,0 +1,24 @@
+name: Supabase Keep-Alive
+
+# 무료 플랜 자동 일시정지(7일 무활동) 방지용 — 2일마다 가벼운 조회 요청을 보낸다
+# 참고: 아래 publishable 키는 브라우저 노출용 공개 키(RLS로 보호됨)라 평문으로 둬도 안전하다.
+on:
+  schedule:
+    - cron: '17 3 */2 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: https://pbtyjxjnmcvmdtfhmovz.supabase.co
+      SUPABASE_ANON_KEY: sb_publishable_OGMaiYxJcdiPFubR0JIbxw_bBMxtovX
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          curl -sf --max-time 30 \
+            "${SUPABASE_URL}/rest/v1/shared_leagues?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            > /dev/null
+          echo "Supabase ping OK"
