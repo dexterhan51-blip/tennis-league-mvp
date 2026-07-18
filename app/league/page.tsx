@@ -67,8 +67,10 @@ export default function LeaguePage() {
     isPublished,
     isSyncing,
     shareUrl,
+    serverNewer,
     publish: publishLeague,
     unpublish: unpublishLeague,
+    pullFromServer,
   } = useLeagueSync({ leagueName, players, matches });
 
   const {
@@ -164,6 +166,22 @@ export default function LeaguePage() {
           </button>
         </div>
       </header>
+
+      {/* 서버에 더 최신 데이터가 있을 때: 동기화 전까지 이 기기의 업로드는 차단됨 */}
+      {serverNewer && (
+        <div className="mx-4 mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <p className="text-sm text-amber-800 font-medium mb-3">
+            서버에 이 기기보다 최신 리그 데이터가 있습니다.
+            덮어쓰기를 막기 위해 동기화 전까지 이 기기의 변경사항은 서버에 올라가지 않습니다.
+          </p>
+          <button
+            onClick={() => pullFromServer()}
+            className="w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold transition-colors touch-target"
+          >
+            서버와 동기화 (최신 데이터 불러오기)
+          </button>
+        </div>
+      )}
 
       <div className="px-4 space-y-6 pt-4">
         <div className="text-center">

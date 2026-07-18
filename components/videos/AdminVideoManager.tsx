@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react';
 import { Youtube, Loader2, Check, Trash2 } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { parseYouTube } from '@/lib/youtube';
+import { safeGetAsync, safeSetAsync } from '@/lib/storage';
+import { LeagueDataSchema } from '@/lib/schemas';
 import { useToast } from '@/contexts/ToastContext';
 import type { Match } from '@/types';
 
@@ -88,8 +90,30 @@ export default function AdminVideoManager({ leagues, onSaved }: AdminVideoManage
         .from('shared_leagues')
         .update({ matches, updated_at: new Date().toISOString() })
         .eq('id', ref.leagueId)
-        .select('id');
+        .select('id, updated_at');
       if (writeErr || !updated || updated.length === 0) throw writeErr ?? new Error('write failed');
+
+      // 이 기기가 편집 중인 리그라면: 로컬 저장본에도 영상을 반영한 뒤에만
+      // 낙관적 잠금 기준값을 갱신한다. (로컬 반영 없이 기준값만 올리면
+      // 다음 동기화 때 영상 없는 로컬 데이터가 서버를 덮어쓴다)
+      if (localStorage.getItem('shared-league-id') === ref.leagueId) {
+        try {
+          const local = await safeGetAsync('current-league', LeagueDataSchema);
+          if (local) {
+            const localMatches = local.matches.map((m) => {
+              if (m.id !== ref.match.id) return m;
+              const next = { ...m };
+              if (normalized) next.videoUrl = normalized;
+              else delete next.videoUrl;
+              return next;
+            });
+            await safeSetAsync('current-league', { ...local, matches: localMatches });
+          }
+          localStorage.setItem('shared-league-updated-at', updated[0].updated_at);
+        } catch {
+          // 로컬 반영 실패 시 기준값을 갱신하지 않음 → 다음 동기화에서 충돌 감지로 안전하게 처리
+        }
+      }
 
       onSaved(ref.leagueId, matches);
       setInputs((prev) => ({ ...prev, [ref.match.id]: '' }));

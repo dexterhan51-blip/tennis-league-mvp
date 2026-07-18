@@ -75,6 +75,8 @@ export default function LoadPage() {
       safeRemove('current-slot-index');
       // 이 서버 리그와 동기화 연결 — 편집하면 자동으로 서버에 반영됨
       localStorage.setItem('shared-league-id', league.id);
+      // 낙관적 잠금 기준값: 지금 내려받은 서버 버전
+      localStorage.setItem('shared-league-updated-at', league.updated_at);
 
       showToast(`${league.name} 리그를 서버에서 불러왔습니다. 편집 내용은 자동 동기화됩니다.`, 'success');
       router.push('/league');
