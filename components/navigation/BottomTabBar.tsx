@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Trophy, Users, Settings, Smartphone, Radio } from 'lucide-react';
+import { Home, Trophy, Users, Settings, Smartphone, Radio, Video } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface TabItem {
@@ -31,6 +31,11 @@ const tabs: TabItem[] = [
     href: '/live',
     icon: <Radio className="w-6 h-6" />,
     label: '라이브',
+  },
+  {
+    href: '/videos',
+    icon: <Video className="w-6 h-6" />,
+    label: '영상',
   },
   {
     href: '/scoreboard',
