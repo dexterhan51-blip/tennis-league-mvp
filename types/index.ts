@@ -61,6 +61,39 @@ export interface PlayerStat {
   mvpCount?: number;
 }
 
+/** 서버 friendly_matches 테이블 행 (리그 밖 친선경기) */
+export interface FriendlyMatchRow {
+  id: string;
+  match_date: string; // 'YYYY-MM-DD'
+  match: Match;
+}
+
+/** 투어 종합 랭킹에서 리그(대회) 하나가 기여한 몫 */
+export interface TourLeagueBreakdown {
+  leagueId: string;
+  leagueName: string;
+  points: number;
+  wins: number;
+  matchesPlayed: number;
+}
+
+/** 투어 종합 랭킹 엔트리 (리그별 점수 + 친선 점수 합산) */
+export interface TourRankingEntry {
+  playerId: string;
+  name: string;
+  gender: Gender;
+  totalPoints: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  matchesPlayed: number;
+  winRate: number;
+  perLeague: TourLeagueBreakdown[];
+  friendlyPoints: number;
+  friendlyWins: number;
+  friendlyMatchesPlayed: number;
+}
+
 export interface PlayerWithRank extends PlayerStat {
   currentRank: number;
   previousRank?: number;

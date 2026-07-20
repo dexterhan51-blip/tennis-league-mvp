@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Trophy, Users, Settings, Smartphone, Radio, Video } from 'lucide-react';
+import { Home, Trophy, Users, Settings, Smartphone, Radio, Video, Medal } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface TabItem {
@@ -36,6 +36,11 @@ const tabs: TabItem[] = [
     href: '/videos',
     icon: <Video className="w-6 h-6" />,
     label: '영상',
+  },
+  {
+    href: '/rankings',
+    icon: <Medal className="w-6 h-6" />,
+    label: '랭킹',
   },
   {
     href: '/scoreboard',
@@ -88,7 +93,7 @@ export default function BottomTabBar() {
               key={tab.href}
               href={tab.href}
               className={`
-                flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl transition-colors touch-target
+                flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-xl transition-colors touch-target
                 ${active
                   ? 'text-clay-600'
                   : 'text-slate-400 hover:text-slate-600'
@@ -99,7 +104,7 @@ export default function BottomTabBar() {
               aria-label={tab.label}
             >
               {tab.icon}
-              <span className="text-xs font-medium whitespace-nowrap">{tab.label}</span>
+              <span className="text-[10px] font-medium whitespace-nowrap">{tab.label}</span>
             </Link>
           );
         })}
