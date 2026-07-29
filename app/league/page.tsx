@@ -71,7 +71,7 @@ export default function LeaguePage() {
     publish: publishLeague,
     unpublish: unpublishLeague,
     pullFromServer,
-  } = useLeagueSync({ leagueName, players, matches });
+  } = useLeagueSync({ leagueName, players, matches, ready: !isLoading });
 
   const {
     pendingScores,
