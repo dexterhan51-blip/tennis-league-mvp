@@ -11,6 +11,8 @@ import {
   generateDoubles,
   generateSingles,
   isGuestPlayer,
+  isNamedGuest,
+  createNamedGuest,
   recalculateMvpCounts,
   GUEST_M_ID,
   GUEST_F_ID,
@@ -164,6 +166,33 @@ describe('calculateRanking', () => {
     const result = calculateRanking([m1, g1, g2, g3], []);
     expect(result).toHaveLength(1);
     expect(result[0].playerId).toBe('m1');
+  });
+
+  it('named guest is excluded from league ranking but league partner/opponents are counted', () => {
+    const guest = createNamedGuest('김게스트', 'FEMALE');
+    // m1 + 게스트 vs m2 + w2, 게스트 팀 승리
+    const match = makeMatch({
+      teamA: { id: 'ta', man: m1, woman: guest },
+      teamB: { id: 'tb', man: m2, woman: w2 },
+      scoreA: 6,
+      scoreB: 4,
+      isFinished: true,
+    });
+
+    const result = calculateRanking([m1, m2, w2], [match]);
+
+    // 게스트는 랭킹에 미포함
+    expect(result.find(r => r.playerId === guest.id)).toBeUndefined();
+
+    // 게스트의 파트너(리그 참가자)는 승리 기록: 출석 1 + 승점 1 = 2점
+    const partner = result.find(r => r.playerId === 'm1')!;
+    expect(partner.wins).toBe(1);
+    expect(partner.matchesPlayed).toBe(1);
+    expect(partner.totalPoints).toBe(2);
+
+    // 상대팀 리그 참가자들도 정상 기록
+    expect(result.find(r => r.playerId === 'm2')!.losses).toBe(1);
+    expect(result.find(r => r.playerId === 'w2')!.losses).toBe(1);
   });
 
   it('correctly distributes points for women-doubles match (stored as { man: w1, woman: w2 })', () => {
@@ -800,6 +829,26 @@ describe('isGuestPlayer', () => {
     expect(isGuestPlayer('abc123')).toBe(false);
     expect(isGuestPlayer('player-1')).toBe(false);
     expect(isGuestPlayer('')).toBe(false);
+  });
+});
+
+describe('named guest (createNamedGuest / isNamedGuest)', () => {
+  it('creates a guest with name-based deterministic id', () => {
+    const g = createNamedGuest('  김철수 ', 'MALE');
+    expect(g.id).toBe('guest-named-김철수');
+    expect(g.name).toBe('김철수');
+    expect(g.gender).toBe('MALE');
+    // 같은 이름은 같은 id — 여러 날 방문해도 동일 인물로 집계
+    expect(createNamedGuest('김철수', 'MALE').id).toBe(g.id);
+  });
+
+  it('named guest is a guest (excluded from league) but distinguishable from anonymous guests', () => {
+    const g = createNamedGuest('박영희', 'FEMALE');
+    expect(isGuestPlayer(g.id)).toBe(true);
+    expect(isNamedGuest(g.id)).toBe(true);
+    expect(isNamedGuest('guest-male-1')).toBe(false);
+    expect(isNamedGuest(GUEST_M_ID)).toBe(false);
+    expect(isNamedGuest('abc123')).toBe(false);
   });
 });
 

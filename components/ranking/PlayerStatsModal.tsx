@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { X, Trophy, Target, TrendingUp, Flame, Star, Crown, Swords, Sparkles, Skull, Zap } from 'lucide-react';
 import type { Player, Match, PlayerStat, PlayerCareerStats, PlayerWithRank } from '@/types';
-import { GUEST_M_ID, GUEST_F_ID, isGuestPlayer } from '@/utils/tennisLogic';
+import { GUEST_M_ID, GUEST_F_ID, isGuestPlayer, isNamedGuest } from '@/utils/tennisLogic';
 import { getPlayerCharacter } from '@/lib/playerCharacters';
 import SeasonHistorySection from '@/components/season/SeasonHistorySection';
 
@@ -73,7 +73,7 @@ export default function PlayerStatsModal({
   const headToHead = useMemo(() => {
     if (!player) return [];
 
-    const records = new Map<string, { name: string; wins: number; draws: number; losses: number }>();
+    const records = new Map<string, { name: string; isGuest: boolean; wins: number; draws: number; losses: number }>();
 
     matches.forEach((m) => {
       if (!m.isFinished || m.isExhibition) return;
@@ -84,12 +84,14 @@ export default function PlayerStatsModal({
       const inB = teamPlayers(m.teamB).some(p => p.id === player.id);
       if (!inA && !inB) return;
 
-      const opponents = teamPlayers(inA ? m.teamB : m.teamA).filter(p => !isGuestPlayer(p.id));
+      // 익명 게스트(게스트(남)1 등)는 제외, 이름 있는 게스트는 개인기록에 포함
+      const opponents = teamPlayers(inA ? m.teamB : m.teamA)
+        .filter(p => !isGuestPlayer(p.id) || isNamedGuest(p.id));
       const myScore = inA ? m.scoreA : m.scoreB;
       const oppScore = inA ? m.scoreB : m.scoreA;
 
       opponents.forEach(opp => {
-        const rec = records.get(opp.id) || { name: opp.name, wins: 0, draws: 0, losses: 0 };
+        const rec = records.get(opp.id) || { name: opp.name, isGuest: isNamedGuest(opp.id), wins: 0, draws: 0, losses: 0 };
         if (myScore > oppScore) rec.wins++;
         else if (myScore < oppScore) rec.losses++;
         else rec.draws++;
@@ -97,7 +99,8 @@ export default function PlayerStatsModal({
       });
     });
 
-    return Array.from(records.values())
+    return Array.from(records.entries())
+      .map(([id, rec]) => ({ id, ...rec }))
       .sort((a, b) => (b.wins + b.draws + b.losses) - (a.wins + a.draws + a.losses));
   }, [player, matches]);
 
@@ -346,10 +349,13 @@ export default function PlayerStatsModal({
                 const dominant = r.wins > r.losses;
                 return (
                   <div
-                    key={r.name}
+                    key={r.id}
                     className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg"
                   >
-                    <span className="text-sm font-medium text-slate-800 truncate">vs {r.name}</span>
+                    <span className="text-sm font-medium text-slate-800 truncate">
+                      vs {r.name}
+                      {r.isGuest && <span className="ml-1 text-[10px] font-bold text-slate-400 align-middle">게스트</span>}
+                    </span>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <span className={`text-sm font-bold ${dominant ? 'text-clay-600' : r.wins < r.losses ? 'text-red-500' : 'text-slate-600'}`}>
                         {r.wins}승{r.draws > 0 ? ` ${r.draws}무` : ''} {r.losses}패

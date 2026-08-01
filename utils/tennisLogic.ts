@@ -1,10 +1,23 @@
-import { Player, Match, PlayerStat, ScheduleConfig } from '@/types';
+import { Player, Match, PlayerStat, ScheduleConfig, Gender } from '@/types';
 
 export const GUEST_M_ID = 'guest-male';
 export const GUEST_F_ID = 'guest-female';
+export const NAMED_GUEST_PREFIX = 'guest-named-';
 
 export function isGuestPlayer(id: string): boolean {
   return id.startsWith('guest-');
+}
+
+// 이름 있는 게스트: 리그 미소속 실명 선수. guest- 접두사를 공유하므로
+// 리그 랭킹/MVP/투어 집계에서는 제외되지만, 상대전적 등 개인기록에는 포함된다.
+export function isNamedGuest(id: string): boolean {
+  return id.startsWith(NAMED_GUEST_PREFIX);
+}
+
+// 이름 기반 결정적 id — 같은 이름의 게스트는 날짜가 달라도 동일 인물로 집계된다.
+export function createNamedGuest(name: string, gender: Gender): Player {
+  const trimmed = name.trim();
+  return { id: `${NAMED_GUEST_PREFIX}${trimmed}`, name: trimmed, gender };
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9);

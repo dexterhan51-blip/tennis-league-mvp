@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { X, RotateCcw } from 'lucide-react';
-import type { Player } from '@/types';
-import { isGuestPlayer } from '@/utils/tennisLogic';
+import { X, RotateCcw, UserPlus } from 'lucide-react';
+import type { Player, Gender } from '@/types';
+import { isGuestPlayer, isNamedGuest, createNamedGuest } from '@/utils/tennisLogic';
 
 interface ManualMatchDialogProps {
   isOpen: boolean;
@@ -34,7 +34,12 @@ export default function ManualMatchDialog({
   });
   const [activeSlot, setActiveSlot] = useState<SlotKey | null>(null);
 
-  const allPlayers = [...guestPlayers, ...players];
+  // 리그 미소속 실명 게스트 (이 다이얼로그에서 직접 추가)
+  const [namedGuests, setNamedGuests] = useState<Player[]>([]);
+  const [guestName, setGuestName] = useState('');
+  const [guestGender, setGuestGender] = useState<Gender>('MALE');
+
+  const allPlayers = [...namedGuests, ...guestPlayers, ...players];
   const assignedIds = new Set(
     Object.values(slots).filter(Boolean).map(p => p!.id)
   );
@@ -79,14 +84,33 @@ export default function ManualMatchDialog({
     setActiveSlot(null);
   };
 
+  const handleAddGuest = () => {
+    const guest = createNamedGuest(guestName, guestGender);
+    if (!guest.name) return;
+    setGuestName('');
+
+    // 같은 이름이 이미 있으면 새로 만들지 않고 그 선수를 배정
+    const existing = allPlayers.find(p => p.id === guest.id || p.name === guest.name);
+    if (existing) {
+      if (!assignedIds.has(existing.id)) handlePlayerTap(existing);
+      return;
+    }
+
+    setNamedGuests(prev => [...prev, guest]);
+    handlePlayerTap(guest);
+  };
+
   const handleConfirm = () => {
     if (!slots.a1 || !slots.a2 || !slots.b1 || !slots.b2) return;
     onConfirm([slots.a1, slots.a2], [slots.b1, slots.b2]);
     handleReset();
+    setNamedGuests([]);
   };
 
   const handleClose = () => {
     handleReset();
+    setNamedGuests([]);
+    setGuestName('');
     onClose();
   };
 
@@ -169,6 +193,47 @@ export default function ManualMatchDialog({
           </p>
         </div>
 
+        {/* 게스트 추가 (리그 미소속 선수) */}
+        <div className="px-4 pb-3 flex-shrink-0">
+          <div className="p-2.5 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+            <div className="flex items-center gap-2">
+              <input
+                value={guestName}
+                onChange={e => setGuestName(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleAddGuest(); }}
+                placeholder="게스트 이름"
+                className="flex-1 min-w-0 px-2.5 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-clay-500 focus:outline-none"
+              />
+              <div className="flex rounded-lg overflow-hidden border border-slate-200 flex-shrink-0">
+                {(['MALE', 'FEMALE'] as Gender[]).map(g => (
+                  <button
+                    key={g}
+                    onClick={() => setGuestGender(g)}
+                    className={`px-2.5 py-2 text-xs font-bold transition-colors ${
+                      guestGender === g
+                        ? g === 'MALE' ? 'bg-blue-500 text-white' : 'bg-pink-500 text-white'
+                        : 'bg-white text-slate-400'
+                    }`}
+                  >
+                    {g === 'MALE' ? '남' : '여'}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={handleAddGuest}
+                disabled={!guestName.trim()}
+                className="p-2 rounded-lg bg-clay-600 text-white disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors flex-shrink-0 touch-target"
+                aria-label="게스트 추가"
+              >
+                <UserPlus size={16} />
+              </button>
+            </div>
+            <p className="text-[10px] text-slate-400 mt-1.5">
+              리그 미소속 게스트 — 개인 기록(상대전적)에는 남지만 리그 랭킹에는 반영되지 않습니다
+            </p>
+          </div>
+        </div>
+
         {/* 선수 목록 */}
         <div className="px-4 pb-3 overflow-y-auto flex-1 min-h-0">
           <div className="grid grid-cols-3 gap-2">
@@ -188,6 +253,9 @@ export default function ManualMatchDialog({
                   }`}
                 >
                   {p.name}
+                  {isNamedGuest(p.id) && (
+                    <span className="block text-[10px] text-slate-400 mt-0.5">게스트</span>
+                  )}
                   {isAssigned && (
                     <span className="block text-[10px] text-clay-500 mt-0.5">
                       {Object.entries(slots).find(([, v]) => v?.id === p.id)?.[0]?.startsWith('a') ? '팀A' : '팀B'}
