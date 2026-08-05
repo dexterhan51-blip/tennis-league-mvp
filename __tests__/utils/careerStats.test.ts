@@ -63,4 +63,37 @@ describe('calculateCareerRanking', () => {
   it('빈 배열이면 빈 랭킹을 반환한다', () => {
     expect(calculateCareerRanking([]).size).toBe(0);
   });
+
+  describe('성별 분리 (ATP/WTA)', () => {
+    const genderOf = new Map<string, 'MALE' | 'FEMALE'>([
+      ['m1', 'MALE'],
+      ['m2', 'MALE'],
+      ['w1', 'FEMALE'],
+      ['w2', 'FEMALE'],
+    ]);
+
+    it('남자끼리, 여자끼리 각각 1위부터 순위를 매긴다', () => {
+      const stats = [
+        career('m1', [{ totalPoints: 10 }]),
+        career('w1', [{ totalPoints: 9 }]),
+        career('m2', [{ totalPoints: 8 }]),
+        career('w2', [{ totalPoints: 7 }]),
+      ];
+      const ranking = calculateCareerRanking(stats, genderOf);
+      expect(ranking.get('m1')).toBe(1); // ATP 1위
+      expect(ranking.get('m2')).toBe(2); // ATP 2위
+      expect(ranking.get('w1')).toBe(1); // WTA 1위 (전체 2위지만 여자 중 1위)
+      expect(ranking.get('w2')).toBe(2); // WTA 2위
+    });
+
+    it('성별을 알 수 없는 선수는 제외된다', () => {
+      const stats = [
+        career('m1', [{ totalPoints: 10 }]),
+        career('unknown', [{ totalPoints: 99 }]), // 명단에 없는 과거 선수
+      ];
+      const ranking = calculateCareerRanking(stats, genderOf);
+      expect(ranking.has('unknown')).toBe(false);
+      expect(ranking.get('m1')).toBe(1); // unknown이 순위를 차지하지 않음
+    });
+  });
 });

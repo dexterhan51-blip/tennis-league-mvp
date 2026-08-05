@@ -1,4 +1,4 @@
-import type { SeasonArchive, PlayerCareerStats, SeasonRecord, PlayerStat } from '@/types';
+import type { SeasonArchive, PlayerCareerStats, SeasonRecord, PlayerStat, Gender } from '@/types';
 import { safeGetAsync, safeSetAsync } from '@/lib/storage';
 import { PlayerCareerStatsArraySchema } from '@/lib/schemas';
 
@@ -13,11 +13,17 @@ export async function saveCareerStats(stats: PlayerCareerStats[]): Promise<void>
 }
 
 /**
- * ATP식 통산 랭킹 계산: 아카이브된 전체 시즌의 누적 포인트 기준.
+ * ATP/WTA식 통산 랭킹 계산: 아카이브된 전체 시즌의 누적 포인트 기준.
  * 동점이면 통산 승수 → 통산 승률 순으로 가른다.
  * 시즌 기록이 없는 선수는 랭킹에 포함되지 않는다.
+ *
+ * genderOf를 넘기면 남자(ATP)/여자(WTA)를 분리해 성별 그룹 안에서 순위를 매긴다.
+ * 성별을 알 수 없는 선수(현재 명단에 없는 과거 선수)는 결과에서 제외된다.
  */
-export function calculateCareerRanking(careerStats: PlayerCareerStats[]): Map<string, number> {
+export function calculateCareerRanking(
+  careerStats: PlayerCareerStats[],
+  genderOf?: Map<string, Gender>,
+): Map<string, number> {
   const totals = careerStats
     .filter(c => c.seasonHistory.length > 0)
     .map(c => {
@@ -31,7 +37,20 @@ export function calculateCareerRanking(careerStats: PlayerCareerStats[]): Map<st
     b.points - a.points || b.wins - a.wins || b.winRate - a.winRate
   );
 
-  return new Map(totals.map((t, idx) => [t.playerId, idx + 1]));
+  if (!genderOf) {
+    return new Map(totals.map((t, idx) => [t.playerId, idx + 1]));
+  }
+
+  const result = new Map<string, number>();
+  const counters = new Map<Gender, number>();
+  totals.forEach(t => {
+    const gender = genderOf.get(t.playerId);
+    if (!gender) return;
+    const rank = (counters.get(gender) ?? 0) + 1;
+    counters.set(gender, rank);
+    result.set(t.playerId, rank);
+  });
+  return result;
 }
 
 export async function updatePlayerCareerStats(archive: SeasonArchive): Promise<PlayerCareerStats[]> {

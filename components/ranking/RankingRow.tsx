@@ -79,10 +79,12 @@ export default function RankingRow({ player, photo, onClick }: RankingRowProps) 
           <span className="font-bold text-slate-900 truncate">{name}</span>
           {careerRank !== undefined && (
             <span
-              className="px-1.5 py-0.5 bg-slate-800 text-white text-[10px] font-bold rounded flex-shrink-0"
-              title={`통산 랭킹 ${careerRank}위 (아카이브된 전체 시즌 누적 포인트 기준)`}
+              className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded flex-shrink-0 ${
+                gender === 'MALE' ? 'bg-slate-800' : 'bg-purple-700'
+              }`}
+              title={`${gender === 'MALE' ? '남자(ATP)' : '여자(WTA)'} 통산 랭킹 ${careerRank}위 (아카이브된 전체 시즌 누적 포인트 기준)`}
             >
-              ATP {careerRank}
+              {gender === 'MALE' ? 'ATP' : 'WTA'} {careerRank}
             </span>
           )}
           {dailyBonus && (
