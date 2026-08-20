@@ -85,7 +85,7 @@ export default function BottomTabBar() {
       role="navigation"
       aria-label="하단 내비게이션"
     >
-      <div className="max-w-md mx-auto h-14 flex items-center justify-around bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] pointer-events-auto">
+      <div className="max-w-md mx-auto h-14 flex items-center justify-around bg-card/95 backdrop-blur-md border border-line rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] pointer-events-auto">
         {visibleTabs.map((tab) => {
           const active = isActive(tab);
           return (
@@ -95,8 +95,8 @@ export default function BottomTabBar() {
               className={`
                 flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-xl transition-colors touch-target
                 ${active
-                  ? 'text-clay-600'
-                  : 'text-slate-400 hover:text-slate-600'
+                  ? 'text-accent'
+                  : 'text-ink-faint hover:text-ink-mute'
                 }
               `}
               role="tab"

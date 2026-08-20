@@ -55,10 +55,10 @@ function VideoCard({ entry }: { entry: VideoEntry }) {
       href={entry.watchUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="block bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:border-clay-300 transition-colors active:scale-[0.99]"
+      className="block bg-card rounded-2xl border border-line overflow-hidden hover:border-accent transition-colors active:scale-[0.99]"
     >
       {entry.thumbnailUrl && (
-        <div className="relative aspect-video bg-slate-100">
+        <div className="relative aspect-video bg-card-soft">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={entry.thumbnailUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
           <div className="absolute inset-0 flex items-center justify-center">
@@ -69,14 +69,14 @@ function VideoCard({ entry }: { entry: VideoEntry }) {
         </div>
       )}
       <div className="p-3">
-        <div className="text-sm text-slate-900">
+        <div className="text-sm text-ink">
           <span className={m.scoreA > m.scoreB ? 'font-bold' : ''}>{teamLabel(m, 'A')}</span>
-          <span className="mx-1.5 font-black text-clay-600">
+          <span className="mx-1.5 font-black text-accent tabular-nums">
             {m.scoreA}:{m.scoreB}
           </span>
           <span className={m.scoreB > m.scoreA ? 'font-bold' : ''}>{teamLabel(m, 'B')}</span>
         </div>
-        <div className="text-[11px] text-slate-400 mt-0.5">
+        <div className="text-[11px] text-ink-faint mt-0.5">
           {entry.leagueName}
           {entry.date ? ` · ${entry.date}` : ''}
         </div>
@@ -157,10 +157,10 @@ export default function VideosPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 max-w-sm w-full text-center">
-          <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <p className="text-sm text-slate-500">영상 정보를 불러올 수 없습니다. 네트워크를 확인해주세요.</p>
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4">
+        <div className="bg-card rounded-2xl border border-line p-8 max-w-sm w-full text-center">
+          <AlertTriangle className="w-12 h-12 text-down mx-auto mb-4" />
+          <p className="text-sm text-ink-mute">영상 정보를 불러올 수 없습니다. 네트워크를 확인해주세요.</p>
         </div>
       </div>
     );
@@ -168,8 +168,8 @@ export default function VideosPage() {
 
   if (!leagues) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-clay-600 animate-spin" aria-label="로딩 중" />
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-accent animate-spin" aria-label="로딩 중" />
       </div>
     );
   }
@@ -189,18 +189,18 @@ export default function VideosPage() {
   const dayVideos = selectedDate ? videos.filter((v) => v.date === selectedDate) : [];
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24">
-      <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
+    <div className="min-h-screen bg-surface pb-24">
+      <div className="sticky top-0 z-10 bg-card border-b border-line">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Video className="w-5 h-5 text-clay-600" /> 경기 영상
+          <h1 className="text-lg font-bold text-ink tracking-tight flex items-center gap-2">
+            <Video className="w-5 h-5 text-accent" /> 경기 영상
           </h1>
           {isAdmin && (
-            <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs font-bold">
+            <div className="flex rounded-lg border border-line overflow-hidden text-xs font-bold">
               <button
                 onClick={() => setMode('view')}
                 className={`px-3 py-1.5 transition-colors touch-target ${
-                  mode === 'view' ? 'bg-clay-600 text-white' : 'bg-white text-slate-500'
+                  mode === 'view' ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft'
                 }`}
               >
                 보기
@@ -208,7 +208,7 @@ export default function VideosPage() {
               <button
                 onClick={() => setMode('manage')}
                 className={`px-3 py-1.5 transition-colors touch-target ${
-                  mode === 'manage' ? 'bg-clay-600 text-white' : 'bg-white text-slate-500'
+                  mode === 'manage' ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft'
                 }`}
               >
                 등록
@@ -227,9 +227,9 @@ export default function VideosPage() {
             }
           />
         ) : videos.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 text-center">
-            <Youtube className="w-10 h-10 text-slate-200 mx-auto mb-3" />
-            <p className="text-sm text-slate-500 leading-relaxed">
+          <div className="bg-card rounded-2xl border border-line p-10 text-center">
+            <Youtube className="w-10 h-10 text-ink-faint mx-auto mb-3" />
+            <p className="text-sm text-ink-mute leading-relaxed">
               아직 등록된 경기 영상이 없습니다.
               <br />
               관리자가 경기에 유튜브 링크를 등록하면 여기에 표시됩니다.
@@ -244,8 +244,8 @@ export default function VideosPage() {
                   onClick={() => setSelectedPlayer(null)}
                   className={`shrink-0 text-xs font-bold px-3 py-2 rounded-full border transition-colors touch-target ${
                     selectedPlayer === null
-                      ? 'bg-clay-600 text-white border-clay-600'
-                      : 'bg-white text-slate-600 border-slate-200 hover:border-clay-300'
+                      ? 'bg-accent text-white border-accent'
+                      : 'bg-card-soft text-ink-soft border-line hover:bg-line'
                   }`}
                 >
                   날짜별
@@ -256,8 +256,8 @@ export default function VideosPage() {
                     onClick={() => setSelectedPlayer(name === selectedPlayer ? null : name)}
                     className={`shrink-0 text-xs font-bold px-3 py-2 rounded-full border transition-colors touch-target ${
                       selectedPlayer === name
-                        ? 'bg-clay-600 text-white border-clay-600'
-                        : 'bg-white text-slate-600 border-slate-200 hover:border-clay-300'
+                        ? 'bg-accent text-white border-accent'
+                        : 'bg-card-soft text-ink-soft border-line hover:bg-line'
                     }`}
                   >
                     {name}
@@ -269,8 +269,8 @@ export default function VideosPage() {
             {selectedPlayer ? (
               /* 선수별 전체 영상 */
               <section>
-                <h2 className="text-sm font-bold text-slate-700 mb-3">
-                  {selectedPlayer} 선수의 영상 <span className="text-clay-600">{playerVideos.length}</span>편
+                <h2 className="text-sm font-semibold text-ink tracking-tight mb-3">
+                  {selectedPlayer} 선수의 영상 <span className="text-accent tabular-nums">{playerVideos.length}</span>편
                 </h2>
                 <div className="space-y-3">
                   {playerVideos.map((v) => (
@@ -281,30 +281,30 @@ export default function VideosPage() {
             ) : (
               <>
                 {/* 달력 */}
-                <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+                <section className="bg-card rounded-2xl border border-line p-4">
                   <div className="flex items-center justify-between mb-3">
                     <button
                       onClick={() => moveMonth(-1)}
-                      className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg touch-target"
+                      className="p-2 text-ink-faint hover:text-ink-mute hover:bg-card-soft rounded-lg touch-target"
                       aria-label="이전 달"
                     >
                       <ChevronLeft size={18} />
                     </button>
-                    <div className="font-bold text-slate-900">
+                    <div className="font-bold text-ink tabular-nums">
                       {year}년 {month + 1}월
                     </div>
                     <button
                       onClick={() => moveMonth(1)}
-                      className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg touch-target"
+                      className="p-2 text-ink-faint hover:text-ink-mute hover:bg-card-soft rounded-lg touch-target"
                       aria-label="다음 달"
                     >
                       <ChevronRight size={18} />
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-7 text-center text-[11px] font-bold text-slate-400 mb-1">
+                  <div className="grid grid-cols-7 text-center text-[11px] font-bold text-ink-faint mb-1">
                     {DAY_LABELS.map((d, i) => (
-                      <div key={d} className={i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : ''}>
+                      <div key={d} className={i === 0 ? 'text-down' : i === 6 ? 'text-tint-m-fg' : ''}>
                         {d}
                       </div>
                     ))}
@@ -320,17 +320,17 @@ export default function VideosPage() {
                           key={date}
                           onClick={() => count > 0 && setSelectedDate(isSelected ? null : date)}
                           disabled={count === 0}
-                          className={`relative mx-auto w-9 h-9 rounded-full text-sm flex flex-col items-center justify-center transition-colors touch-target ${
+                          className={`relative mx-auto w-9 h-9 rounded-full text-sm tabular-nums flex flex-col items-center justify-center transition-colors touch-target ${
                             isSelected
-                              ? 'bg-clay-600 text-white font-bold'
+                              ? 'bg-accent text-white font-bold'
                               : count > 0
-                              ? 'text-slate-900 font-bold hover:bg-clay-50'
-                              : 'text-slate-300'
+                              ? 'text-ink font-bold hover:bg-accent-soft'
+                              : 'text-ink-faint'
                           }`}
                         >
                           {day}
                           {count > 0 && !isSelected && (
-                            <span className="absolute bottom-0.5 w-1.5 h-1.5 rounded-full bg-clay-500" />
+                            <span className="absolute bottom-0.5 w-1.5 h-1.5 rounded-full bg-accent" />
                           )}
                         </button>
                       );
@@ -341,8 +341,8 @@ export default function VideosPage() {
                 {/* 선택한 날짜의 영상 */}
                 {selectedDate ? (
                   <section>
-                    <h2 className="text-sm font-bold text-slate-700 mb-3">
-                      {selectedDate} 영상 <span className="text-clay-600">{dayVideos.length}</span>편
+                    <h2 className="text-sm font-semibold text-ink tracking-tight mb-3">
+                      {selectedDate} 영상 <span className="text-accent tabular-nums">{dayVideos.length}</span>편
                     </h2>
                     <div className="space-y-3">
                       {dayVideos.map((v) => (
@@ -351,7 +351,7 @@ export default function VideosPage() {
                     </div>
                   </section>
                 ) : (
-                  <p className="text-xs text-slate-400 text-center">
+                  <p className="text-xs text-ink-faint text-center">
                     영상이 있는 날짜(점 표시)를 누르면 해당 날짜의 경기 영상이 나옵니다.
                   </p>
                 )}

@@ -131,15 +131,15 @@ export default function AdminVideoManager({ leagues, onSaved }: AdminVideoManage
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-bold text-slate-700">
-          영상 등록 <span className="text-clay-600">{visible.length}</span>경기
+        <h2 className="text-sm font-semibold text-ink tracking-tight">
+          영상 등록 <span className="text-accent tabular-nums">{visible.length}</span>경기
         </h2>
         <button
           onClick={() => setOnlyMissing(!onlyMissing)}
           className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors touch-target ${
             onlyMissing
-              ? 'bg-clay-600 text-white border-clay-600'
-              : 'bg-white text-slate-600 border-slate-200'
+              ? 'bg-accent text-white border-accent'
+              : 'bg-card-soft text-ink-soft border-line'
           }`}
         >
           {onlyMissing ? '미등록만 보기' : '전체 보기'}
@@ -147,9 +147,9 @@ export default function AdminVideoManager({ leagues, onSaved }: AdminVideoManage
       </div>
 
       {visible.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center">
-          <Check className="w-8 h-8 text-green-400 mx-auto mb-2" />
-          <p className="text-sm text-slate-500">
+        <div className="bg-card rounded-2xl border border-line p-8 text-center">
+          <Check className="w-8 h-8 text-up mx-auto mb-2" />
+          <p className="text-sm text-ink-mute">
             {onlyMissing ? '모든 경기에 영상이 등록되어 있습니다.' : '완료된 경기가 없습니다.'}
           </p>
         </div>
@@ -163,41 +163,41 @@ export default function AdminVideoManager({ leagues, onSaved }: AdminVideoManage
             return (
               <div key={ref.match.id}>
                 {showDateHeader && (
-                  <div className="text-xs font-bold text-slate-400 mt-4 mb-2">
+                  <div className="text-xs font-medium text-ink-mute mt-4 mb-2">
                     {ref.match.date || '날짜 미정'}
                   </div>
                 )}
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-3">
+                <div className="bg-card rounded-xl border border-line p-3">
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <div className="text-sm text-slate-900 min-w-0 truncate">
+                    <div className="text-sm text-ink min-w-0 truncate">
                       <span className={ref.match.scoreA > ref.match.scoreB ? 'font-bold' : ''}>
                         {teamLabel(ref.match, 'A')}
                       </span>
-                      <span className="mx-1.5 font-black text-clay-600">
+                      <span className="mx-1.5 font-black text-accent tabular-nums">
                         {ref.match.scoreA}:{ref.match.scoreB}
                       </span>
                       <span className={ref.match.scoreB > ref.match.scoreA ? 'font-bold' : ''}>
                         {teamLabel(ref.match, 'B')}
                       </span>
                     </div>
-                    <span className="shrink-0 text-[10px] text-slate-400">{ref.leagueName}</span>
+                    <span className="shrink-0 text-[10px] text-ink-faint">{ref.leagueName}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="relative flex-1">
-                      <Youtube size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-red-400" />
+                      <Youtube size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-down" />
                       <input
                         type="url"
                         inputMode="url"
                         value={inputValue}
                         onChange={(e) => setInputs((prev) => ({ ...prev, [ref.match.id]: e.target.value }))}
                         placeholder="유튜브 링크 붙여넣기"
-                        className="w-full pl-8 pr-2 py-2 text-xs border border-slate-200 rounded-lg focus:border-clay-500 focus:outline-none"
+                        className="w-full pl-8 pr-2 py-2 text-xs bg-card text-ink placeholder:text-ink-faint border border-line-strong rounded-lg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40"
                       />
                     </div>
                     <button
                       onClick={() => handleSave(ref, inputValue)}
                       disabled={isSaving || (!inputValue.trim() && !ref.match.videoUrl)}
-                      className="shrink-0 text-xs font-bold text-white bg-clay-600 hover:bg-clay-700 disabled:bg-slate-300 px-3 py-2 rounded-lg transition-colors touch-target"
+                      className="shrink-0 text-xs font-bold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 px-3 py-2 rounded-lg transition-colors touch-target"
                     >
                       {isSaving ? <Loader2 size={14} className="animate-spin" /> : '저장'}
                     </button>
@@ -205,7 +205,7 @@ export default function AdminVideoManager({ leagues, onSaved }: AdminVideoManage
                       <button
                         onClick={() => handleSave(ref, '')}
                         disabled={isSaving}
-                        className="shrink-0 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors touch-target"
+                        className="shrink-0 p-2 text-ink-faint hover:text-down hover:bg-down/10 rounded-lg transition-colors touch-target"
                         aria-label="영상 링크 삭제"
                       >
                         <Trash2 size={14} />

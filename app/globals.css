@@ -1,16 +1,109 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 @import "tailwindcss";
 
+/* ============================================================
+   러브포티 디자인 토큰
+   - 라이트/다크는 html.light / html.dark 클래스로 전환됨 (ThemeContext)
+   - 컴포넌트는 아래 시맨틱 유틸리티만 사용:
+     bg-surface / bg-card / bg-card-soft
+     border-line / border-line-strong
+     text-ink / text-ink-soft / text-ink-mute / text-ink-faint
+     accent(클레이) / up / down / tint-m / tint-f
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
   --font-scale: 1;
+
+  /* Light */
+  --surface: #f6f4f1;
+  --card: #ffffff;
+  --card-soft: #f1eeea;
+  --line: #e9e4de;
+  --line-strong: #d9d2c9;
+  --ink: #201c18;
+  --ink-soft: #4c463f;
+  --ink-mute: #7d766d;
+  --ink-faint: #aaa39a;
+  --accent: #bf633a;
+  --accent-strong: #a0522f;
+  --accent-soft: #f7ece5;
+  --up: #48876f;
+  --down: #c05b52;
+  --tint-m-bg: #e3e9ef;
+  --tint-m-fg: #46596b;
+  --tint-f-bg: #f4e4dc;
+  --tint-f-fg: #a05537;
+
+  /* 하위 호환 */
+  --background: var(--surface);
+  --foreground: var(--ink);
+}
+
+html.dark {
+  --surface: #161311;
+  --card: #1f1b18;
+  --card-soft: #282320;
+  --line: #322c27;
+  --line-strong: #453e36;
+  --ink: #ece7e1;
+  --ink-soft: #c7c0b8;
+  --ink-mute: #918a81;
+  --ink-faint: #665f57;
+  --accent: #d0815b;
+  --accent-strong: #dda283;
+  --accent-soft: #33251d;
+  --up: #6fae91;
+  --down: #d17b71;
+  --tint-m-bg: #26303a;
+  --tint-m-fg: #9db4c8;
+  --tint-f-bg: #3a2a22;
+  --tint-f-fg: #d8a385;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not(.dark) {
+    --surface: #161311;
+    --card: #1f1b18;
+    --card-soft: #282320;
+    --line: #322c27;
+    --line-strong: #453e36;
+    --ink: #ece7e1;
+    --ink-soft: #c7c0b8;
+    --ink-mute: #918a81;
+    --ink-faint: #665f57;
+    --accent: #d0815b;
+    --accent-strong: #dda283;
+    --accent-soft: #33251d;
+    --up: #6fae91;
+    --down: #d17b71;
+    --tint-m-bg: #26303a;
+    --tint-m-fg: #9db4c8;
+    --tint-f-bg: #3a2a22;
+    --tint-f-fg: #d8a385;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-card-soft: var(--card-soft);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-mute: var(--ink-mute);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-tint-m-bg: var(--tint-m-bg);
+  --color-tint-m-fg: var(--tint-m-fg);
+  --color-tint-f-bg: var(--tint-f-bg);
+  --color-tint-f-fg: var(--tint-f-fg);
 }
 
 /* 러브포티 브랜드 클레이 팔레트 (로고 배경색 #BF633A 기준) */
@@ -27,32 +120,14 @@
   --color-clay-900: #66351f;
 }
 
-/* Light theme */
-:root,
-html.light {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-/* Dark theme */
-html.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not(.light):not(.dark) {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
   font-size: calc(1rem * var(--font-scale));
   overscroll-behavior: contain;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Touch target minimum size for accessibility */
@@ -189,45 +264,4 @@ body {
   .swipeable {
     transition: none !important;
   }
-}
-
-/* Dark mode specific styles */
-html.dark .bg-white {
-  background-color: #1e293b;
-}
-
-html.dark .bg-slate-50 {
-  background-color: #0f172a;
-}
-
-html.dark .bg-slate-100 {
-  background-color: #1e293b;
-}
-
-html.dark .text-slate-900 {
-  color: #f1f5f9;
-}
-
-html.dark .text-slate-700 {
-  color: #cbd5e1;
-}
-
-html.dark .text-slate-600 {
-  color: #94a3b8;
-}
-
-html.dark .text-slate-500 {
-  color: #64748b;
-}
-
-html.dark .border-slate-200 {
-  border-color: #334155;
-}
-
-html.dark .border-slate-100 {
-  border-color: #1e293b;
-}
-
-html.dark .bg-white\/95 {
-  background-color: rgba(30, 41, 59, 0.95);
 }

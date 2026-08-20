@@ -57,7 +57,7 @@ export default function ShareButton({
     <button
       onClick={handleShare}
       disabled={isSharing || disabled}
-      className={`px-4 bg-green-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-green-700 transition-colors touch-target ${
+      className={`px-4 bg-up text-white rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-colors touch-target ${
         (isSharing || disabled) ? 'opacity-50 cursor-not-allowed' : ''
       }`}
       aria-label="경기 결과 공유"

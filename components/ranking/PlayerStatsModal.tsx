@@ -115,15 +115,15 @@ export default function PlayerStatsModal({
       aria-modal="true"
       aria-labelledby="player-stats-title"
     >
-      <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full animate-scale-in max-h-[90vh] overflow-y-auto">
+      <div className="bg-card border border-line rounded-2xl shadow-xl max-w-sm w-full animate-scale-in max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="relative p-6 pb-4">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-full transition-colors touch-target"
+            className="absolute top-4 right-4 p-2 hover:bg-card-soft rounded-full transition-colors touch-target"
             aria-label="닫기"
           >
-            <X className="w-5 h-5 text-slate-400" />
+            <X className="w-5 h-5 text-ink-faint" />
           </button>
 
           <div className="flex items-center gap-4">
@@ -131,24 +131,24 @@ export default function PlayerStatsModal({
               <img
                 src={player.photo}
                 alt={player.name}
-                className="w-16 h-16 rounded-full object-cover border-4 border-slate-200"
+                className="w-16 h-16 rounded-full object-cover border border-line-strong"
               />
             ) : (
               <div
                 className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                  player.gender === 'MALE' ? 'bg-blue-100' : 'bg-pink-100'
+                  player.gender === 'MALE' ? 'bg-tint-m-bg text-tint-m-fg' : 'bg-tint-f-bg text-tint-f-fg'
                 }`}
               >
-                <span className="text-2xl">
-                  {player.gender === 'MALE' ? '👨' : '👩'}
+                <span className="text-2xl font-bold">
+                  {player.name.charAt(0)}
                 </span>
               </div>
             )}
             <div>
-              <h2 id="player-stats-title" className="text-xl font-bold text-slate-900">
+              <h2 id="player-stats-title" className="text-xl font-bold text-ink tracking-tight">
                 {player.name}
               </h2>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-ink-mute">
                 {player.gender === 'MALE' ? '남성' : '여성'}
               </p>
             </div>
@@ -158,37 +158,37 @@ export default function PlayerStatsModal({
         {/* Character Section (시즌 데이터 기반 별명/플레이스타일/천적) */}
         {character && (
           <div className="px-6 pb-4">
-            <div className="rounded-2xl overflow-hidden border border-slate-200">
-              <div className="bg-gradient-to-r from-slate-900 to-slate-700 px-4 py-4 text-white">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-lime-300 uppercase mb-1">
+            <div className="rounded-2xl overflow-hidden border border-line">
+              <div className="bg-clay-900 px-4 py-4 text-white">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-clay-300 uppercase mb-1">
                   <Sparkles className="w-3.5 h-3.5" /> 캐릭터
                 </div>
                 <div className="text-xl font-black leading-tight">{character.nickname}</div>
                 {character.proPlayer && (
-                  <div className="text-sm font-bold text-lime-300 mt-0.5">“{character.proPlayer}”</div>
+                  <div className="text-sm font-bold text-clay-300 mt-0.5">“{character.proPlayer}”</div>
                 )}
-                <div className="text-xs text-slate-300 mt-1.5">{character.tagline}</div>
+                <div className="text-xs text-white/60 mt-1.5">{character.tagline}</div>
               </div>
-              <div className="bg-white p-4 space-y-3">
+              <div className="bg-card p-4 space-y-3">
                 <div className="flex gap-2.5">
-                  <Zap className="w-4 h-4 text-clay-500 flex-shrink-0 mt-0.5" />
+                  <Zap className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-bold text-clay-600 mb-0.5">플레이스타일</div>
-                    <p className="text-sm text-slate-700 leading-relaxed">{character.style}</p>
+                    <div className="text-xs font-bold text-accent mb-0.5">플레이스타일</div>
+                    <p className="text-sm text-ink-soft leading-relaxed">{character.style}</p>
                   </div>
                 </div>
                 <div className="flex gap-2.5">
-                  <Skull className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                  <Skull className="w-4 h-4 text-down flex-shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-bold text-red-500 mb-0.5">천적 / 약점</div>
-                    <p className="text-sm text-slate-700 leading-relaxed">{character.nemesis}</p>
+                    <div className="text-xs font-bold text-down mb-0.5">천적 / 약점</div>
+                    <p className="text-sm text-ink-soft leading-relaxed">{character.nemesis}</p>
                   </div>
                 </div>
                 <div className="flex gap-2.5">
-                  <Flame className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                  <Flame className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-bold text-orange-500 mb-0.5">강점 / 케미</div>
-                    <p className="text-sm text-slate-700 leading-relaxed">{character.edge}</p>
+                    <div className="text-xs font-bold text-amber-500 mb-0.5">강점 / 케미</div>
+                    <p className="text-sm text-ink-soft leading-relaxed">{character.edge}</p>
                   </div>
                 </div>
               </div>
@@ -199,26 +199,26 @@ export default function PlayerStatsModal({
         {/* Career Section */}
         {(careerStats || currentRank) && (
           <div className="px-6 pb-4">
-            <div className="p-4 bg-amber-50 rounded-xl space-y-2">
-              <h3 className="text-sm font-bold text-amber-700 flex items-center gap-1.5">
-                <Crown className="w-4 h-4" /> 커리어
+            <div className="p-4 bg-accent-soft rounded-xl space-y-2">
+              <h3 className="text-sm font-semibold text-accent tracking-tight flex items-center gap-1.5">
+                <Crown className="w-4 h-4 text-amber-400" /> 커리어
               </h3>
               <div className="grid grid-cols-3 gap-3 text-center">
                 {currentRank && (
                   <div>
-                    <div className="text-xs text-slate-500">현재 순위</div>
-                    <div className="text-lg font-bold text-slate-900">{currentRank}위</div>
+                    <div className="text-xs text-ink-mute">현재 순위</div>
+                    <div className="text-lg font-bold text-ink tabular-nums">{currentRank}위</div>
                   </div>
                 )}
                 <div>
-                  <div className="text-xs text-slate-500">최고 순위</div>
-                  <div className="text-lg font-bold text-amber-600">
+                  <div className="text-xs text-ink-mute">최고 순위</div>
+                  <div className="text-lg font-bold text-amber-500 tabular-nums">
                     {careerStats ? `${careerStats.peakRank}위` : currentRank ? `${currentRank}위` : '-'}
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-slate-500">시즌 우승</div>
-                  <div className="text-lg font-bold text-slate-900">
+                  <div className="text-xs text-ink-mute">시즌 우승</div>
+                  <div className="text-lg font-bold text-ink tabular-nums">
                     {careerStats?.championships ?? 0}회
                     {(careerStats?.championships ?? 0) > 0 && (
                       <span className="ml-0.5">
@@ -238,64 +238,64 @@ export default function PlayerStatsModal({
         {stats && (
           <div className="px-6 pb-4">
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-clay-50 rounded-xl">
+              <div className="p-4 bg-accent-soft rounded-xl">
                 <div className="flex items-center gap-2 mb-1">
-                  <Trophy className="w-4 h-4 text-clay-600" />
-                  <span className="text-xs font-medium text-clay-600">총 경기</span>
+                  <Trophy className="w-4 h-4 text-accent" />
+                  <span className="text-xs font-medium text-accent">총 경기</span>
                 </div>
-                <span className="text-2xl font-bold text-slate-900">
+                <span className="text-2xl font-bold text-ink tabular-nums">
                   {stats.matchesPlayed}
                 </span>
               </div>
 
-              <div className="p-4 bg-green-50 rounded-xl">
+              <div className="p-4 bg-up/10 rounded-xl">
                 <div className="flex items-center gap-2 mb-1">
-                  <Target className="w-4 h-4 text-green-600" />
-                  <span className="text-xs font-medium text-green-600">승률</span>
+                  <Target className="w-4 h-4 text-up" />
+                  <span className="text-xs font-medium text-up">승률</span>
                 </div>
-                <span className="text-2xl font-bold text-slate-900">
+                <span className="text-2xl font-bold text-ink tabular-nums">
                   {stats.winRate.toFixed(0)}%
                 </span>
               </div>
 
-              <div className="p-4 bg-purple-50 rounded-xl">
+              <div className="p-4 bg-card-soft rounded-xl">
                 <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp className="w-4 h-4 text-purple-600" />
-                  <span className="text-xs font-medium text-purple-600">평균 득점</span>
+                  <TrendingUp className="w-4 h-4 text-ink-mute" />
+                  <span className="text-xs font-medium text-ink-mute">평균 득점</span>
                 </div>
-                <span className="text-2xl font-bold text-slate-900">
+                <span className="text-2xl font-bold text-ink tabular-nums">
                   {avgPointsPerMatch}
                 </span>
               </div>
 
-              <div className="p-4 bg-orange-50 rounded-xl">
+              <div className="p-4 bg-amber-500/10 rounded-xl">
                 <div className="flex items-center gap-2 mb-1">
-                  <Flame className="w-4 h-4 text-orange-600" />
-                  <span className="text-xs font-medium text-orange-600">연승</span>
+                  <Flame className="w-4 h-4 text-amber-500" />
+                  <span className="text-xs font-medium text-amber-500">연승</span>
                 </div>
-                <span className="text-2xl font-bold text-slate-900">
+                <span className="text-2xl font-bold text-ink tabular-nums">
                   {winStreak}
                 </span>
               </div>
             </div>
 
             {/* Win/Draw/Loss */}
-            <div className="mt-4 p-4 bg-slate-50 rounded-xl">
+            <div className="mt-4 p-4 bg-card-soft rounded-xl">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-slate-700">승/무/패</span>
-                <span className="text-sm font-bold text-slate-900">
+                <span className="text-sm font-medium text-ink-soft">승/무/패</span>
+                <span className="text-sm font-bold text-ink tabular-nums">
                   {stats.wins}승 {stats.draws}무 {stats.losses}패
                 </span>
               </div>
-              <div className="h-2 bg-slate-200 rounded-full overflow-hidden flex">
+              <div className="h-2 bg-line rounded-full overflow-hidden flex">
                 <div
-                  className="h-full bg-clay-500 transition-all"
+                  className="h-full bg-accent transition-all"
                   style={{
                     width: `${stats.matchesPlayed > 0 ? (stats.wins / stats.matchesPlayed) * 100 : 0}%`,
                   }}
                 />
                 <div
-                  className="h-full bg-slate-400 transition-all"
+                  className="h-full bg-ink-faint transition-all"
                   style={{
                     width: `${stats.matchesPlayed > 0 ? (stats.draws / stats.matchesPlayed) * 100 : 0}%`,
                   }}
@@ -307,31 +307,31 @@ export default function PlayerStatsModal({
 
         {/* Recent Matches */}
         <div className="px-6 pb-6">
-          <h3 className="text-sm font-bold text-slate-700 mb-3">최근 5경기</h3>
+          <h3 className="text-sm font-semibold text-ink tracking-tight mb-3">최근 5경기</h3>
           {recentMatches.length > 0 ? (
             <div className="flex gap-2">
               {recentMatches.map((r, i) => (
                 <div
                   key={i}
                   className={`flex-1 p-3 rounded-xl text-center ${
-                    r.won ? 'bg-clay-100' : r.draw ? 'bg-slate-100' : 'bg-red-100'
+                    r.won ? 'bg-up/10' : r.draw ? 'bg-card-soft' : 'bg-down/10'
                   }`}
                 >
                   <div
                     className={`text-xs font-bold mb-1 ${
-                      r.won ? 'text-clay-600' : r.draw ? 'text-slate-500' : 'text-red-600'
+                      r.won ? 'text-up' : r.draw ? 'text-ink-mute' : 'text-down'
                     }`}
                   >
                     {r.won ? '승' : r.draw ? '무' : '패'}
                   </div>
-                  <div className="text-sm font-medium text-slate-900">
+                  <div className="text-sm font-medium text-ink tabular-nums">
                     {r.myScore}-{r.oppScore}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-500 text-center py-4">
+            <p className="text-sm text-ink-mute text-center py-4">
               경기 기록이 없습니다
             </p>
           )}
@@ -340,8 +340,8 @@ export default function PlayerStatsModal({
         {/* Head-to-Head */}
         {headToHead.length > 0 && (
           <div className="px-6 pb-6">
-            <h3 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5">
-              <Swords className="w-4 h-4 text-slate-500" /> 상대 전적
+            <h3 className="text-sm font-semibold text-ink tracking-tight mb-3 flex items-center gap-1.5">
+              <Swords className="w-4 h-4 text-ink-mute" /> 상대 전적
             </h3>
             <div className="space-y-1.5">
               {headToHead.map((r) => {
@@ -350,17 +350,17 @@ export default function PlayerStatsModal({
                 return (
                   <div
                     key={r.id}
-                    className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg"
+                    className="flex items-center justify-between p-2.5 bg-card-soft rounded-lg"
                   >
-                    <span className="text-sm font-medium text-slate-800 truncate">
+                    <span className="text-sm font-medium text-ink truncate">
                       vs {r.name}
-                      {r.isGuest && <span className="ml-1 text-[10px] font-bold text-slate-400 align-middle">게스트</span>}
+                      {r.isGuest && <span className="ml-1 text-[10px] font-bold text-ink-faint align-middle">게스트</span>}
                     </span>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`text-sm font-bold ${dominant ? 'text-clay-600' : r.wins < r.losses ? 'text-red-500' : 'text-slate-600'}`}>
+                      <span className={`text-sm font-bold tabular-nums ${dominant ? 'text-up' : r.wins < r.losses ? 'text-down' : 'text-ink-mute'}`}>
                         {r.wins}승{r.draws > 0 ? ` ${r.draws}무` : ''} {r.losses}패
                       </span>
-                      <span className="text-xs text-slate-400">({total}경기)</span>
+                      <span className="text-xs text-ink-faint tabular-nums">({total}경기)</span>
                     </div>
                   </div>
                 );
@@ -377,10 +377,10 @@ export default function PlayerStatsModal({
         {/* Total Points */}
         {stats && (
           <div className="px-6 pb-6">
-            <div className="p-4 bg-gradient-to-r from-clay-500 to-clay-600 rounded-xl text-white">
+            <div className="p-4 bg-accent rounded-xl text-white">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium opacity-90">총 점수</span>
-                <span className="text-3xl font-bold">{stats.totalPoints}</span>
+                <span className="text-3xl font-bold tabular-nums">{stats.totalPoints}</span>
               </div>
             </div>
           </div>

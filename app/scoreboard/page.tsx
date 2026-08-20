@@ -135,13 +135,13 @@ export default function ScoreboardPage() {
   };
 
   return (
-    <main className="max-w-md mx-auto min-h-screen bg-slate-900 flex flex-col">
+    <main className="max-w-md mx-auto min-h-screen bg-stone-900 flex flex-col">
       {/* Header */}
-      <header className="p-4 flex items-center justify-between bg-slate-800">
+      <header className="p-4 flex items-center justify-between bg-stone-800">
         <div className="flex items-center gap-2">
           <button
             onClick={() => router.back()}
-            className="p-2 hover:bg-slate-700 rounded-full text-slate-400"
+            className="p-2 hover:bg-stone-700 rounded-full text-stone-400"
             aria-label="뒤로 가기"
           >
             <ArrowLeft size={20} />
@@ -154,14 +154,14 @@ export default function ScoreboardPage() {
           <button
             onClick={undo}
             disabled={history.length === 0}
-            className="p-2 hover:bg-slate-700 rounded-full text-slate-400 disabled:opacity-30"
+            className="p-2 hover:bg-stone-700 rounded-full text-stone-400 disabled:opacity-30"
             aria-label="실행취소"
           >
             <Undo2 size={20} />
           </button>
           <button
             onClick={() => setShowResetDialog(true)}
-            className="p-2 hover:bg-slate-700 rounded-full text-slate-400"
+            className="p-2 hover:bg-stone-700 rounded-full text-stone-400"
             aria-label="리셋"
           >
             <RotateCcw size={20} />
@@ -174,34 +174,34 @@ export default function ScoreboardPage() {
         {/* Team A - Top Half */}
         <button
           onClick={() => addPoint('A')}
-          className="flex-1 flex flex-col items-center justify-center bg-blue-600 hover:bg-blue-700 active:bg-blue-800 transition-colors relative"
+          className="flex-1 flex flex-col items-center justify-center bg-[#46596b] hover:bg-[#3d4e5e] active:bg-[#344251] transition-colors relative"
         >
           {state.server === 'A' && (
             <div className="absolute top-4 left-4 flex items-center gap-2">
-              <Circle size={20} className="text-yellow-300 fill-yellow-300" />
-              <span className="text-yellow-300 text-sm font-bold">서브</span>
+              <Circle size={20} className="text-amber-300 fill-amber-300" />
+              <span className="text-amber-300 text-sm font-bold">서브</span>
             </div>
           )}
           <div className="text-white/70 text-lg font-medium mb-2">팀 A</div>
           <div className="flex items-baseline gap-4">
-            <span className="text-8xl font-black text-white">
+            <span className="text-8xl font-black text-white tabular-nums">
               {displayPoint(state.pointsA)}
             </span>
           </div>
           <div className="mt-4 flex items-center gap-2 text-white/80">
-            <span className="text-2xl font-bold">{state.gamesA}</span>
+            <span className="text-2xl font-bold tabular-nums">{state.gamesA}</span>
             <span className="text-sm">게임</span>
           </div>
           {state.isDeuce && state.pointsA === 40 && state.pointsB === 40 && (
-            <div className="absolute bottom-4 bg-yellow-500 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">
+            <div className="absolute bottom-4 bg-amber-400 text-amber-950 px-3 py-1 rounded-full text-sm font-bold">
               DEUCE
             </div>
           )}
         </button>
 
         {/* Divider */}
-        <div className="h-1 bg-slate-900 flex items-center justify-center relative">
-          <div className="absolute bg-slate-700 px-4 py-1 rounded-full text-slate-400 text-xs font-bold">
+        <div className="h-1 bg-stone-900 flex items-center justify-center relative">
+          <div className="absolute bg-stone-800 px-4 py-1 rounded-full text-stone-400 text-xs font-bold">
             VS
           </div>
         </div>
@@ -209,26 +209,26 @@ export default function ScoreboardPage() {
         {/* Team B - Bottom Half */}
         <button
           onClick={() => addPoint('B')}
-          className="flex-1 flex flex-col items-center justify-center bg-rose-600 hover:bg-rose-700 active:bg-rose-800 transition-colors relative"
+          className="flex-1 flex flex-col items-center justify-center bg-clay-600 hover:bg-clay-700 active:bg-clay-800 transition-colors relative"
         >
           {state.server === 'B' && (
             <div className="absolute top-4 left-4 flex items-center gap-2">
-              <Circle size={20} className="text-yellow-300 fill-yellow-300" />
-              <span className="text-yellow-300 text-sm font-bold">서브</span>
+              <Circle size={20} className="text-amber-300 fill-amber-300" />
+              <span className="text-amber-300 text-sm font-bold">서브</span>
             </div>
           )}
           <div className="text-white/70 text-lg font-medium mb-2">팀 B</div>
           <div className="flex items-baseline gap-4">
-            <span className="text-8xl font-black text-white">
+            <span className="text-8xl font-black text-white tabular-nums">
               {displayPoint(state.pointsB)}
             </span>
           </div>
           <div className="mt-4 flex items-center gap-2 text-white/80">
-            <span className="text-2xl font-bold">{state.gamesB}</span>
+            <span className="text-2xl font-bold tabular-nums">{state.gamesB}</span>
             <span className="text-sm">게임</span>
           </div>
           {state.isDeuce && state.pointsB === 40 && state.pointsA === 40 && (
-            <div className="absolute bottom-4 bg-yellow-500 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">
+            <div className="absolute bottom-4 bg-amber-400 text-amber-950 px-3 py-1 rounded-full text-sm font-bold">
               DEUCE
             </div>
           )}

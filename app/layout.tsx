@@ -2,7 +2,6 @@
 // 홈 바로가기: / (루트 URL)
 
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/contexts/ToastContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -13,8 +12,6 @@ import ToastContainer from "@/components/ui/Toast";
 import BottomTabBar from "@/components/navigation/BottomTabBar";
 import UndoButton from "@/components/match/UndoButton";
 import StorageMigration from "@/components/StorageMigration";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -45,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body>
         <ThemeProvider>
           <ToastProvider>
             <UndoProvider>

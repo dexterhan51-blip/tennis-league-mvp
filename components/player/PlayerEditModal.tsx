@@ -101,18 +101,18 @@ export default function PlayerEditModal({
       aria-modal="true"
       aria-labelledby="edit-player-title"
     >
-      <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full animate-scale-in max-h-[90vh] overflow-y-auto">
+      <div className="bg-card border border-line rounded-2xl shadow-xl max-w-sm w-full animate-scale-in max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
-          <h2 id="edit-player-title" className="text-lg font-bold text-slate-900">
+        <div className="flex items-center justify-between p-4 border-b border-line">
+          <h2 id="edit-player-title" className="text-lg font-bold text-ink tracking-tight">
             선수 정보 수정
           </h2>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors touch-target"
+            className="p-2 hover:bg-card-soft rounded-full transition-colors touch-target"
             aria-label="닫기"
           >
-            <X className="w-5 h-5 text-slate-400" />
+            <X className="w-5 h-5 text-ink-faint" />
           </button>
         </div>
 
@@ -125,23 +125,23 @@ export default function PlayerEditModal({
                 <img
                   src={photo}
                   alt={name}
-                  className="w-24 h-24 rounded-full object-cover border-4 border-slate-200"
+                  className="w-24 h-24 rounded-full object-cover border border-line-strong"
                 />
               ) : (
                 <div
                   className={`w-24 h-24 rounded-full flex items-center justify-center ${
-                    gender === 'MALE' ? 'bg-blue-100' : 'bg-pink-100'
+                    gender === 'MALE' ? 'bg-tint-m-bg text-tint-m-fg' : 'bg-tint-f-bg text-tint-f-fg'
                   }`}
                 >
-                  <span className="text-3xl">
-                    {gender === 'MALE' ? '👨' : '👩'}
+                  <span className="text-3xl font-bold">
+                    {(name || player.name).charAt(0)}
                   </span>
                 </div>
               )}
               {photo && (
                 <button
                   onClick={handleRemovePhoto}
-                  className="absolute -top-1 -right-1 p-1.5 bg-red-500 text-white rounded-full shadow-lg touch-target"
+                  className="absolute -top-1 -right-1 p-1.5 bg-down text-white rounded-full shadow-lg touch-target"
                   aria-label="사진 삭제"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -151,7 +151,7 @@ export default function PlayerEditModal({
             <div className="flex gap-2">
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700 transition-colors touch-target"
+                className="flex items-center gap-2 px-3 py-2 bg-card-soft hover:bg-line rounded-lg text-sm font-medium text-ink-soft transition-colors touch-target"
               >
                 <ImageIcon className="w-4 h-4" />
                 앨범에서 선택
@@ -168,40 +168,40 @@ export default function PlayerEditModal({
 
           {/* Name */}
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-ink-soft mb-2">
               이름
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-clay-500 focus:border-clay-500"
+              className="w-full px-4 py-3 bg-card text-ink placeholder:text-ink-faint border border-line-strong rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
               placeholder="선수 이름"
             />
           </div>
 
           {/* Gender */}
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-ink-soft mb-2">
               성별
             </label>
             <div className="flex gap-2">
               <button
                 onClick={() => setGender('MALE')}
-                className={`flex-1 py-3 rounded-xl font-medium transition-colors touch-target ${
+                className={`flex-1 py-3 rounded-xl font-semibold transition-colors touch-target ${
                   gender === 'MALE'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    ? 'bg-tint-m-bg text-tint-m-fg'
+                    : 'bg-card-soft text-ink-mute hover:bg-line'
                 }`}
               >
                 남성
               </button>
               <button
                 onClick={() => setGender('FEMALE')}
-                className={`flex-1 py-3 rounded-xl font-medium transition-colors touch-target ${
+                className={`flex-1 py-3 rounded-xl font-semibold transition-colors touch-target ${
                   gender === 'FEMALE'
-                    ? 'bg-pink-500 text-white'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    ? 'bg-tint-f-bg text-tint-f-fg'
+                    : 'bg-card-soft text-ink-mute hover:bg-line'
                 }`}
               >
                 여성
@@ -212,17 +212,17 @@ export default function PlayerEditModal({
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 p-4 border-t border-slate-200">
+        <div className="flex gap-3 p-4 border-t border-line">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 px-4 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors touch-target"
+            className="flex-1 py-3 px-4 rounded-xl font-semibold text-ink-soft bg-card-soft hover:bg-line transition-colors touch-target"
           >
             취소
           </button>
           <button
             onClick={handleSave}
             disabled={!name.trim()}
-            className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
+            className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
           >
             저장
           </button>

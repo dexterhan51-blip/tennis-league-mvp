@@ -121,16 +121,16 @@ export default function LoadPage() {
 
   if (isLoading) {
     return (
-      <main className="max-w-md mx-auto min-h-screen bg-slate-900 text-white flex items-center justify-center">
-        <div className="text-slate-400 text-sm">불러오는 중...</div>
+      <main className="max-w-md mx-auto min-h-screen bg-surface flex items-center justify-center">
+        <div className="text-ink-mute text-sm">불러오는 중...</div>
       </main>
     );
   }
 
   return (
-    <main className="max-w-md mx-auto min-h-screen bg-slate-900 text-white pb-32">
+    <main className="max-w-md mx-auto min-h-screen bg-surface text-ink pb-32">
       <header className="p-6 mb-2">
-        <h1 className="text-xl font-bold flex items-center gap-2">
+        <h1 className="text-xl font-bold tracking-tight flex items-center gap-2">
           <AppLogo size={26} /> 리그 불러오기
         </h1>
       </header>
@@ -138,19 +138,19 @@ export default function LoadPage() {
       {/* 서버에서 불러오기 (관리자 전용) */}
       {isAdmin && (
         <div className="px-6 mb-8">
-          <h2 className="text-sm font-bold text-slate-300 mb-1 flex items-center gap-1.5">
-            <CloudDownload size={16} className="text-clay-400" /> 서버에서 불러오기
+          <h2 className="text-sm font-semibold text-ink tracking-tight mb-1 flex items-center gap-1.5">
+            <CloudDownload size={16} className="text-accent" /> 서버에서 불러오기
           </h2>
-          <p className="text-xs text-slate-500 mb-3">
+          <p className="text-xs text-ink-mute mb-3">
             최신 데이터를 이 기기로 가져와 편집합니다. 편집 내용은 자동으로 서버에 반영됩니다.
             여러 기기에서 동시에 편집하면 마지막 저장만 남으니 주의하세요.
           </p>
           {!serverLeagues ? (
             <div className="flex justify-center py-6">
-              <Loader2 className="w-6 h-6 text-clay-500 animate-spin" aria-label="로딩 중" />
+              <Loader2 className="w-6 h-6 text-accent animate-spin" aria-label="로딩 중" />
             </div>
           ) : serverLeagues.length === 0 ? (
-            <p className="text-sm text-slate-500 py-4 text-center">서버에 공개된 리그가 없습니다.</p>
+            <p className="text-sm text-ink-mute py-4 text-center">서버에 공개된 리그가 없습니다.</p>
           ) : (
             <div className="space-y-2">
               {serverLeagues.map((league) => {
@@ -161,20 +161,20 @@ export default function LoadPage() {
                     key={league.id}
                     onClick={() => handleImportServerLeague(league)}
                     disabled={importingId !== null}
-                    className="w-full p-4 rounded-2xl border-2 border-slate-700 bg-slate-900/50 hover:border-clay-500 text-left transition-all touch-target disabled:opacity-50"
+                    className="w-full p-4 rounded-2xl border border-line bg-card hover:border-accent text-left transition-all touch-target disabled:opacity-50"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-bold truncate">{league.name}</h3>
-                        <div className="text-xs text-slate-400 mt-0.5">
+                        <h3 className="font-bold text-ink truncate">{league.name}</h3>
+                        <div className="text-xs text-ink-mute mt-0.5 tabular-nums">
                           선수 {league.players?.length ?? 0}명 · 경기 {finished}/{total} ·{' '}
                           {new Date(league.updated_at).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} 업데이트
                         </div>
                       </div>
                       {importingId === league.id ? (
-                        <Loader2 size={18} className="text-clay-400 animate-spin shrink-0" />
+                        <Loader2 size={18} className="text-accent animate-spin shrink-0" />
                       ) : (
-                        <CloudDownload size={18} className="text-clay-400 shrink-0" />
+                        <CloudDownload size={18} className="text-accent shrink-0" />
                       )}
                     </div>
                   </button>
@@ -182,7 +182,7 @@ export default function LoadPage() {
               })}
             </div>
           )}
-          <h2 className="text-sm font-bold text-slate-300 mt-8 mb-3">이 기기의 저장 슬롯</h2>
+          <h2 className="text-sm font-semibold text-ink tracking-tight mt-8 mb-3">이 기기의 저장 슬롯</h2>
         </div>
       )}
 
@@ -198,29 +198,29 @@ export default function LoadPage() {
               disabled={!hasData}
               className={`relative w-full p-5 rounded-2xl border-2 text-left transition-all touch-target ${
                 isSelected
-                  ? 'bg-slate-800 border-clay-500'
+                  ? 'bg-accent-soft border-accent'
                   : hasData
-                  ? 'bg-slate-900/50 border-slate-700 hover:border-slate-600'
-                  : 'bg-slate-900/30 border-slate-800 cursor-not-allowed'
+                  ? 'bg-card border-line hover:border-line-strong'
+                  : 'bg-card-soft border-line cursor-not-allowed'
               }`}
               aria-pressed={isSelected}
             >
               <div className="flex justify-between items-start mb-3">
-                <span className={`text-xs font-bold px-2 py-1 rounded ${isSelected ? 'bg-clay-600' : 'bg-slate-700'}`}>
+                <span className={`text-xs font-bold px-2 py-1 rounded ${isSelected ? 'bg-accent text-white' : 'bg-card-soft text-ink-mute'}`}>
                   SLOT {index + 1}
                 </span>
-                {isSelected && <CheckCircle className="text-clay-500" size={20} />}
+                {isSelected && <CheckCircle className="text-accent" size={20} />}
               </div>
 
               {slot ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
-                      <Save size={24} className="text-clay-400" />
+                    <div className="w-12 h-12 bg-card-soft rounded-xl flex items-center justify-center">
+                      <Save size={24} className="text-accent" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-lg font-bold truncate">{slot.name}</h2>
-                      <div className="flex items-center gap-3 text-xs text-slate-400">
+                      <h2 className="text-lg font-bold text-ink truncate">{slot.name}</h2>
+                      <div className="flex items-center gap-3 text-xs text-ink-mute tabular-nums">
                         <span className="flex items-center gap-1">
                           <Calendar size={12} />
                           {new Date(slot.createdAt).toLocaleDateString()}
@@ -235,14 +235,14 @@ export default function LoadPage() {
 
                   <button
                     onClick={(e) => { e.stopPropagation(); setDeleteSlotIdx(index); }}
-                    className="absolute bottom-4 right-4 p-2 text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors touch-target"
+                    className="absolute bottom-4 right-4 p-2 text-ink-faint hover:text-down hover:bg-down/10 rounded-lg transition-colors touch-target"
                     aria-label={`슬롯 ${index + 1} 삭제`}
                   >
                     <Trash2 size={16} />
                   </button>
                 </div>
               ) : (
-                <div className="text-center py-6 text-slate-600">
+                <div className="text-center py-6 text-ink-faint">
                   <Save size={32} className="mx-auto mb-2 opacity-30" />
                   <p>데이터 없음</p>
                 </div>
@@ -252,14 +252,14 @@ export default function LoadPage() {
         })}
       </div>
 
-      <div className="fixed bottom-20 left-0 right-0 p-4 bg-slate-900 border-t border-slate-800 max-w-md mx-auto">
+      <div className="fixed bottom-20 left-0 right-0 p-4 bg-card border-t border-line shadow-lg max-w-md mx-auto">
         <button
           onClick={handleLoadGame}
           disabled={selectedIdx === null}
           className={`w-full py-4 rounded-xl font-bold text-lg transition-all touch-target ${
             selectedIdx !== null
-              ? 'bg-clay-600 text-white hover:bg-clay-700'
-              : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+              ? 'bg-accent text-white hover:bg-accent-strong active:scale-95'
+              : 'bg-card-soft text-ink-faint cursor-not-allowed'
           }`}
         >
           선택한 리그 불러오기

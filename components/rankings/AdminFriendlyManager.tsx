@@ -172,9 +172,9 @@ export default function AdminFriendlyManager({ serverPlayers, friendly, onChange
 
   return (
     <section className="space-y-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-        <h2 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5">
-          <Handshake size={15} className="text-green-600" /> 친선경기 등록
+      <div className="bg-card rounded-2xl border border-line p-4">
+        <h2 className="text-sm font-semibold text-ink tracking-tight mb-3 flex items-center gap-1.5">
+          <Handshake size={15} className="text-up" /> 친선경기 등록
         </h2>
 
         <div className="grid grid-cols-2 gap-2 mb-3">
@@ -182,15 +182,15 @@ export default function AdminFriendlyManager({ serverPlayers, friendly, onChange
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:border-clay-500 focus:outline-none"
+            className="px-3 py-2 text-sm bg-card text-ink border border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
           />
-          <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs font-bold">
+          <div className="flex rounded-lg border border-line overflow-hidden text-xs font-bold">
             {(['doubles', 'singles'] as MatchType[]).map((t) => (
               <button
                 key={t}
                 onClick={() => setMatchType(t)}
                 className={`flex-1 py-2 transition-colors touch-target ${
-                  matchType === t ? 'bg-clay-600 text-white' : 'bg-white text-slate-500'
+                  matchType === t ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft'
                 }`}
               >
                 {t === 'doubles' ? '복식' : '단식'}
@@ -205,7 +205,7 @@ export default function AdminFriendlyManager({ serverPlayers, friendly, onChange
               key={k}
               value={slots[k]}
               onChange={(e) => setSlots((prev) => ({ ...prev, [k]: e.target.value }))}
-              className="px-2 py-2 text-sm border border-slate-200 rounded-lg focus:border-clay-500 focus:outline-none bg-white"
+              className="px-2 py-2 text-sm border border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent bg-card text-ink"
             >
               <option value="">{slotLabel[k]}</option>
               {pool.map((p) => (
@@ -223,15 +223,15 @@ export default function AdminFriendlyManager({ serverPlayers, friendly, onChange
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="목록에 없는 선수 이름"
-            className="flex-1 px-3 py-2 text-xs border border-dashed border-slate-300 rounded-lg focus:border-clay-500 focus:outline-none"
+            className="flex-1 px-3 py-2 text-xs bg-card text-ink placeholder:text-ink-faint border border-dashed border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
           />
-          <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs font-bold">
+          <div className="flex rounded-lg border border-line overflow-hidden text-xs font-bold">
             {(['MALE', 'FEMALE'] as Gender[]).map((g) => (
               <button
                 key={g}
                 onClick={() => setNewGender(g)}
                 className={`px-2.5 py-2 transition-colors touch-target ${
-                  newGender === g ? 'bg-slate-700 text-white' : 'bg-white text-slate-400'
+                  newGender === g ? 'bg-accent text-white' : 'bg-card-soft text-ink-mute'
                 }`}
               >
                 {g === 'MALE' ? '남' : '여'}
@@ -241,7 +241,7 @@ export default function AdminFriendlyManager({ serverPlayers, friendly, onChange
           <button
             onClick={handleAddNewPlayer}
             disabled={!newName.trim()}
-            className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:opacity-40 touch-target"
+            className="p-2 rounded-lg bg-card-soft text-ink-soft hover:bg-line disabled:opacity-40 touch-target"
             aria-label="선수 추가"
           >
             <Plus size={16} />
@@ -255,25 +255,25 @@ export default function AdminFriendlyManager({ serverPlayers, friendly, onChange
             value={scoreA}
             onChange={(e) => setScoreA(e.target.value)}
             placeholder="A팀"
-            className="w-20 px-2 py-2 text-center text-sm font-bold border border-slate-200 rounded-lg focus:border-clay-500 focus:outline-none"
+            className="w-20 px-2 py-2 text-center text-sm font-bold tabular-nums bg-card text-ink placeholder:text-ink-faint border border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
           />
-          <span className="text-slate-400 font-black">:</span>
+          <span className="text-ink-faint font-black">:</span>
           <input
             type="number"
             inputMode="numeric"
             value={scoreB}
             onChange={(e) => setScoreB(e.target.value)}
             placeholder="B팀"
-            className="w-20 px-2 py-2 text-center text-sm font-bold border border-slate-200 rounded-lg focus:border-clay-500 focus:outline-none"
+            className="w-20 px-2 py-2 text-center text-sm font-bold tabular-nums bg-card text-ink placeholder:text-ink-faint border border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
           />
           <div className="relative flex-1">
-            <Youtube size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-red-400" />
+            <Youtube size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-down" />
             <input
               type="url"
               value={videoInput}
               onChange={(e) => setVideoInput(e.target.value)}
               placeholder="영상 링크 (선택)"
-              className="w-full pl-8 pr-2 py-2 text-xs border border-slate-200 rounded-lg focus:border-clay-500 focus:outline-none"
+              className="w-full pl-8 pr-2 py-2 text-xs bg-card text-ink placeholder:text-ink-faint border border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
             />
           </div>
         </div>
@@ -281,7 +281,7 @@ export default function AdminFriendlyManager({ serverPlayers, friendly, onChange
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="w-full py-2.5 rounded-xl bg-clay-600 hover:bg-clay-700 text-white text-sm font-bold transition-colors disabled:bg-slate-300 touch-target flex items-center justify-center gap-2"
+          className="w-full py-2.5 rounded-xl bg-accent hover:bg-accent-strong text-white text-sm font-semibold transition-colors disabled:opacity-50 touch-target flex items-center justify-center gap-2"
         >
           {isSaving ? <Loader2 size={16} className="animate-spin" /> : '등록'}
         </button>
@@ -289,9 +289,9 @@ export default function AdminFriendlyManager({ serverPlayers, friendly, onChange
 
       {/* 기존 친선경기 목록 */}
       <div>
-        <h3 className="text-xs font-bold text-slate-500 mb-2">등록된 친선경기 {sortedFriendly.length}건</h3>
+        <h3 className="text-xs font-medium text-ink-mute mb-2">등록된 친선경기 {sortedFriendly.length}건</h3>
         {sortedFriendly.length === 0 ? (
-          <p className="text-xs text-slate-400 bg-white rounded-xl border border-slate-100 p-4 text-center">
+          <p className="text-xs text-ink-mute bg-card rounded-xl border border-line p-4 text-center">
             아직 등록된 친선경기가 없습니다.
           </p>
         ) : (
@@ -299,17 +299,17 @@ export default function AdminFriendlyManager({ serverPlayers, friendly, onChange
             {sortedFriendly.map((f) => (
               <div
                 key={f.id}
-                className="bg-white rounded-xl shadow-sm border border-slate-100 p-3 flex items-center justify-between gap-2"
+                className="bg-card rounded-xl border border-line p-3 flex items-center justify-between gap-2"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm text-slate-900 truncate">
+                  <div className="text-sm text-ink truncate">
                     {teamLabel(f.match, 'A')}
-                    <span className="mx-1.5 font-black text-clay-600">
+                    <span className="mx-1.5 font-bold text-accent tabular-nums">
                       {f.match.scoreA}:{f.match.scoreB}
                     </span>
                     {teamLabel(f.match, 'B')}
                   </div>
-                  <div className="text-[11px] text-slate-400">
+                  <div className="text-[11px] text-ink-faint tabular-nums">
                     {f.match_date}
                     {f.match.videoUrl ? ' · 영상 있음' : ''}
                   </div>
@@ -317,7 +317,7 @@ export default function AdminFriendlyManager({ serverPlayers, friendly, onChange
                 <button
                   onClick={() => handleDelete(f.id)}
                   disabled={deletingId === f.id}
-                  className="shrink-0 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors touch-target"
+                  className="shrink-0 p-2 text-ink-faint hover:text-down hover:bg-down/10 rounded-lg transition-colors touch-target"
                   aria-label="친선경기 삭제"
                 >
                   {deletingId === f.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}

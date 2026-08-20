@@ -53,8 +53,8 @@ export default function ConfirmDialog({
 
   const isDanger = variant === 'danger';
   const confirmButtonClass = isDanger
-    ? 'bg-red-500 hover:bg-red-600 text-white'
-    : 'bg-clay-600 hover:bg-clay-700 text-white';
+    ? 'bg-down hover:opacity-90 text-white'
+    : 'bg-accent hover:bg-accent-strong text-white';
 
   return (
     <div
@@ -63,46 +63,46 @@ export default function ConfirmDialog({
       aria-modal="true"
       aria-labelledby="dialog-title"
     >
-      <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full animate-scale-in">
+      <div className="bg-card border border-line rounded-2xl shadow-xl max-w-sm w-full animate-scale-in">
         <div className="p-6">
           <div className="flex items-start gap-4">
             {isDanger && (
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-down/10 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-down" />
               </div>
             )}
             <div className="flex-1">
-              <h3 id="dialog-title" className="text-lg font-bold text-slate-900">
+              <h3 id="dialog-title" className="text-lg font-bold text-ink tracking-tight">
                 {step === 2 ? doubleConfirmText : title}
               </h3>
               {step === 1 && (
-                <p className="mt-2 text-sm text-slate-600">{message}</p>
+                <p className="mt-2 text-sm text-ink-mute leading-relaxed">{message}</p>
               )}
               {step === 2 && (
-                <p className="mt-2 text-sm text-red-600 font-medium">
+                <p className="mt-2 text-sm text-down font-medium">
                   이 작업은 되돌릴 수 없습니다.
                 </p>
               )}
             </div>
             <button
               onClick={handleCancel}
-              className="p-1 hover:bg-slate-100 rounded-full transition-colors touch-target"
+              className="p-1 hover:bg-card-soft rounded-full transition-colors touch-target"
               aria-label="닫기"
             >
-              <X className="w-5 h-5 text-slate-400" />
+              <X className="w-5 h-5 text-ink-faint" />
             </button>
           </div>
         </div>
-        <div className="flex gap-3 p-4 border-t border-slate-200">
+        <div className="flex gap-3 p-4 border-t border-line">
           <button
             onClick={handleCancel}
-            className="flex-1 py-3 px-4 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors touch-target"
+            className="flex-1 py-3 px-4 rounded-xl font-semibold text-ink-soft bg-card-soft hover:bg-line transition-colors touch-target"
           >
             {cancelText}
           </button>
           <button
             onClick={handleConfirm}
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-colors touch-target ${confirmButtonClass}`}
+            className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-colors touch-target ${confirmButtonClass}`}
           >
             {step === 2 ? '네, 삭제합니다' : confirmText}
           </button>

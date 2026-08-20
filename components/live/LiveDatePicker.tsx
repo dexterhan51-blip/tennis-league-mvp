@@ -21,7 +21,7 @@ export function LiveDatePicker({ dates, selectedDate, onSelect }: LiveDatePicker
 
   return (
     <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1">
-      <Calendar className="w-4 h-4 text-slate-400 flex-shrink-0" />
+      <Calendar className="w-4 h-4 text-ink-faint flex-shrink-0" />
       {dates.map(date => {
         const isSelected = date === selectedDate;
         const isToday = date === new Date().toISOString().split('T')[0];
@@ -32,13 +32,13 @@ export function LiveDatePicker({ dates, selectedDate, onSelect }: LiveDatePicker
             onClick={() => onSelect(date)}
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               isSelected
-                ? 'bg-clay-600 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                ? 'bg-accent text-white'
+                : 'bg-card-soft text-ink-soft hover:bg-line'
             }`}
           >
             {formatDateShort(date)}
             {isToday && !isSelected && (
-              <span className="ml-1 w-1.5 h-1.5 bg-clay-500 rounded-full inline-block" />
+              <span className="ml-1 w-1.5 h-1.5 bg-accent rounded-full inline-block" />
             )}
           </button>
         );

@@ -24,15 +24,15 @@ export default function MatchCard({
 
   return (
     <div
-      className={`p-4 bg-white rounded-xl shadow-sm border transition-all ${
-        isFinished ? 'border-green-200 bg-green-50/30' : 'border-slate-200'
+      className={`p-4 bg-card rounded-xl border transition-all ${
+        isFinished ? 'border-up/30 bg-up/5' : 'border-line'
       }`}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-bold text-slate-500">게임 {index + 1}</span>
+        <span className="text-sm font-bold text-ink-mute">게임 {index + 1}</span>
         {isFinished && (
-          <span className="flex items-center gap-1 text-xs font-medium text-green-600">
+          <span className="flex items-center gap-1 text-xs font-medium text-up">
             <CheckCircle className="w-4 h-4" />
             완료
           </span>
@@ -40,17 +40,17 @@ export default function MatchCard({
       </div>
 
       {/* Team A */}
-      <div className={`mb-4 ${teamAWon ? 'ring-2 ring-clay-200 rounded-lg p-2 -m-2' : ''}`}>
+      <div className={`mb-4 ${teamAWon ? 'ring-2 ring-accent/30 rounded-lg p-2 -m-2' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
           {teamAWon && (
-            <span className="text-xs font-bold text-clay-600 bg-clay-100 px-1.5 py-0.5 rounded">
+            <span className="text-xs font-bold text-accent bg-accent-soft px-1.5 py-0.5 rounded">
               WIN
             </span>
           )}
-          <span className="font-medium text-slate-900 text-sm">
+          <span className="font-medium text-ink text-sm">
             {match.teamA.man.name}
             {match.teamA.man.id !== match.teamA.woman.id && (
-              <span className="text-slate-400"> & </span>
+              <span className="text-ink-faint"> & </span>
             )}
             {match.teamA.man.id !== match.teamA.woman.id && match.teamA.woman.name}
           </span>
@@ -64,23 +64,23 @@ export default function MatchCard({
 
       {/* VS Divider */}
       <div className="flex items-center gap-2 my-3">
-        <div className="flex-1 border-t border-slate-200" />
-        <span className="text-xs font-bold text-slate-400">VS</span>
-        <div className="flex-1 border-t border-slate-200" />
+        <div className="flex-1 border-t border-line" />
+        <span className="text-xs font-bold text-ink-faint">VS</span>
+        <div className="flex-1 border-t border-line" />
       </div>
 
       {/* Team B */}
-      <div className={`${teamBWon ? 'ring-2 ring-clay-200 rounded-lg p-2 -m-2' : ''}`}>
+      <div className={`${teamBWon ? 'ring-2 ring-accent/30 rounded-lg p-2 -m-2' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
           {teamBWon && (
-            <span className="text-xs font-bold text-clay-600 bg-clay-100 px-1.5 py-0.5 rounded">
+            <span className="text-xs font-bold text-accent bg-accent-soft px-1.5 py-0.5 rounded">
               WIN
             </span>
           )}
-          <span className="font-medium text-slate-900 text-sm">
+          <span className="font-medium text-ink text-sm">
             {match.teamB.man.name}
             {match.teamB.man.id !== match.teamB.woman.id && (
-              <span className="text-slate-400"> & </span>
+              <span className="text-ink-faint"> & </span>
             )}
             {match.teamB.man.id !== match.teamB.woman.id && match.teamB.woman.name}
           </span>

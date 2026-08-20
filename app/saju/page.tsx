@@ -45,11 +45,11 @@ const ELEMENT_STYLE: Record<
   Element,
   { label: string; tile: string; bar: string; text: string }
 > = {
-  목: { label: "목(木)", tile: "bg-green-50 text-green-700", bar: "bg-green-400", text: "text-green-600" },
-  화: { label: "화(火)", tile: "bg-red-50 text-red-700", bar: "bg-red-400", text: "text-red-600" },
-  토: { label: "토(土)", tile: "bg-amber-50 text-amber-700", bar: "bg-amber-400", text: "text-amber-600" },
-  금: { label: "금(金)", tile: "bg-slate-100 text-slate-700", bar: "bg-slate-400", text: "text-slate-600" },
-  수: { label: "수(水)", tile: "bg-blue-50 text-blue-700", bar: "bg-blue-400", text: "text-blue-600" },
+  목: { label: "목(木)", tile: "bg-emerald-500/10 text-emerald-600", bar: "bg-emerald-500/70", text: "text-emerald-600" },
+  화: { label: "화(火)", tile: "bg-red-500/10 text-red-500", bar: "bg-red-500/70", text: "text-red-500" },
+  토: { label: "토(土)", tile: "bg-amber-500/10 text-amber-600", bar: "bg-amber-500/70", text: "text-amber-600" },
+  금: { label: "금(金)", tile: "bg-stone-500/10 text-stone-500", bar: "bg-stone-400/80", text: "text-stone-500" },
+  수: { label: "수(水)", tile: "bg-blue-500/10 text-blue-500", bar: "bg-blue-500/70", text: "text-blue-500" },
 };
 const ELEMENT_ORDER: Element[] = ["목", "화", "토", "금", "수"];
 
@@ -62,12 +62,12 @@ const MBTI_AXES = [
 type AxisKey = (typeof MBTI_AXES)[number]["key"];
 
 const TIER_GRADIENT: Record<Tier, string> = {
-  천생연분: "from-pink-500 to-rose-500",
-  찰떡궁합: "from-blue-500 to-indigo-500",
-  좋은짝: "from-green-500 to-emerald-500",
-  무난: "from-slate-500 to-slate-600",
-  도전적: "from-amber-500 to-orange-500",
-  상극주의: "from-red-500 to-rose-600",
+  천생연분: "bg-tint-f-fg",
+  찰떡궁합: "bg-tint-m-fg",
+  좋은짝: "bg-up",
+  무난: "bg-ink-mute",
+  도전적: "bg-amber-500",
+  상극주의: "bg-down",
 };
 
 const YEARS = Array.from({ length: 2026 - 1920 + 1 }, (_, i) => 2026 - i);
@@ -76,17 +76,17 @@ const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 const SELECT_CLASS =
-  "w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-clay-500 focus:border-clay-500";
+  "w-full px-3 py-2.5 border border-line-strong rounded-xl bg-card text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent";
 
 // ─────────────────────────── 보조 컴포넌트 ───────────────────────────
 
 function PillarTile({ label, pillar }: { label: string; pillar: Pillar | null }) {
   if (!pillar) {
     return (
-      <div className="flex-1 rounded-xl bg-slate-100 p-2 text-center">
-        <div className="text-[10px] text-slate-400 mb-1">{label}</div>
-        <div className="text-2xl font-black text-slate-300 leading-tight">—</div>
-        <div className="text-[10px] text-slate-400 mt-1">미상</div>
+      <div className="flex-1 rounded-xl bg-card-soft p-2 text-center">
+        <div className="text-[10px] text-ink-faint mb-1">{label}</div>
+        <div className="text-2xl font-black text-ink-faint leading-tight">—</div>
+        <div className="text-[10px] text-ink-faint mt-1">미상</div>
       </div>
     );
   }
@@ -112,10 +112,10 @@ function OhaengBars({ counts }: { counts: Record<Element, number> }) {
         return (
           <div key={e} className="flex items-center gap-2">
             <span className={`text-xs font-bold w-12 shrink-0 ${st.text}`}>{st.label}</span>
-            <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+            <div className="flex-1 h-3 bg-card-soft rounded-full overflow-hidden">
               <div className={`h-full rounded-full ${st.bar}`} style={{ width: `${(c / max) * 100}%` }} />
             </div>
-            <span className="text-xs text-slate-500 w-4 text-right">{c}</span>
+            <span className="text-xs text-ink-mute w-4 text-right tabular-nums">{c}</span>
           </div>
         );
       })}
@@ -125,8 +125,8 @@ function OhaengBars({ counts }: { counts: Record<Element, number> }) {
 
 function SectionCard({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-      <h2 className="text-sm font-bold text-slate-700 flex items-center gap-1.5 mb-3">
+    <section className="bg-card p-5 rounded-2xl border border-line">
+      <h2 className="text-sm font-semibold text-ink tracking-tight flex items-center gap-1.5 mb-3">
         {icon}
         {title}
       </h2>
@@ -265,12 +265,12 @@ export default function SajuPage() {
   }
 
   return (
-    <main className="max-w-md mx-auto min-h-screen bg-slate-50 p-4 pb-24">
+    <main className="max-w-md mx-auto min-h-screen bg-surface p-4 pb-24">
       <header className="mb-5">
-        <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+        <h1 className="text-xl font-bold text-ink tracking-tight flex items-center gap-2">
           <AppLogo size={26} /> 테니스 페르소나 &amp; 궁합
         </h1>
-        <p className="text-xs text-slate-500 mt-1">
+        <p className="text-xs text-ink-mute mt-1">
           MBTI와 사주로 보는 내 혼복 스타일 · 닮은 프로 · 궁합 — 재미로 보는 콘텐츠예요 🎾
         </p>
       </header>
@@ -279,7 +279,7 @@ export default function SajuPage() {
         {/* 우리 리그 궁합 관계도 진입 */}
         <Link
           href="/saju/relations"
-          className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-clay-600 text-white shadow-sm active:scale-[0.99] transition-transform"
+          className="flex items-center gap-3 p-4 rounded-2xl bg-accent hover:bg-accent-strong text-white active:scale-[0.99] transition-transform"
         >
           <Users className="w-6 h-6 shrink-0" />
           <div className="flex-1">
@@ -290,11 +290,11 @@ export default function SajuPage() {
         </Link>
 
         {/* ───────── (A) 입력 폼 ───────── */}
-        <SectionCard title="내 정보 입력" icon={<Sparkles className="w-4 h-4 text-clay-500" />}>
+        <SectionCard title="내 정보 입력" icon={<Sparkles className="w-4 h-4 text-accent" />}>
           <div className="space-y-4">
             {/* MBTI 4축 토글 */}
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-2">MBTI</label>
+              <label className="block text-xs font-medium text-ink-mute mb-2">MBTI</label>
               <div className="space-y-2">
                 {MBTI_AXES.map((axis) => {
                   const val = axes[axis.key];
@@ -314,8 +314,8 @@ export default function SajuPage() {
                             aria-pressed={active}
                             className={`py-2.5 rounded-xl text-sm font-bold transition-colors touch-target ${
                               active
-                                ? "bg-clay-600 text-white"
-                                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                ? "bg-accent text-white"
+                                : "bg-card-soft text-ink-soft hover:bg-line"
                             }`}
                           >
                             {poleLabel}
@@ -327,14 +327,14 @@ export default function SajuPage() {
                 })}
               </div>
               {mbti.length === 4 && (
-                <p className="text-xs text-clay-600 font-bold mt-2">선택: {mbti}</p>
+                <p className="text-xs text-accent font-bold mt-2">선택: {mbti}</p>
               )}
             </div>
 
             {/* 성별 / 달력 */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-2">성별</label>
+                <label className="block text-xs font-medium text-ink-mute mb-2">성별</label>
                 <div className="grid grid-cols-2 gap-2">
                   {([["male", "남"], ["female", "여"]] as const).map(([g, lbl]) => (
                     <button
@@ -343,7 +343,7 @@ export default function SajuPage() {
                       onClick={() => setGender(g)}
                       aria-pressed={gender === g}
                       className={`py-2.5 rounded-xl text-sm font-bold transition-colors touch-target ${
-                        gender === g ? "bg-clay-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        gender === g ? "bg-accent text-white" : "bg-card-soft text-ink-soft hover:bg-line"
                       }`}
                     >
                       {lbl}
@@ -352,7 +352,7 @@ export default function SajuPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-2">양력/음력</label>
+                <label className="block text-xs font-medium text-ink-mute mb-2">양력/음력</label>
                 <div className="grid grid-cols-2 gap-2">
                   {([["solar", "양력"], ["lunar", "음력"]] as const).map(([c, lbl]) => (
                     <button
@@ -361,7 +361,7 @@ export default function SajuPage() {
                       onClick={() => setCalendarType(c)}
                       aria-pressed={calendarType === c}
                       className={`py-2.5 rounded-xl text-sm font-bold transition-colors touch-target ${
-                        calendarType === c ? "bg-clay-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        calendarType === c ? "bg-accent text-white" : "bg-card-soft text-ink-soft hover:bg-line"
                       }`}
                     >
                       {lbl}
@@ -373,7 +373,7 @@ export default function SajuPage() {
 
             {/* 생년월일 */}
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-2">생년월일</label>
+              <label className="block text-xs font-medium text-ink-mute mb-2">생년월일</label>
               <div className="grid grid-cols-3 gap-2">
                 <select className={SELECT_CLASS} value={birthYear} aria-label="출생연도"
                   onChange={(e) => setBirthYear(Number(e.target.value))}>
@@ -392,7 +392,7 @@ export default function SajuPage() {
 
             {/* 태어난 시 */}
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-2">태어난 시 (시주)</label>
+              <label className="block text-xs font-medium text-ink-mute mb-2">태어난 시 (시주)</label>
               <select
                 className={SELECT_CLASS}
                 aria-label="출생시"
@@ -411,7 +411,7 @@ export default function SajuPage() {
             <button
               type="button"
               onClick={handleSubmit}
-              className="w-full py-3.5 px-4 rounded-xl font-bold text-base bg-clay-600 hover:bg-clay-700 text-white shadow-md transition-colors touch-target"
+              className="w-full py-3.5 px-4 rounded-xl font-bold text-base bg-accent hover:bg-accent-strong text-white active:scale-95 transition-colors touch-target"
             >
               결과 보기
             </button>
@@ -421,49 +421,49 @@ export default function SajuPage() {
         {/* ───────── (B) 결과 카드 ───────── */}
         {result && (
           <>
-            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-              {/* 다크 그라데이션 헤더 */}
-              <div className="bg-gradient-to-r from-slate-900 to-slate-700 px-4 py-4 text-white">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-lime-300 uppercase mb-1">
+            <div className="rounded-2xl overflow-hidden border border-line">
+              {/* 잉크 헤더 */}
+              <div className="bg-ink px-4 py-4 text-card">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-accent uppercase mb-1">
                   <Sparkles className="w-3.5 h-3.5" /> 내 테니스 페르소나
                 </div>
                 <div className="text-xl font-black leading-tight">{result.persona.mbtiProfile.nickname}</div>
-                <div className="text-sm font-bold text-lime-300 mt-0.5">
+                <div className="text-sm font-bold text-accent mt-0.5">
                   {result.inputs.mbti} · {result.persona.mbtiProfile.courtRole}
                 </div>
-                <div className="text-xs text-slate-300 mt-1.5">
+                <div className="text-xs text-card/70 mt-1.5">
                   일간 {result.persona.saju.dayMaster}({result.persona.saju.dayMasterElement}) · 닮은 프로{" "}
                   {result.persona.proMatch.best.player.name}
                 </div>
               </div>
-              {/* 화이트 바디 */}
-              <div className="bg-white p-4 space-y-3">
+              {/* 카드 바디 */}
+              <div className="bg-card p-4 space-y-3">
                 <div className="flex gap-2.5">
-                  <Zap className="w-4 h-4 text-clay-500 shrink-0 mt-0.5" />
+                  <Zap className="w-4 h-4 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-bold text-clay-600 mb-0.5">플레이스타일</div>
-                    <p className="text-sm text-slate-700 leading-relaxed">{result.persona.mbtiProfile.playstyle}</p>
+                    <div className="text-xs font-bold text-accent mb-0.5">플레이스타일</div>
+                    <p className="text-sm text-ink-soft leading-relaxed">{result.persona.mbtiProfile.playstyle}</p>
                   </div>
                 </div>
                 <div className="flex gap-2.5">
-                  <Flame className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                  <Flame className="w-4 h-4 text-up shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-bold text-orange-600 mb-0.5">강점</div>
-                    <p className="text-sm text-slate-700 leading-relaxed">{result.persona.mbtiProfile.strength}</p>
+                    <div className="text-xs font-bold text-up mb-0.5">강점</div>
+                    <p className="text-sm text-ink-soft leading-relaxed">{result.persona.mbtiProfile.strength}</p>
                   </div>
                 </div>
                 <div className="flex gap-2.5">
-                  <ShieldAlert className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                  <ShieldAlert className="w-4 h-4 text-ink-faint shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-bold text-slate-500 mb-0.5">약점</div>
-                    <p className="text-sm text-slate-700 leading-relaxed">{result.persona.mbtiProfile.weakness}</p>
+                    <div className="text-xs font-bold text-ink-mute mb-0.5">약점</div>
+                    <p className="text-sm text-ink-soft leading-relaxed">{result.persona.mbtiProfile.weakness}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* 사주 4주 */}
-            <SectionCard title="내 사주 (네 기둥)" icon={<Sparkles className="w-4 h-4 text-purple-500" />}>
+            <SectionCard title="내 사주 (네 기둥)" icon={<Sparkles className="w-4 h-4 text-accent" />}>
               <div className="flex gap-2">
                 <PillarTile label="년주" pillar={result.persona.saju.year} />
                 <PillarTile label="월주" pillar={result.persona.saju.month} />
@@ -471,13 +471,13 @@ export default function SajuPage() {
                 <PillarTile label="시주" pillar={result.persona.saju.hour} />
               </div>
               <div className="mt-4">
-                <div className="text-xs font-bold text-slate-500 mb-2">오행 분포</div>
+                <div className="text-xs font-medium text-ink-mute mb-2">오행 분포</div>
                 <OhaengBars counts={result.persona.saju.elementCounts} />
               </div>
               {result.persona.saju.notes.length > 0 && (
-                <div className="mt-3 flex gap-2 p-2.5 bg-amber-50 rounded-xl">
+                <div className="mt-3 flex gap-2 p-2.5 bg-amber-500/10 rounded-xl">
                   <Info className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                  <div className="text-[11px] text-amber-700 leading-relaxed space-y-0.5">
+                  <div className="text-[11px] text-amber-600 leading-relaxed space-y-0.5">
                     {result.persona.saju.notes.map((n, i) => <p key={i}>{n}</p>)}
                   </div>
                 </div>
@@ -486,44 +486,44 @@ export default function SajuPage() {
 
             {/* 닮은 프로 */}
             <SectionCard title="닮은 프로 선수" icon={<Trophy className="w-4 h-4 text-amber-500" />}>
-              <div className="p-4 bg-gradient-to-r from-slate-900 to-slate-700 rounded-xl text-white">
+              <div className="p-4 bg-ink rounded-xl text-card">
                 <div className="flex items-baseline justify-between">
                   <div className="text-lg font-black">{result.persona.proMatch.best.player.name}</div>
-                  <div className="text-sm font-bold text-lime-300">{result.persona.proMatch.best.score}점 닮음</div>
+                  <div className="text-sm font-bold text-accent tabular-nums">{result.persona.proMatch.best.score}점 닮음</div>
                 </div>
                 <div className="flex flex-wrap gap-1 mt-1.5">
                   {result.persona.proMatch.best.player.tags.map((t) => (
-                    <span key={t} className="text-[10px] font-bold text-slate-200 bg-white/10 px-1.5 py-0.5 rounded">{t}</span>
+                    <span key={t} className="text-[10px] font-bold text-card/80 bg-card/10 px-1.5 py-0.5 rounded">{t}</span>
                   ))}
                 </div>
-                <p className="text-xs text-slate-300 mt-2 leading-relaxed">{result.persona.proMatch.reason}</p>
+                <p className="text-xs text-card/70 mt-2 leading-relaxed">{result.persona.proMatch.reason}</p>
               </div>
               <div className="mt-3 space-y-2">
-                <div className="text-xs font-bold text-slate-500">라이벌 후보</div>
+                <div className="text-xs font-medium text-ink-mute">라이벌 후보</div>
                 {result.persona.proMatch.runnersUp.map((r) => (
-                  <div key={r.player.key} className="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg">
-                    <span className="text-sm font-bold text-slate-700">{r.player.name}</span>
-                    <span className="text-xs text-slate-500">{r.score}점</span>
+                  <div key={r.player.key} className="flex items-center justify-between px-3 py-2 bg-card-soft rounded-lg">
+                    <span className="text-sm font-bold text-ink-soft">{r.player.name}</span>
+                    <span className="text-xs text-ink-mute tabular-nums">{r.score}점</span>
                   </div>
                 ))}
               </div>
             </SectionCard>
 
             {/* ───────── (C) 내 코드 ───────── */}
-            <SectionCard title="내 페르소나 코드" icon={<Heart className="w-4 h-4 text-rose-500" />}>
-              <p className="text-xs text-slate-500 mb-2">이 코드를 친구에게 공유하면, 친구가 우리 궁합을 볼 수 있어요.</p>
+            <SectionCard title="내 페르소나 코드" icon={<Heart className="w-4 h-4 text-tint-f-fg" />}>
+              <p className="text-xs text-ink-mute mb-2">이 코드를 친구에게 공유하면, 친구가 우리 궁합을 볼 수 있어요.</p>
               <div className="flex gap-2">
                 <input
                   readOnly
                   value={result.code}
                   aria-label="내 페르소나 코드"
-                  className="flex-1 px-3 py-2.5 border border-slate-300 rounded-xl bg-slate-50 text-slate-800 font-mono text-sm tracking-wider text-center"
+                  className="flex-1 px-3 py-2.5 border border-line-strong rounded-xl bg-card-soft text-ink font-mono text-sm tracking-wider text-center"
                 />
                 <button
                   type="button"
                   onClick={handleCopy}
                   aria-label="코드 복사하기"
-                  className="px-4 py-2.5 rounded-xl font-bold text-sm bg-green-600 hover:bg-green-700 text-white shadow-sm transition-colors touch-target flex items-center gap-1.5 shrink-0"
+                  className="px-4 py-2.5 rounded-xl font-bold text-sm bg-up hover:opacity-90 text-white transition-colors touch-target flex items-center gap-1.5 shrink-0"
                 >
                   <Copy className="w-4 h-4" /> 복사
                 </button>
@@ -531,27 +531,27 @@ export default function SajuPage() {
             </SectionCard>
 
             {/* ───────── (D) 친구 궁합 ───────── */}
-            <SectionCard title="친구와 궁합 보기" icon={<Heart className="w-4 h-4 text-pink-500" />}>
-              <p className="text-xs text-slate-500 mb-2">친구의 페르소나 코드를 입력하면 궁합 점수를 알려드려요.</p>
+            <SectionCard title="친구와 궁합 보기" icon={<Heart className="w-4 h-4 text-tint-f-fg" />}>
+              <p className="text-xs text-ink-mute mb-2">친구의 페르소나 코드를 입력하면 궁합 점수를 알려드려요.</p>
               <div className="flex gap-2">
                 <input
                   value={friendCode}
                   onChange={(e) => setFriendCode(e.target.value)}
                   placeholder="SAJU1-XXXX-XXXX"
                   aria-label="친구 코드 입력"
-                  className="flex-1 px-3 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 font-mono text-sm tracking-wider focus:outline-none focus:ring-2 focus:ring-clay-500 focus:border-clay-500"
+                  className="flex-1 px-3 py-2.5 border border-line-strong rounded-xl bg-card text-ink placeholder:text-ink-faint font-mono text-sm tracking-wider focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
                 />
                 <button
                   type="button"
                   onClick={handleCompat}
                   aria-label="궁합 보기"
-                  className="px-4 py-2.5 rounded-xl font-bold text-sm bg-clay-600 hover:bg-clay-700 text-white shadow-sm transition-colors touch-target shrink-0"
+                  className="px-4 py-2.5 rounded-xl font-bold text-sm bg-accent hover:bg-accent-strong text-white transition-colors touch-target shrink-0"
                 >
                   궁합 보기
                 </button>
               </div>
               {friendError && (
-                <p className="text-xs text-red-500 mt-2">
+                <p className="text-xs text-down mt-2">
                   {friendError.message}
                   {friendError.kind === "UNKNOWN_VERSION" && " (앱 업데이트 필요)"}
                   {(friendError.kind === "CHECKSUM" || friendError.kind === "FORMAT") && " 코드를 다시 확인해 주세요."}
@@ -561,9 +561,9 @@ export default function SajuPage() {
               {compat && (
                 <div className="mt-4 space-y-3">
                   {/* 점수 배너 */}
-                  <div className={`p-4 rounded-xl text-white text-center bg-gradient-to-r ${TIER_GRADIENT[compat.breakdown.tier]}`}>
+                  <div className={`p-4 rounded-xl text-white text-center ${TIER_GRADIENT[compat.breakdown.tier]}`}>
                     <div className="text-xs font-bold uppercase tracking-widest opacity-90">{compat.breakdown.tier}</div>
-                    <div className="text-4xl font-black mt-1">{compat.breakdown.total}<span className="text-lg">점</span></div>
+                    <div className="text-4xl font-black mt-1 tabular-nums">{compat.breakdown.total}<span className="text-lg">점</span></div>
                     <div className="text-xs mt-1.5 opacity-90">
                       나({result.inputs.mbti}) × 친구({compat.friendMbti}) · 닮은 프로 {compat.friend.proMatch.best.player.name}
                     </div>
@@ -571,13 +571,13 @@ export default function SajuPage() {
 
                   {/* 사주/소통 점수 타일 */}
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="p-3 bg-purple-50 rounded-xl text-center">
-                      <div className="text-xs font-bold text-purple-600">사주(오행) 궁합</div>
-                      <div className="text-2xl font-black text-slate-900">{compat.breakdown.ohaengScore}</div>
+                    <div className="p-3 bg-tint-m-bg rounded-xl text-center">
+                      <div className="text-xs font-bold text-tint-m-fg">사주(오행) 궁합</div>
+                      <div className="text-2xl font-black text-ink tabular-nums">{compat.breakdown.ohaengScore}</div>
                     </div>
-                    <div className="p-3 bg-clay-50 rounded-xl text-center">
-                      <div className="text-xs font-bold text-clay-600">소통(MBTI) 궁합</div>
-                      <div className="text-2xl font-black text-slate-900">{compat.breakdown.mbtiScore}</div>
+                    <div className="p-3 bg-accent-soft rounded-xl text-center">
+                      <div className="text-xs font-bold text-accent">소통(MBTI) 궁합</div>
+                      <div className="text-2xl font-black text-ink tabular-nums">{compat.breakdown.mbtiScore}</div>
                     </div>
                   </div>
 
@@ -585,16 +585,16 @@ export default function SajuPage() {
                   <div className="space-y-1.5">
                     {compat.breakdown.reasons.map((reason, i) => (
                       <div key={i} className="flex gap-2">
-                        <Sparkles className="w-3.5 h-3.5 text-clay-500 shrink-0 mt-0.5" />
-                        <p className="text-sm text-slate-700 leading-relaxed">{reason}</p>
+                        <Sparkles className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
+                        <p className="text-sm text-ink-soft leading-relaxed">{reason}</p>
                       </div>
                     ))}
                   </div>
 
                   {/* 코트 위 시너지 */}
-                  <div className="p-3 bg-slate-50 rounded-xl">
-                    <div className="text-xs font-bold text-slate-500 mb-0.5">코트 위 시너지</div>
-                    <p className="text-sm text-slate-700 leading-relaxed">{compat.breakdown.courtSynergy}</p>
+                  <div className="p-3 bg-card-soft rounded-xl">
+                    <div className="text-xs font-medium text-ink-mute mb-0.5">코트 위 시너지</div>
+                    <p className="text-sm text-ink-soft leading-relaxed">{compat.breakdown.courtSynergy}</p>
                   </div>
                 </div>
               )}
@@ -602,7 +602,7 @@ export default function SajuPage() {
           </>
         )}
 
-        <p className="text-[11px] text-slate-400 text-center px-4 leading-relaxed">
+        <p className="text-[11px] text-ink-faint text-center px-4 leading-relaxed">
           ※ MBTI·사주 기반 분석은 과학적 예측이 아닌 재미를 위한 콘텐츠입니다.
           사주의 년·월주는 절기 경계에서 하루 정도 오차가 있을 수 있어요.
         </p>

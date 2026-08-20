@@ -28,17 +28,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-clay-50">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-surface">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Image src="/icon.png" alt="러브포티" width={72} height={72} className="mx-auto rounded-2xl mb-4" unoptimized />
-          <h1 className="text-2xl font-bold text-slate-800">러브포티 테니스</h1>
-          <p className="text-sm text-slate-500 mt-1">회원 전용 리그 서비스입니다</p>
+          <h1 className="text-2xl font-bold text-ink tracking-tight">러브포티 테니스</h1>
+          <p className="text-sm text-ink-mute mt-1">회원 전용 리그 서비스입니다</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-card border border-line rounded-2xl p-6 space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-600 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-ink-mute mb-1">
               아이디 (이메일)
             </label>
             <input
@@ -48,12 +48,12 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-clay-500 focus:outline-none text-slate-800"
+              className="w-full px-4 py-3 rounded-xl bg-card border border-line-strong text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
               placeholder="you@example.com"
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-600 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-ink-mute mb-1">
               비밀번호
             </label>
             <input
@@ -63,13 +63,13 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-clay-500 focus:outline-none text-slate-800"
+              className="w-full px-4 py-3 rounded-xl bg-card border border-line-strong text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
               placeholder="••••••••"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600" role="alert">
+            <p className="text-sm text-down" role="alert">
               {error}
             </p>
           )}
@@ -77,13 +77,13 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 rounded-xl bg-clay-600 text-white font-semibold hover:bg-clay-700 transition-colors disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-accent text-white font-semibold hover:bg-accent-strong active:scale-95 transition-colors disabled:opacity-50"
           >
             {isSubmitting ? '로그인 중…' : '로그인'}
           </button>
         </form>
 
-        <p className="text-xs text-slate-400 text-center mt-6">
+        <p className="text-xs text-ink-faint text-center mt-6">
           계정은 리그 관리자에게 문의해 발급받을 수 있습니다.
         </p>
       </div>

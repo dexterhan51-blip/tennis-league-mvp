@@ -24,11 +24,11 @@ const R = 128;
 const NODE_R = 20;
 
 const ELEM_FILL: Record<Element, string> = {
-  목: "#22c55e",
-  화: "#ef4444",
-  토: "#f59e0b",
-  금: "#64748b",
-  수: "#3b82f6",
+  목: "#4f9670",
+  화: "#c05b52",
+  토: "#c9973f",
+  금: "#8f8a84",
+  수: "#5b84a8",
 };
 
 interface EdgeStyle {
@@ -38,19 +38,19 @@ interface EdgeStyle {
   dash?: string;
 }
 function edgeStyle(total: number): EdgeStyle {
-  if (total >= 92) return { stroke: "#ec4899", width: 4, opacity: 0.95 };
-  if (total >= 80) return { stroke: "#10b981", width: 3.5, opacity: 0.9 };
-  if (total >= 68) return { stroke: "#3b82f6", width: 2.5, opacity: 0.75 };
-  if (total >= 52) return { stroke: "#94a3b8", width: 1.5, opacity: 0.4 };
-  if (total >= 38) return { stroke: "#f59e0b", width: 1.5, opacity: 0.6, dash: "4 3" };
-  return { stroke: "#ef4444", width: 1.5, opacity: 0.7, dash: "4 3" };
+  if (total >= 92) return { stroke: "#c4698f", width: 4, opacity: 0.95 };
+  if (total >= 80) return { stroke: "#48876f", width: 3.5, opacity: 0.9 };
+  if (total >= 68) return { stroke: "#5b84a8", width: 2.5, opacity: 0.75 };
+  if (total >= 52) return { stroke: "#a9a19a", width: 1.5, opacity: 0.4 };
+  if (total >= 38) return { stroke: "#cf9c42", width: 1.5, opacity: 0.6, dash: "4 3" };
+  return { stroke: "#c05b52", width: 1.5, opacity: 0.7, dash: "4 3" };
 }
 
 const LEGEND: { label: string; color: string; range: string }[] = [
-  { label: "천생연분/찰떡궁합", color: "#10b981", range: "80+" },
-  { label: "좋은짝", color: "#3b82f6", range: "68-79" },
-  { label: "무난", color: "#94a3b8", range: "52-67" },
-  { label: "도전적/상극", color: "#f59e0b", range: "<52" },
+  { label: "천생연분/찰떡궁합", color: "#48876f", range: "80+" },
+  { label: "좋은짝", color: "#5b84a8", range: "68-79" },
+  { label: "무난", color: "#a9a19a", range: "52-67" },
+  { label: "도전적/상극", color: "#cf9c42", range: "<52" },
 ];
 
 function nodePos(i: number, n: number) {
@@ -134,23 +134,23 @@ export default function RelationsPage() {
   );
 
   return (
-    <main className="max-w-md mx-auto min-h-screen bg-slate-50 p-4 pb-24">
+    <main className="max-w-md mx-auto min-h-screen bg-surface p-4 pb-24">
       <header className="flex items-center gap-2 mb-4">
         <button
           onClick={() => router.push("/saju")}
-          className="p-2 hover:bg-slate-200 rounded-full text-slate-500"
+          className="p-2 hover:bg-card-soft rounded-full text-ink-mute"
           aria-label="뒤로 가기"
         >
           <ArrowLeft size={20} />
         </button>
-        <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <Users className="w-5 h-5 text-clay-600" /> 우리 리그 궁합 관계도
+        <h1 className="text-xl font-bold text-ink tracking-tight flex items-center gap-2">
+          <Users className="w-5 h-5 text-accent" /> 우리 리그 궁합 관계도
         </h1>
       </header>
 
       {/* 명단 추가 */}
-      <section className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-4">
-        <label className="block text-xs font-bold text-slate-500 mb-2">
+      <section className="bg-card p-4 rounded-2xl border border-line mb-4">
+        <label className="block text-xs font-medium text-ink-mute mb-2">
           멤버 코드 추가 (한 줄에 한 명: 이름 - 코드)
         </label>
         <textarea
@@ -158,19 +158,19 @@ export default function RelationsPage() {
           onChange={(e) => setBulkText(e.target.value)}
           rows={3}
           placeholder={"지윤 - SAJU1-228C-TBR7\n빛나 - SAJU1-3A82-83W5"}
-          className="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-clay-500 focus:border-clay-500"
+          className="w-full px-3 py-2.5 bg-card text-ink placeholder:text-ink-faint border border-line-strong rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
         />
         <div className="flex gap-2 mt-2">
           <button
             onClick={handleAdd}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-sm bg-clay-600 text-white hover:bg-clay-700 transition-colors touch-target"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-sm bg-accent text-white hover:bg-accent-strong transition-colors touch-target"
           >
             <Plus className="w-4 h-4" /> 명단에 추가
           </button>
           {roster.length > 0 && (
             <button
               onClick={() => setShowClear(true)}
-              className="px-4 py-2.5 rounded-xl font-bold text-sm text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors touch-target"
+              className="px-4 py-2.5 rounded-xl font-bold text-sm text-ink-soft bg-card-soft hover:bg-line transition-colors touch-target"
             >
               전체 비우기
             </button>
@@ -180,25 +180,25 @@ export default function RelationsPage() {
 
       {/* 관계도 (로드 완료 후에만 — 저장된 명단 깜빡임 방지) */}
       {!loaded ? null : valid.length < 2 ? (
-        <div className="text-center py-10 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-300">
+        <div className="text-center py-10 text-ink-faint bg-card rounded-2xl border border-dashed border-line-strong">
           <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">관계도를 보려면 2명 이상 등록해주세요.</p>
         </div>
       ) : (
-        <section className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-4">
+        <section className="bg-card p-4 rounded-2xl border border-line mb-4">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-sm font-bold text-slate-700">{valid.length}명 · 궁합 {edges.length}쌍</span>
-            <label className="flex items-center gap-1.5 text-xs text-slate-500">
+            <span className="text-sm font-semibold text-ink tracking-tight tabular-nums">{valid.length}명 · 궁합 {edges.length}쌍</span>
+            <label className="flex items-center gap-1.5 text-xs text-ink-mute">
               <input
                 type="checkbox"
                 checked={strongOnly}
                 onChange={(e) => setStrongOnly(e.target.checked)}
-                className="accent-clay-600"
+                className="accent-accent"
               />
               좋은 궁합만
             </label>
           </div>
-          <p className="text-[11px] text-slate-400 mb-2">선이 굵고 초록/파랑일수록 좋은 궁합 · 노드를 탭하면 그 사람 궁합만 강조</p>
+          <p className="text-[11px] text-ink-faint mb-2">선이 굵고 초록/파랑일수록 좋은 궁합 · 노드를 탭하면 그 사람 궁합만 강조</p>
 
           <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full h-auto" role="group" aria-label="궁합 관계도">
             {/* 선(엣지) */}
@@ -253,8 +253,8 @@ export default function RelationsPage() {
                     cx={pos.x}
                     cy={pos.y}
                     r={NODE_R}
-                    fill={p.dominant ? ELEM_FILL[p.dominant] : "#64748b"}
-                    stroke={isSel ? "#0f172a" : "#fff"}
+                    fill={p.dominant ? ELEM_FILL[p.dominant] : "#8f8a84"}
+                    stroke={isSel ? "var(--ink)" : "var(--card)"}
                     strokeWidth={isSel ? 3 : 2}
                   />
                   <text
@@ -276,7 +276,7 @@ export default function RelationsPage() {
           {/* 범례 */}
           <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 justify-center">
             {LEGEND.map((l) => (
-              <div key={l.label} className="flex items-center gap-1 text-[10px] text-slate-500">
+              <div key={l.label} className="flex items-center gap-1 text-[10px] text-ink-mute">
                 <span className="inline-block w-4 h-0.5 rounded" style={{ background: l.color }} />
                 {l.label}
               </div>
@@ -287,12 +287,12 @@ export default function RelationsPage() {
 
       {/* 선택 상세 또는 TOP 궁합 */}
       {loaded && valid.length >= 2 && (
-        <section className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-4">
+        <section className="bg-card p-4 rounded-2xl border border-line mb-4">
           {selectedIdx >= 0 ? (
             <>
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-sm font-bold text-slate-700">{selected}의 궁합 순위</h2>
-                <button onClick={() => setSelected(null)} className="text-xs text-slate-400 hover:text-slate-600">
+                <h2 className="text-sm font-semibold text-ink tracking-tight">{selected}의 궁합 순위</h2>
+                <button onClick={() => setSelected(null)} className="text-xs text-ink-faint hover:text-ink-mute">
                   전체 보기
                 </button>
               </div>
@@ -300,11 +300,11 @@ export default function RelationsPage() {
                 {selectedRanking.map((r, idx) => {
                   const st = edgeStyle(r.total);
                   return (
-                    <div key={r.name} className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg">
-                      <span className="text-xs font-bold text-slate-400 w-4">{idx + 1}</span>
-                      <span className="flex-1 text-sm font-bold text-slate-700">{r.name}</span>
-                      <span className="text-xs text-slate-500">{r.tier}</span>
-                      <span className="text-base font-black" style={{ color: st.stroke }}>{r.total}</span>
+                    <div key={r.name} className="flex items-center gap-2 px-3 py-2 bg-card-soft rounded-lg">
+                      <span className="text-xs font-bold text-ink-faint w-4 tabular-nums">{idx + 1}</span>
+                      <span className="flex-1 text-sm font-bold text-ink-soft">{r.name}</span>
+                      <span className="text-xs text-ink-mute">{r.tier}</span>
+                      <span className="text-base font-black tabular-nums" style={{ color: st.stroke }}>{r.total}</span>
                     </div>
                   );
                 })}
@@ -312,20 +312,20 @@ export default function RelationsPage() {
             </>
           ) : (
             <>
-              <h2 className="text-sm font-bold text-slate-700 flex items-center gap-1.5 mb-2">
+              <h2 className="text-sm font-semibold text-ink tracking-tight flex items-center gap-1.5 mb-2">
                 <Sparkles className="w-4 h-4 text-amber-500" /> 최고의 궁합 TOP 3
               </h2>
               <div className="space-y-1.5">
                 {topPairs.map((e, idx) => {
                   const st = edgeStyle(e.total);
                   return (
-                    <div key={`${e.i}-${e.j}`} className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg">
-                      <span className="text-xs font-bold text-slate-400 w-4">{idx + 1}</span>
-                      <span className="flex-1 text-sm font-bold text-slate-700">
-                        {valid[e.i].name} <span className="text-slate-400">×</span> {valid[e.j].name}
+                    <div key={`${e.i}-${e.j}`} className="flex items-center gap-2 px-3 py-2 bg-card-soft rounded-lg">
+                      <span className="text-xs font-bold text-ink-faint w-4 tabular-nums">{idx + 1}</span>
+                      <span className="flex-1 text-sm font-bold text-ink-soft">
+                        {valid[e.i].name} <span className="text-ink-faint">×</span> {valid[e.j].name}
                       </span>
-                      <span className="text-xs text-slate-500">{e.breakdown.tier}</span>
-                      <span className="text-base font-black" style={{ color: st.stroke }}>{e.total}</span>
+                      <span className="text-xs text-ink-mute">{e.breakdown.tier}</span>
+                      <span className="text-base font-black tabular-nums" style={{ color: st.stroke }}>{e.total}</span>
                     </div>
                   );
                 })}
@@ -337,27 +337,27 @@ export default function RelationsPage() {
 
       {/* 등록 명단 + 잘못된 코드 */}
       {loaded && roster.length > 0 && (
-        <section className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-          <h2 className="text-sm font-bold text-slate-700 mb-2">등록 명단 ({roster.length})</h2>
+        <section className="bg-card p-4 rounded-2xl border border-line">
+          <h2 className="text-sm font-semibold text-ink tracking-tight mb-2">등록 명단 ({roster.length})</h2>
           <div className="flex flex-wrap gap-2">
             {personas.map((p, idx) => (
               <span
                 key={`${p.name}-${p.code}-${idx}`}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold ${
-                  p.ok ? "bg-slate-100 text-slate-700" : "bg-red-50 text-red-600"
+                  p.ok ? "bg-card-soft text-ink-soft" : "bg-down/10 text-down"
                 }`}
               >
                 {!p.ok && <AlertTriangle className="w-3 h-3" />}
                 {p.name}
-                {p.ok && p.mbti && <span className="text-slate-400 font-medium">{p.mbti}</span>}
-                <button onClick={() => handleRemove(p.name)} aria-label={`${p.name} 삭제`} className="text-slate-400 hover:text-red-500">
+                {p.ok && p.mbti && <span className="text-ink-faint font-medium">{p.mbti}</span>}
+                <button onClick={() => handleRemove(p.name)} aria-label={`${p.name} 삭제`} className="text-ink-faint hover:text-down">
                   <Trash2 className="w-3 h-3" />
                 </button>
               </span>
             ))}
           </div>
           {invalid.length > 0 && (
-            <p className="text-[11px] text-red-500 mt-2">잘못된 코드 {invalid.length}건 — 코드를 다시 확인해주세요.</p>
+            <p className="text-[11px] text-down mt-2">잘못된 코드 {invalid.length}건 — 코드를 다시 확인해주세요.</p>
           )}
         </section>
       )}

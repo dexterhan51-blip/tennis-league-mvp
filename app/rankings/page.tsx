@@ -85,10 +85,10 @@ export default function RankingsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 max-w-sm w-full text-center">
-          <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <p className="text-sm text-slate-500">랭킹 정보를 불러올 수 없습니다. 네트워크를 확인해주세요.</p>
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4">
+        <div className="bg-card rounded-2xl border border-line p-8 max-w-sm w-full text-center">
+          <AlertTriangle className="w-12 h-12 text-down mx-auto mb-4" />
+          <p className="text-sm text-ink-mute">랭킹 정보를 불러올 수 없습니다. 네트워크를 확인해주세요.</p>
         </div>
       </div>
     );
@@ -96,25 +96,25 @@ export default function RankingsPage() {
 
   if (!leagues) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-clay-600 animate-spin" aria-label="로딩 중" />
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-accent animate-spin" aria-label="로딩 중" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24">
-      <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
+    <div className="min-h-screen bg-surface pb-24">
+      <div className="sticky top-0 z-10 bg-card border-b border-line">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Medal className="w-5 h-5 text-clay-600" /> 종합 랭킹
+          <h1 className="text-lg font-bold text-ink tracking-tight flex items-center gap-2">
+            <Medal className="w-5 h-5 text-accent" /> 종합 랭킹
           </h1>
           {isAdmin && (
-            <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs font-bold">
+            <div className="flex rounded-lg border border-line overflow-hidden text-xs font-bold">
               <button
                 onClick={() => setMode('view')}
                 className={`px-3 py-1.5 transition-colors touch-target ${
-                  mode === 'view' ? 'bg-clay-600 text-white' : 'bg-white text-slate-500'
+                  mode === 'view' ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft'
                 }`}
               >
                 보기
@@ -122,7 +122,7 @@ export default function RankingsPage() {
               <button
                 onClick={() => setMode('manage')}
                 className={`px-3 py-1.5 transition-colors touch-target ${
-                  mode === 'manage' ? 'bg-clay-600 text-white' : 'bg-white text-slate-500'
+                  mode === 'manage' ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft'
                 }`}
               >
                 관리
@@ -136,7 +136,7 @@ export default function RankingsPage() {
         {isAdmin && mode === 'manage' ? (
           <>
             {friendlyTableMissing && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-800 leading-relaxed">
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-xs text-amber-600 leading-relaxed">
                 friendly_matches 테이블이 아직 없습니다. Supabase SQL Editor에서{' '}
                 <code className="font-bold">supabase-migration-friendly.sql</code>을 실행해야 친선경기
                 등록이 동작합니다.
@@ -154,8 +154,8 @@ export default function RankingsPage() {
                   onClick={() => setYear('all')}
                   className={`shrink-0 text-xs font-bold px-3 py-2 rounded-full border transition-colors touch-target ${
                     activeYear === 'all'
-                      ? 'bg-clay-600 text-white border-clay-600'
-                      : 'bg-white text-slate-600 border-slate-200 hover:border-clay-300'
+                      ? 'bg-accent text-white border-accent'
+                      : 'bg-card-soft text-ink-soft border-line hover:bg-line'
                   }`}
                 >
                   통산
@@ -166,8 +166,8 @@ export default function RankingsPage() {
                     onClick={() => setYear(y)}
                     className={`shrink-0 text-xs font-bold px-3 py-2 rounded-full border transition-colors touch-target ${
                       activeYear === y
-                        ? 'bg-clay-600 text-white border-clay-600'
-                        : 'bg-white text-slate-600 border-slate-200 hover:border-clay-300'
+                        ? 'bg-accent text-white border-accent'
+                        : 'bg-card-soft text-ink-soft border-line hover:bg-line'
                     }`}
                   >
                     {y}
@@ -177,9 +177,9 @@ export default function RankingsPage() {
             </div>
 
             {entries.length === 0 ? (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 text-center">
-                <Medal className="w-10 h-10 text-slate-200 mx-auto mb-3" />
-                <p className="text-sm text-slate-500">아직 집계된 경기가 없습니다.</p>
+              <div className="bg-card rounded-2xl border border-line p-10 text-center">
+                <Medal className="w-10 h-10 text-ink-faint mx-auto mb-3" />
+                <p className="text-sm text-ink-mute">아직 집계된 경기가 없습니다.</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -194,7 +194,7 @@ export default function RankingsPage() {
               </div>
             )}
 
-            <p className="text-[11px] text-slate-400 text-center leading-relaxed">
+            <p className="text-[11px] text-ink-faint text-center leading-relaxed">
               각 리그(대회)와 친선경기의 점수를 합산한 랭킹입니다.
               <br />
               점수 = 참석 1점(하루 1회) + 승리 1점

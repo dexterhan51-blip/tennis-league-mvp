@@ -33,9 +33,9 @@ export default function PlayersPage() {
   });
 
   return (
-    <main className="max-w-md mx-auto min-h-screen bg-slate-50 p-4 pb-24">
+    <main className="max-w-md mx-auto min-h-screen bg-surface p-4 pb-24">
       <header className="mb-6">
-        <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+        <h1 className="text-xl font-bold text-ink tracking-tight flex items-center gap-2">
           <AppLogo size={26} /> 선수 관리
         </h1>
       </header>
@@ -45,36 +45,36 @@ export default function PlayersPage() {
       </div>
 
       {/* 선수 등록 폼 */}
-      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-6">
-        <h2 className="text-sm font-bold text-slate-500 mb-4 uppercase tracking-wider">새 멤버 등록</h2>
+      <div className="bg-card p-5 rounded-2xl border border-line mb-6">
+        <h2 className="text-sm font-semibold text-ink-mute mb-4 uppercase tracking-wider">새 멤버 등록</h2>
 
         <div className="flex justify-center mb-4">
           <div className="relative">
             {photo ? (
               <div className="relative">
-                <img src={photo} alt="프로필 미리보기" className="w-24 h-24 rounded-full object-cover border-4 border-slate-100 shadow-sm" />
+                <img src={photo} alt="프로필 미리보기" className="w-24 h-24 rounded-full object-cover border border-line-strong" />
                 <button
                   onClick={handleRemovePhoto}
-                  className="absolute -top-1 -right-1 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-md touch-target"
+                  className="absolute -top-1 -right-1 w-7 h-7 bg-down text-white rounded-full flex items-center justify-center hover:opacity-90 transition-colors shadow-md touch-target"
                   aria-label="사진 삭제"
                 >
                   <X size={14} />
                 </button>
               </div>
             ) : (
-              <div className="w-24 h-24 rounded-full bg-slate-50 border-2 border-dashed border-slate-300 flex items-center justify-center">
-                <User size={32} className="text-slate-300" />
+              <div className="w-24 h-24 rounded-full bg-card-soft border-2 border-dashed border-line-strong flex items-center justify-center">
+                <User size={32} className="text-ink-faint" />
               </div>
             )}
           </div>
         </div>
 
         <div className="flex gap-2 mb-4">
-          <button onClick={() => cameraInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-100 hover:bg-slate-200 rounded-xl text-slate-600 font-medium transition-colors touch-target">
+          <button onClick={() => cameraInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 py-3 bg-card-soft hover:bg-line rounded-xl text-ink-soft font-medium transition-colors touch-target">
             <Camera size={18} />
             <span className="text-sm">카메라</span>
           </button>
-          <button onClick={() => fileInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-100 hover:bg-slate-200 rounded-xl text-slate-600 font-medium transition-colors touch-target">
+          <button onClick={() => fileInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 py-3 bg-card-soft hover:bg-line rounded-xl text-ink-soft font-medium transition-colors touch-target">
             <ImageIcon size={18} />
             <span className="text-sm">앨범</span>
           </button>
@@ -89,11 +89,11 @@ export default function PlayersPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="이름 입력"
-            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-clay-500 focus:ring-2 focus:ring-clay-100 transition-all font-medium"
+            className="flex-1 bg-card text-ink placeholder:text-ink-faint border border-line-strong rounded-xl px-4 py-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/40 transition-all font-medium"
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
             aria-label="선수 이름"
           />
-          <button onClick={handleAdd} className="bg-slate-800 text-white px-5 rounded-xl font-bold hover:bg-slate-900 transition-colors touch-target">
+          <button onClick={handleAdd} className="bg-accent text-white px-5 rounded-xl font-semibold hover:bg-accent-strong transition-colors touch-target">
             추가
           </button>
         </div>
@@ -101,7 +101,7 @@ export default function PlayersPage() {
         <div className="flex gap-2" role="radiogroup" aria-label="성별 선택">
           <button
             onClick={() => setGender("MALE")}
-            className={`flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all touch-target ${gender === 'MALE' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-slate-100 text-slate-400 bg-slate-50'}`}
+            className={`flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all touch-target ${gender === 'MALE' ? 'border-tint-m-fg/40 text-tint-m-fg bg-tint-m-bg' : 'border-line text-ink-faint bg-card-soft'}`}
             role="radio"
             aria-checked={gender === 'MALE'}
           >
@@ -109,7 +109,7 @@ export default function PlayersPage() {
           </button>
           <button
             onClick={() => setGender("FEMALE")}
-            className={`flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all touch-target ${gender === 'FEMALE' ? 'border-pink-500 text-pink-600 bg-pink-50' : 'border-slate-100 text-slate-400 bg-slate-50'}`}
+            className={`flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all touch-target ${gender === 'FEMALE' ? 'border-tint-f-fg/40 text-tint-f-fg bg-tint-f-bg' : 'border-line text-ink-faint bg-card-soft'}`}
             role="radio"
             aria-checked={gender === 'FEMALE'}
           >
@@ -121,20 +121,20 @@ export default function PlayersPage() {
       {/* 선수 목록 */}
       <div className="space-y-3">
         <div className="flex justify-between items-end px-1">
-          <h2 className="text-lg font-bold text-slate-800">
-            등록된 선수 <span className="text-clay-600">{players.length}</span>명
+          <h2 className="text-lg font-bold text-ink tracking-tight">
+            등록된 선수 <span className="text-accent tabular-nums">{players.length}</span>명
             {searchQuery && (
-              <span className="text-sm font-normal text-slate-500 ml-2">({filteredPlayers.length}명 표시)</span>
+              <span className="text-sm font-normal text-ink-mute ml-2">({filteredPlayers.length}명 표시)</span>
             )}
           </h2>
         </div>
 
         {filteredPlayers.length === 0 ? (
-          <div className="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100 border-dashed">
+          <div className="text-center py-10 text-ink-mute bg-card rounded-2xl border border-line border-dashed">
             <UserPlus size={48} className="mx-auto mb-2 opacity-20" />
             <p className="mb-3">{searchQuery ? '검색 결과가 없습니다.' : '아직 등록된 선수가 없습니다.'}</p>
             {!searchQuery && (
-              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-sm text-clay-600 font-bold hover:underline cursor-pointer">
+              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-sm text-accent font-bold hover:underline cursor-pointer">
                 위에서 새 멤버를 등록해주세요
               </button>
             )}
@@ -142,27 +142,27 @@ export default function PlayersPage() {
         ) : (
           <div ref={(el) => setContainerRef(el)} {...handlers} className="space-y-2">
             {filteredPlayers.map((player, index) => (
-              <div key={player.id} {...getItemProps(index)} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center group">
+              <div key={player.id} {...getItemProps(index)} className="bg-card p-4 rounded-xl border border-line flex justify-between items-center group">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div {...getDragHandleProps(index)} className="p-1 text-slate-300 hover:text-slate-500 cursor-grab active:cursor-grabbing touch-target" aria-label="드래그하여 순서 변경">
+                  <div {...getDragHandleProps(index)} className="p-1 text-ink-faint hover:text-ink-mute cursor-grab active:cursor-grabbing touch-target" aria-label="드래그하여 순서 변경">
                     <GripVertical size={20} />
                   </div>
                   {player.photo ? (
-                    <img src={player.photo} alt={player.name} className="w-10 h-10 rounded-full object-cover border border-slate-200 flex-shrink-0" />
+                    <img src={player.photo} alt={player.name} className="w-10 h-10 rounded-full object-cover border border-line-strong flex-shrink-0" />
                   ) : (
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${player.gender === 'MALE' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
-                      <User size={20} />
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${player.gender === 'MALE' ? 'bg-tint-m-bg text-tint-m-fg' : 'bg-tint-f-bg text-tint-f-fg'}`}>
+                      <span className="text-sm font-bold">{player.name.charAt(0)}</span>
                     </div>
                   )}
                   <button onClick={() => setEditPlayer(player)} className="flex-1 min-w-0 text-left" aria-label={`${player.name} 선수 정보 수정`}>
-                    <div className="font-bold text-slate-800 truncate">{highlightMatch(player.name, searchQuery)}</div>
-                    <div className="text-xs text-slate-400 font-medium">
+                    <div className="font-bold text-ink truncate">{highlightMatch(player.name, searchQuery)}</div>
+                    <div className="text-xs text-ink-mute font-medium">
                       {player.gender === 'MALE' ? '남성' : '여성'}
                       {player.bonusPoints ? ` · 보너스 ${player.bonusPoints}점` : ''}
                     </div>
                   </button>
                 </div>
-                <button onClick={() => setDeletePlayerId(player.id)} className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all touch-target" aria-label={`${player.name} 선수 삭제`}>
+                <button onClick={() => setDeletePlayerId(player.id)} className="p-2 text-ink-faint hover:text-down hover:bg-down/10 rounded-lg transition-all touch-target" aria-label={`${player.name} 선수 삭제`}>
                   <Trash2 size={18} />
                 </button>
               </div>

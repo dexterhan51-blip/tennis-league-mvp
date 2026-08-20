@@ -4,21 +4,21 @@ import React from 'react';
 import { useToast, ToastType } from '@/contexts/ToastContext';
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
 
-const toastStyles: Record<ToastType, { bg: string; icon: React.ReactNode }> = {
+const toastStyles: Record<ToastType, { iconColor: string; icon: React.ReactNode }> = {
   success: {
-    bg: 'bg-green-500',
+    iconColor: 'text-up',
     icon: <CheckCircle className="w-5 h-5" />,
   },
   error: {
-    bg: 'bg-red-500',
+    iconColor: 'text-down',
     icon: <XCircle className="w-5 h-5" />,
   },
   warning: {
-    bg: 'bg-yellow-500',
+    iconColor: 'text-amber-500',
     icon: <AlertTriangle className="w-5 h-5" />,
   },
   info: {
-    bg: 'bg-blue-500',
+    iconColor: 'text-accent',
     icon: <Info className="w-5 h-5" />,
   },
 };
@@ -33,18 +33,18 @@ export default function ToastContainer() {
         return (
           <div
             key={toast.id}
-            className={`${style.bg} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 pointer-events-auto animate-toast-slide-down max-w-sm w-full`}
+            className="bg-card border border-line text-ink px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 pointer-events-auto animate-toast-slide-down max-w-sm w-full"
             role="alert"
             aria-live="polite"
           >
-            {style.icon}
+            <span className={style.iconColor}>{style.icon}</span>
             <span className="flex-1 text-sm font-medium">{toast.message}</span>
             <button
               onClick={() => hideToast(toast.id)}
-              className="p-1 hover:bg-white/20 rounded-full transition-colors touch-target"
+              className="p-1 hover:bg-card-soft rounded-full transition-colors touch-target"
               aria-label="닫기"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 text-ink-faint" />
             </button>
           </div>
         );

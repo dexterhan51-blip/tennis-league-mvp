@@ -46,45 +46,45 @@ export default function MatchCreatedDialog({
       aria-modal="true"
       aria-labelledby="match-created-title"
     >
-      <div className="bg-white rounded-2xl w-full max-w-sm max-h-[80vh] flex flex-col shadow-2xl animate-scale-in">
+      <div className="bg-card border border-line rounded-2xl w-full max-w-sm max-h-[80vh] flex flex-col shadow-xl animate-scale-in">
         {/* Header */}
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+        <div className="p-4 border-b border-line flex items-center justify-between bg-card-soft rounded-t-2xl">
           <div>
-            <h3 id="match-created-title" className="font-bold text-lg text-slate-900">
+            <h3 id="match-created-title" className="font-bold text-lg text-ink tracking-tight">
               {isPending ? '매치 라인업 확인' : '게임 생성 완료'}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-ink-mute mt-0.5">
               {typeLabel} {matches.length}게임
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-slate-200 rounded-full transition-colors touch-target"
+            className="p-1.5 hover:bg-line rounded-full transition-colors touch-target"
             aria-label="닫기"
           >
-            <X size={20} className="text-slate-400" />
+            <X size={20} className="text-ink-faint" />
           </button>
         </div>
 
         {/* Match List */}
         <div className="overflow-auto flex-1 p-4 space-y-3">
           {matches.map((m, idx) => (
-            <div key={m.id} className="bg-slate-50 rounded-xl p-3 border border-slate-200">
-              <div className="text-xs font-bold text-clay-600 mb-2">GAME {idx + 1}</div>
+            <div key={m.id} className="bg-card-soft rounded-xl p-3 border border-line">
+              <div className="text-xs font-bold text-accent mb-2">GAME {idx + 1}</div>
               <div className="flex items-center gap-3">
                 <div className="flex-1 text-right">
-                  <div className="text-sm font-bold text-slate-800">{m.teamA.man.name}</div>
+                  <div className="text-sm font-bold text-ink">{m.teamA.man.name}</div>
                   {!isSingles && m.teamA.man.id !== m.teamA.woman.id && (
-                    <div className="text-xs text-slate-500">{m.teamA.woman.name}</div>
+                    <div className="text-xs text-ink-mute">{m.teamA.woman.name}</div>
                   )}
                 </div>
-                <div className="flex-shrink-0 text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded border border-slate-200">
+                <div className="flex-shrink-0 text-xs font-bold text-ink-faint bg-card px-2 py-1 rounded border border-line">
                   VS
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="text-sm font-bold text-slate-800">{m.teamB.man.name}</div>
+                  <div className="text-sm font-bold text-ink">{m.teamB.man.name}</div>
                   {!isSingles && m.teamB.man.id !== m.teamB.woman.id && (
-                    <div className="text-xs text-slate-500">{m.teamB.woman.name}</div>
+                    <div className="text-xs text-ink-mute">{m.teamB.woman.name}</div>
                   )}
                 </div>
               </div>
@@ -93,20 +93,20 @@ export default function MatchCreatedDialog({
         </div>
 
         {/* Footer Buttons */}
-        <div className="flex gap-3 p-4 border-t border-slate-200">
+        <div className="flex gap-3 p-4 border-t border-line">
           {isPending ? (
             <>
               {onReshuffle && (
                 <button
                   onClick={onReshuffle}
-                  className="flex-1 py-3 px-4 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors touch-target flex items-center justify-center gap-1.5"
+                  className="flex-1 py-3 px-4 rounded-xl font-semibold text-ink-soft bg-card-soft hover:bg-line transition-colors touch-target flex items-center justify-center gap-1.5"
                 >
                   <Shuffle size={16} /> 다시 섞기
                 </button>
               )}
               <button
                 onClick={onConfirm}
-                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 transition-colors touch-target"
+                className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong transition-colors touch-target"
               >
                 생성
               </button>
@@ -116,14 +116,14 @@ export default function MatchCreatedDialog({
               {onCopyBracket && (
                 <button
                   onClick={onCopyBracket}
-                  className="flex-1 py-3 px-4 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors touch-target flex items-center justify-center gap-1.5"
+                  className="flex-1 py-3 px-4 rounded-xl font-semibold text-ink-soft bg-card-soft hover:bg-line transition-colors touch-target flex items-center justify-center gap-1.5"
                 >
                   <Copy size={16} /> 대진표 복사
                 </button>
               )}
               <button
                 onClick={onClose}
-                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 transition-colors touch-target"
+                className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong transition-colors touch-target"
               >
                 확인
               </button>

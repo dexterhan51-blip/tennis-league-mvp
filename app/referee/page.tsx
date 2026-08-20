@@ -219,7 +219,7 @@ export default function RefereePage() {
 
   if (phase === "loading") {
     return (
-      <main className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400">
+      <main className="min-h-screen bg-stone-900 flex items-center justify-center text-stone-400">
         불러오는 중...
       </main>
     );
@@ -227,7 +227,7 @@ export default function RefereePage() {
 
   if (phase === "notfound" || !ctx) {
     return (
-      <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center gap-4 text-slate-300 p-6">
+      <main className="min-h-screen bg-stone-900 flex flex-col items-center justify-center gap-4 text-stone-300 p-6">
         <p>경기를 찾을 수 없습니다.</p>
         <button
           onClick={() => router.push("/league")}
@@ -245,11 +245,11 @@ export default function RefereePage() {
   // ── 설정 단계 ──
   if (phase === "setup") {
     return (
-      <main className="max-w-md mx-auto min-h-screen bg-slate-900 text-white flex flex-col p-4">
+      <main className="max-w-md mx-auto min-h-screen bg-stone-900 text-white flex flex-col p-4">
         <header className="flex items-center gap-2 mb-5">
           <button
             onClick={() => router.push("/league")}
-            className="p-2 hover:bg-slate-800 rounded-full text-slate-400"
+            className="p-2 hover:bg-stone-800 rounded-full text-stone-400"
             aria-label="뒤로 가기"
           >
             <ArrowLeft size={20} />
@@ -260,29 +260,29 @@ export default function RefereePage() {
         </header>
 
         {/* 대진 */}
-        <div className="bg-slate-800 rounded-2xl p-4 mb-4 text-center">
-          <div className="text-blue-300 font-bold">{teamName(match, "A")}</div>
-          <div className="text-slate-500 text-xs my-1">VS</div>
-          <div className="text-rose-300 font-bold">{teamName(match, "B")}</div>
+        <div className="bg-stone-800 rounded-2xl p-4 mb-4 text-center">
+          <div className="text-[#9db4c8] font-bold">{teamName(match, "A")}</div>
+          <div className="text-stone-500 text-xs my-1">VS</div>
+          <div className="text-clay-300 font-bold">{teamName(match, "B")}</div>
         </div>
 
         {/* 규칙 */}
         <div className="mb-4">
-          <div className="text-xs font-bold text-slate-400 mb-2">승부 규칙 (리그 전체 적용)</div>
+          <div className="text-xs font-bold text-stone-400 mb-2">승부 규칙 (리그 전체 적용)</div>
           <div className="grid grid-cols-2 gap-2">
             {([["no-ad", "노애드"], ["deuce", "듀스"]] as const).map(([r, lbl]) => (
               <button
                 key={r}
                 onClick={() => setRule(r)}
                 className={`py-3 rounded-xl font-bold transition-colors touch-target ${
-                  config.rule === r ? "bg-clay-600 text-white" : "bg-slate-800 text-slate-400"
+                  config.rule === r ? "bg-clay-600 text-white" : "bg-stone-800 text-stone-400"
                 }`}
               >
                 {lbl}
               </button>
             ))}
           </div>
-          <p className="text-[11px] text-slate-500 mt-1.5">
+          <p className="text-[11px] text-stone-500 mt-1.5">
             {config.rule === "no-ad"
               ? "40-40에서 다음 득점 팀이 게임 승리(골든포인트)"
               : "40-40 이후 2점차로 게임 승리"}
@@ -291,14 +291,14 @@ export default function RefereePage() {
 
         {/* 게임당 목표 점수 */}
         <div className="mb-4">
-          <div className="text-xs font-bold text-slate-400 mb-2">게임당 목표 점수</div>
+          <div className="text-xs font-bold text-stone-400 mb-2">게임당 목표 점수</div>
           <div className="grid grid-cols-4 gap-2">
             {[3, 4, 5, 7].map((n) => (
               <button
                 key={n}
                 onClick={() => setWinPoints(n)}
                 className={`py-2.5 rounded-xl font-bold transition-colors touch-target ${
-                  config.winPoints === n ? "bg-clay-600 text-white" : "bg-slate-800 text-slate-400"
+                  config.winPoints === n ? "bg-clay-600 text-white" : "bg-stone-800 text-stone-400"
                 }`}
               >
                 {n}점
@@ -310,8 +310,8 @@ export default function RefereePage() {
         {/* 서브 순서 */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-slate-400">서브 순서 (탭한 순서대로)</span>
-            <button onClick={() => setServeOrder([])} className="text-xs text-slate-500 hover:text-slate-300">
+            <span className="text-xs font-bold text-stone-400">서브 순서 (탭한 순서대로)</span>
+            <button onClick={() => setServeOrder([])} className="text-xs text-stone-500 hover:text-stone-300">
               초기화
             </button>
           </div>
@@ -324,17 +324,17 @@ export default function RefereePage() {
                   key={p.id}
                   onClick={() => toggleServe(p.id)}
                   className={`px-3 py-2.5 rounded-xl font-bold text-sm transition-colors touch-target flex items-center gap-1.5 ${
-                    picked ? "bg-yellow-500 text-yellow-950" : "bg-slate-800 text-slate-300"
+                    picked ? "bg-amber-400 text-amber-950" : "bg-stone-800 text-stone-300"
                   }`}
                 >
-                  {picked && <span className="text-xs bg-yellow-950/20 rounded-full w-5 h-5 flex items-center justify-center">{order + 1}</span>}
+                  {picked && <span className="text-xs bg-amber-950/20 rounded-full w-5 h-5 flex items-center justify-center tabular-nums">{order + 1}</span>}
                   {p.name}
                 </button>
               );
             })}
           </div>
           {serveOrder.length > 0 && (
-            <p className="text-[11px] text-yellow-300 mt-2">
+            <p className="text-[11px] text-amber-300 mt-2">
               서브: {serveOrder.map((id) => nameById(id)).join(" → ")} · 게임마다 순서대로 교대
             </p>
           )}
@@ -359,32 +359,32 @@ export default function RefereePage() {
   const matchWinner = progress.ga > progress.gb ? "A" : progress.gb > progress.ga ? "B" : null;
 
   return (
-    <main className="max-w-md mx-auto min-h-screen bg-slate-900 flex flex-col">
-      <header className="p-3 flex items-center justify-between bg-slate-800">
+    <main className="max-w-md mx-auto min-h-screen bg-stone-900 flex flex-col">
+      <header className="p-3 flex items-center justify-between bg-stone-800">
         <button
           onClick={() => setPhase("setup")}
-          className="p-2 hover:bg-slate-700 rounded-full text-slate-400"
+          className="p-2 hover:bg-stone-700 rounded-full text-stone-400"
           aria-label="설정으로"
         >
           <ArrowLeft size={20} />
         </button>
-        <div className="text-center text-[11px] text-slate-400">
+        <div className="text-center text-[11px] text-stone-400">
           {config.rule === "no-ad" ? "노애드" : "듀스"} · 게임당 {config.winPoints}점
-          {golden && <span className="ml-1 text-yellow-300 font-bold">· 골든포인트</span>}
-          {deuce && <span className="ml-1 text-yellow-300 font-bold">· 듀스</span>}
+          {golden && <span className="ml-1 text-amber-300 font-bold">· 골든포인트</span>}
+          {deuce && <span className="ml-1 text-amber-300 font-bold">· 듀스</span>}
         </div>
         <div className="flex gap-1">
           <button
             onClick={undo}
             disabled={history.length === 0}
-            className="p-2 hover:bg-slate-700 rounded-full text-slate-400 disabled:opacity-30"
+            className="p-2 hover:bg-stone-700 rounded-full text-stone-400 disabled:opacity-30"
             aria-label="되돌리기"
           >
             <Undo2 size={20} />
           </button>
           <button
             onClick={() => setShowFinish(true)}
-            className="p-2 hover:bg-slate-700 rounded-full text-slate-400"
+            className="p-2 hover:bg-stone-700 rounded-full text-stone-400"
             aria-label="경기 종료"
           >
             <Flag size={20} />
@@ -393,79 +393,79 @@ export default function RefereePage() {
       </header>
 
       {/* 매치 스코어(게임) */}
-      <div className="bg-slate-800 py-2 flex items-center justify-center gap-3 text-white">
-        <span className="text-xs text-slate-400">매치(게임)</span>
-        <span className="text-2xl font-black text-blue-400">{progress.ga}</span>
-        <span className="text-slate-500">:</span>
-        <span className="text-2xl font-black text-rose-400">{progress.gb}</span>
+      <div className="bg-stone-800 py-2 flex items-center justify-center gap-3 text-white">
+        <span className="text-xs text-stone-400">매치(게임)</span>
+        <span className="text-2xl font-black text-[#9db4c8] tabular-nums">{progress.ga}</span>
+        <span className="text-stone-500">:</span>
+        <span className="text-2xl font-black text-clay-400 tabular-nums">{progress.gb}</span>
       </div>
 
       <div className="flex-1 flex flex-col">
         {/* 팀 A */}
         <button
           onClick={() => handleAddPoint("A")}
-          className="flex-1 flex flex-col items-center justify-center bg-blue-600 active:bg-blue-800 transition-colors relative"
+          className="flex-1 flex flex-col items-center justify-center bg-[#46596b] active:bg-[#344251] transition-colors relative"
         >
           {servingTeam === "A" && (
             <div className="absolute top-4 left-4 flex items-center gap-1.5">
-              <Circle size={16} className="text-yellow-300 fill-yellow-300" />
-              <span className="text-yellow-300 text-xs font-bold">서브 {nameById(serverId)}</span>
+              <Circle size={16} className="text-amber-300 fill-amber-300" />
+              <span className="text-amber-300 text-xs font-bold">서브 {nameById(serverId)}</span>
             </div>
           )}
           <div className="text-white/70 text-base font-medium mb-1 px-4 text-center">{teamName(match, "A")}</div>
-          <span className="text-8xl font-black text-white">{disp.a}</span>
-          <span className="text-white/60 text-sm mt-2 font-bold">{progress.ga} 게임</span>
+          <span className="text-8xl font-black text-white tabular-nums">{disp.a}</span>
+          <span className="text-white/60 text-sm mt-2 font-bold tabular-nums">{progress.ga} 게임</span>
         </button>
 
-        <div className="h-px bg-slate-700" />
+        <div className="h-px bg-stone-700" />
 
         {/* 팀 B */}
         <button
           onClick={() => handleAddPoint("B")}
-          className="flex-1 flex flex-col items-center justify-center bg-rose-600 active:bg-rose-800 transition-colors relative"
+          className="flex-1 flex flex-col items-center justify-center bg-clay-600 active:bg-clay-800 transition-colors relative"
         >
           {servingTeam === "B" && (
             <div className="absolute top-4 left-4 flex items-center gap-1.5">
-              <Circle size={16} className="text-yellow-300 fill-yellow-300" />
-              <span className="text-yellow-300 text-xs font-bold">서브 {nameById(serverId)}</span>
+              <Circle size={16} className="text-amber-300 fill-amber-300" />
+              <span className="text-amber-300 text-xs font-bold">서브 {nameById(serverId)}</span>
             </div>
           )}
           <div className="text-white/70 text-base font-medium mb-1 px-4 text-center">{teamName(match, "B")}</div>
-          <span className="text-8xl font-black text-white">{disp.b}</span>
-          <span className="text-white/60 text-sm mt-2 font-bold">{progress.gb} 게임</span>
+          <span className="text-8xl font-black text-white tabular-nums">{disp.b}</span>
+          <span className="text-white/60 text-sm mt-2 font-bold tabular-nums">{progress.gb} 게임</span>
         </button>
       </div>
 
       {/* 결과 반영 오버레이 (수동 종료) */}
       {showFinish && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-6 animate-fade-in">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6 animate-scale-in text-center">
-            <Trophy className="w-10 h-10 text-amber-500 mx-auto mb-2" />
-            <h2 className="text-lg font-bold text-slate-800 mb-1">
+          <div className="bg-card border border-line rounded-2xl shadow-xl w-full max-w-sm p-6 animate-scale-in text-center">
+            <Trophy className="w-10 h-10 text-amber-400 mx-auto mb-2" />
+            <h2 className="text-lg font-bold text-ink tracking-tight mb-1">
               {matchWinner
                 ? `${matchWinner === "A" ? teamName(match, "A") : teamName(match, "B")} 승리!`
                 : "경기 종료"}
             </h2>
-            <div className="text-3xl font-black text-slate-900 my-3">
+            <div className="text-3xl font-black text-ink tabular-nums my-3">
               {progress.ga} : {progress.gb}
-              <span className="text-sm font-medium text-slate-400 ml-1">게임</span>
+              <span className="text-sm font-medium text-ink-faint ml-1">게임</span>
             </div>
             {(progress.pa > 0 || progress.pb > 0) && (
-              <p className="text-xs text-amber-600 mb-2">
+              <p className="text-xs text-amber-500 mb-2">
                 진행 중인 게임({disp.a}:{disp.b})은 집계되지 않습니다.
               </p>
             )}
-            <p className="text-sm text-slate-500 mb-5">이 게임 스코어를 경기 기록에 반영할까요?</p>
+            <p className="text-sm text-ink-mute mb-5">이 게임 스코어를 경기 기록에 반영할까요?</p>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowFinish(false)}
-                className="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 touch-target"
+                className="flex-1 py-3 rounded-xl font-bold text-ink-soft bg-card-soft hover:bg-line touch-target"
               >
                 계속 진행
               </button>
               <button
                 onClick={reflectResult}
-                className="flex-1 py-3 rounded-xl font-bold text-white bg-green-600 hover:bg-green-700 touch-target flex items-center justify-center gap-1.5"
+                className="flex-1 py-3 rounded-xl font-bold text-white bg-up hover:opacity-90 touch-target flex items-center justify-center gap-1.5"
               >
                 <Check className="w-4 h-4" /> 결과 반영
               </button>

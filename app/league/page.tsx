@@ -135,18 +135,18 @@ export default function LeaguePage() {
 
   if (isLoading) {
     return (
-      <main className="max-w-md mx-auto min-h-screen bg-white flex items-center justify-center">
-        <div className="text-slate-400 text-sm">불러오는 중...</div>
+      <main className="max-w-md mx-auto min-h-screen bg-surface flex items-center justify-center">
+        <div className="text-ink-faint text-sm">불러오는 중...</div>
       </main>
     );
   }
 
   return (
-    <main className="max-w-md mx-auto min-h-screen bg-white pb-40 relative">
-      <header className="p-4 flex items-center justify-between sticky top-0 bg-white z-10 border-b border-slate-100 shadow-sm">
+    <main className="max-w-md mx-auto min-h-screen bg-surface pb-40 relative">
+      <header className="p-4 flex items-center justify-between sticky top-0 bg-surface z-10 border-b border-line">
         <div className="flex items-center gap-2">
           <AppLogo size={28} />
-          {slotIndex && <span className="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded font-bold">SLOT {slotIndex}</span>}
+          {slotIndex && <span className="bg-card-soft text-ink-mute text-xs px-2 py-1 rounded font-bold">SLOT {slotIndex}</span>}
         </div>
         <div className="flex items-center gap-2">
           <LiveShareControl
@@ -159,7 +159,7 @@ export default function LeaguePage() {
           />
           <button
             onClick={() => setIsHistoryOpen(true)}
-            className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-bold text-xs border border-green-200 touch-target cursor-pointer active:scale-[0.98] transition-transform"
+            className="flex items-center gap-1 bg-card-soft text-ink-soft px-3 py-1.5 rounded-lg font-bold text-xs border border-line touch-target cursor-pointer active:scale-[0.98] transition-transform"
             aria-label="경기 기록 보기"
           >
             <Table size={14}/> 기록
@@ -169,8 +169,8 @@ export default function LeaguePage() {
 
       {/* 서버에 더 최신 데이터가 있을 때: 동기화 전까지 이 기기의 업로드는 차단됨 */}
       {serverNewer && (
-        <div className="mx-4 mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <p className="text-sm text-amber-800 font-medium mb-3">
+        <div className="mx-4 mt-4 bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+          <p className="text-sm text-amber-600 font-medium mb-3">
             서버에 이 기기보다 최신 리그 데이터가 있습니다.
             덮어쓰기를 막기 위해 동기화 전까지 이 기기의 변경사항은 서버에 올라가지 않습니다.
           </p>
@@ -185,11 +185,11 @@ export default function LeaguePage() {
 
       <div className="px-4 space-y-6 pt-4">
         <div className="text-center">
-          <h1 className="text-2xl font-black text-slate-800 flex justify-center items-center gap-2">
-            <span className="text-clay-600">-</span> {leagueName} <span className="text-clay-600">-</span>
+          <h1 className="text-2xl font-black text-ink tracking-tight flex justify-center items-center gap-2">
+            <span className="text-accent">-</span> {leagueName} <span className="text-accent">-</span>
             <button
               onClick={() => { setRenameInput(leagueName); setShowRenameDialog(true); }}
-              className="p-1.5 text-slate-300 hover:text-clay-600 transition-colors touch-target"
+              className="p-1.5 text-ink-faint hover:text-accent transition-colors touch-target"
               aria-label="시즌 이름 변경"
             >
               <Pencil size={16} />
@@ -246,15 +246,15 @@ export default function LeaguePage() {
         {displayedMatches.length > 0 && (
           <section className="flex gap-2">
             {finishedDates.includes(matchDate) ? (
-              <div className="flex-1 bg-slate-300 text-slate-500 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 cursor-not-allowed">
+              <div className="flex-1 bg-card-soft text-ink-faint py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 cursor-not-allowed">
                 <Medal size={20} /> [{matchDate}] 게임 종료 완료
               </div>
             ) : (
               <button
                 onClick={handleFinishDailyGame}
-                className="flex-1 bg-slate-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-slate-700 touch-target"
+                className="flex-1 bg-accent text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-accent-strong transition-colors touch-target"
               >
-                <Medal size={20} className="text-yellow-400" /> [{matchDate}] 게임 종료
+                <Medal size={20} className="text-amber-300" /> [{matchDate}] 게임 종료
               </button>
             )}
             <ShareButton leagueName={leagueName} matchDate={matchDate} matches={matches} rankings={rankingsWithChange} />
@@ -265,18 +265,18 @@ export default function LeaguePage() {
         {hasTimelineData(matchDate, matches) && (
           <button
             onClick={handleExportTimeline}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 transition-colors touch-target"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-accent-soft text-accent border border-accent/20 hover:bg-accent/15 transition-colors touch-target"
           >
             <Film size={18} /> 경기 타임라인 내보내기 (영상 편집용)
           </button>
         )}
 
         {/* Bottom Action Bar */}
-        <div className="fixed bottom-20 left-0 right-0 p-4 bg-white border-t border-slate-100 max-w-md mx-auto flex gap-2 z-30">
-          <button onClick={() => handleManualSave(rankings)} className="flex-1 bg-clay-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg touch-target">
+        <div className="fixed bottom-20 left-0 right-0 p-4 bg-card border-t border-line max-w-md mx-auto flex gap-2 z-30">
+          <button onClick={() => handleManualSave(rankings)} className="flex-1 bg-accent hover:bg-accent-strong text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors touch-target">
             <Save size={18}/> 저장하기
           </button>
-          <button onClick={() => setShowEndSeasonDialog(true)} className="px-4 bg-amber-50 text-amber-600 border border-amber-200 rounded-xl font-bold touch-target" aria-label="시즌 종료">
+          <button onClick={() => setShowEndSeasonDialog(true)} className="px-4 bg-amber-500/10 text-amber-600 border border-amber-500/30 rounded-xl font-bold touch-target" aria-label="시즌 종료">
             <Flag size={18}/>
           </button>
         </div>
@@ -307,9 +307,9 @@ export default function LeaguePage() {
           aria-modal="true"
           aria-labelledby="rename-season-title"
         >
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl animate-scale-in p-5">
-            <h3 id="rename-season-title" className="font-bold text-lg text-slate-900 mb-1">시즌 이름 변경</h3>
-            <p className="text-xs text-slate-500 mb-4">진행 중인 시즌의 이름만 바뀌고 기록은 그대로 유지됩니다.</p>
+          <div className="bg-card border border-line rounded-2xl w-full max-w-sm shadow-xl animate-scale-in p-5">
+            <h3 id="rename-season-title" className="font-bold text-lg text-ink tracking-tight mb-1">시즌 이름 변경</h3>
+            <p className="text-xs text-ink-mute mb-4">진행 중인 시즌의 이름만 바뀌고 기록은 그대로 유지됩니다.</p>
             <input
               type="text"
               value={renameInput}
@@ -322,19 +322,19 @@ export default function LeaguePage() {
               }}
               placeholder="예: 2026 7~8월 리그"
               autoFocus
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-clay-500 focus:border-clay-500"
+              className="w-full px-4 py-3 bg-card border border-line-strong rounded-xl font-bold text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
             />
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => setShowRenameDialog(false)}
-                className="flex-1 py-3 px-4 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors touch-target"
+                className="flex-1 py-3 px-4 rounded-xl font-semibold text-ink-soft bg-card-soft hover:bg-line transition-colors touch-target"
               >
                 취소
               </button>
               <button
                 onClick={() => { handleRenameLeague(renameInput); setShowRenameDialog(false); }}
                 disabled={!renameInput.trim()}
-                className="flex-1 py-3 px-4 rounded-xl font-medium text-white bg-clay-600 hover:bg-clay-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
+                className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
               >
                 변경
               </button>

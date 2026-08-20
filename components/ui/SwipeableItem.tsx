@@ -85,7 +85,7 @@ export default function SwipeableItem({
     <div className="relative overflow-hidden" ref={containerRef}>
       {/* Delete button background */}
       <div
-        className={`absolute inset-y-0 right-0 flex items-center justify-end bg-red-500 transition-opacity ${
+        className={`absolute inset-y-0 right-0 flex items-center justify-end bg-down transition-opacity ${
           showDelete ? 'opacity-100' : 'opacity-0'
         }`}
         style={{ width: threshold }}
@@ -102,7 +102,7 @@ export default function SwipeableItem({
 
       {/* Swipeable content */}
       <div
-        className={`relative bg-white ${
+        className={`relative bg-card ${
           isSwiping ? '' : 'transition-transform duration-200'
         }`}
         style={{ transform: `translateX(${translateX}px)` }}

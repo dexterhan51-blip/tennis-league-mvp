@@ -84,20 +84,20 @@ export default function QuickDatePicker({
       <div className="flex gap-2">
         <button
           onClick={() => onChange(today)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors touch-target ${
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors touch-target ${
             selectedDate === today
-              ? 'bg-clay-600 text-white'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              ? 'bg-accent text-white'
+              : 'bg-card-soft text-ink-soft hover:bg-line'
           }`}
         >
           오늘
         </button>
         <button
           onClick={() => onChange(yesterday)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors touch-target ${
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors touch-target ${
             selectedDate === yesterday
-              ? 'bg-clay-600 text-white'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              ? 'bg-accent text-white'
+              : 'bg-card-soft text-ink-soft hover:bg-line'
           }`}
         >
           어제
@@ -105,17 +105,17 @@ export default function QuickDatePicker({
         <div className="flex-1" />
         <button
           onClick={handlePrev}
-          className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors touch-target"
+          className="p-2 rounded-lg bg-card-soft hover:bg-line transition-colors touch-target"
           aria-label="이전 날짜"
         >
-          <ChevronLeft className="w-5 h-5 text-slate-600" />
+          <ChevronLeft className="w-5 h-5 text-ink-mute" />
         </button>
         <button
           onClick={handleNext}
-          className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors touch-target"
+          className="p-2 rounded-lg bg-card-soft hover:bg-line transition-colors touch-target"
           aria-label="다음 날짜"
         >
-          <ChevronRight className="w-5 h-5 text-slate-600" />
+          <ChevronRight className="w-5 h-5 text-ink-mute" />
         </button>
       </div>
 
@@ -140,24 +140,24 @@ export default function QuickDatePicker({
               className={`
                 flex-shrink-0 flex flex-col items-center px-3 py-2 rounded-xl transition-all touch-target
                 ${isSelected
-                  ? 'bg-clay-600 text-white shadow-md'
+                  ? 'bg-accent text-white'
                   : hasMatch
-                  ? 'bg-clay-50 text-clay-700 border border-clay-200'
+                  ? 'bg-accent-soft text-accent border border-line'
                   : isFuture
-                  ? 'bg-purple-50 text-purple-600 border border-purple-200 hover:bg-purple-100'
-                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                  ? 'bg-card text-ink-faint border border-line hover:bg-card-soft'
+                  : 'bg-card-soft text-ink-mute hover:bg-line'
                 }
               `}
               role="tab"
               aria-selected={isSelected}
             >
               <span className="text-xs font-medium">{getDayName(date)}</span>
-              <span className="text-sm font-bold">{formatDate(date)}</span>
+              <span className="text-sm font-bold tabular-nums">{formatDate(date)}</span>
               {hasMatch && !isSelected && (
-                <div className="w-1.5 h-1.5 rounded-full bg-clay-500 mt-1" />
+                <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1" />
               )}
               {isToday && !isSelected && (
-                <Calendar className="w-3 h-3 mt-1 text-slate-400" />
+                <Calendar className="w-3 h-3 mt-1 text-ink-faint" />
               )}
             </button>
           );

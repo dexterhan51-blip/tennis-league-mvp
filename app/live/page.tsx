@@ -42,11 +42,11 @@ function LiveLeaguePicker() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 max-w-sm w-full text-center">
-          <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h2 className="text-lg font-bold text-slate-900 mb-2">리그 목록을 불러올 수 없습니다</h2>
-          <p className="text-sm text-slate-500">네트워크 상태를 확인해주세요.</p>
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4">
+        <div className="bg-card rounded-2xl border border-line p-8 max-w-sm w-full text-center">
+          <AlertTriangle className="w-12 h-12 text-down mx-auto mb-4" />
+          <h2 className="text-lg font-bold text-ink tracking-tight mb-2">리그 목록을 불러올 수 없습니다</h2>
+          <p className="text-sm text-ink-mute">네트워크 상태를 확인해주세요.</p>
         </div>
       </div>
     );
@@ -54,23 +54,23 @@ function LiveLeaguePicker() {
 
   if (!leagues) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-clay-600 animate-spin" aria-label="로딩 중" />
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-accent animate-spin" aria-label="로딩 중" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 pt-8">
+    <div className="min-h-screen bg-surface p-4 pt-8">
       <div className="max-w-md mx-auto">
-        <h1 className="text-xl font-bold text-slate-900 mb-1 flex items-center gap-2">
-          <Radio className="w-5 h-5 text-clay-600" /> 라이브
+        <h1 className="text-xl font-bold text-ink tracking-tight mb-1 flex items-center gap-2">
+          <Radio className="w-5 h-5 text-accent" /> 라이브
         </h1>
-        <p className="text-sm text-slate-500 mb-6">진행 중인 리그를 선택하세요.</p>
+        <p className="text-sm text-ink-mute mb-6">진행 중인 리그를 선택하세요.</p>
 
         {leagues.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center">
-            <p className="text-sm text-slate-500">아직 공개된 리그가 없습니다.</p>
+          <div className="bg-card rounded-2xl border border-line p-8 text-center">
+            <p className="text-sm text-ink-mute">아직 공개된 리그가 없습니다.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -78,15 +78,15 @@ function LiveLeaguePicker() {
               <Link
                 key={league.id}
                 href={`/live?id=${league.id}`}
-                className="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-100 p-4 hover:border-clay-300 transition-colors"
+                className="flex items-center justify-between bg-card rounded-2xl border border-line p-4 hover:border-accent/40 hover:bg-card-soft transition-colors"
               >
                 <div>
-                  <div className="font-bold text-slate-900">{league.name}</div>
-                  <div className="text-xs text-slate-400 mt-0.5">
+                  <div className="font-bold text-ink">{league.name}</div>
+                  <div className="text-xs text-ink-faint mt-0.5">
                     마지막 업데이트 {new Date(league.updated_at).toLocaleDateString('ko-KR')}
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-slate-300" />
+                <ChevronRight className="w-5 h-5 text-ink-faint" />
               </Link>
             ))}
           </div>
@@ -113,11 +113,11 @@ function LiveDashboardView({ leagueId }: { leagueId: string }) {
   // 에러 상태
   if (dashboard.error) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 max-w-sm w-full text-center">
-          <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h2 className="text-lg font-bold text-slate-900 mb-2">접근할 수 없습니다</h2>
-          <p className="text-sm text-slate-500">{dashboard.error}</p>
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4">
+        <div className="bg-card rounded-2xl border border-line p-8 max-w-sm w-full text-center">
+          <AlertTriangle className="w-12 h-12 text-down mx-auto mb-4" />
+          <h2 className="text-lg font-bold text-ink tracking-tight mb-2">접근할 수 없습니다</h2>
+          <p className="text-sm text-ink-mute">{dashboard.error}</p>
         </div>
       </div>
     );
@@ -126,10 +126,10 @@ function LiveDashboardView({ leagueId }: { leagueId: string }) {
   // 로딩 상태
   if (dashboard.connectionStatus === 'connecting' && !dashboard.leagueName) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-clay-500 animate-spin mx-auto mb-3" />
-          <p className="text-sm text-slate-500">대시보드 연결 중...</p>
+          <Loader2 className="w-8 h-8 text-accent animate-spin mx-auto mb-3" />
+          <p className="text-sm text-ink-mute">대시보드 연결 중...</p>
         </div>
       </div>
     );
@@ -148,7 +148,7 @@ function LiveDashboardView({ leagueId }: { leagueId: string }) {
   const displayTotal = displayMatches.length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-surface">
       <div className="max-w-md mx-auto px-4 py-4 space-y-3">
         {/* 헤더 */}
         <LiveHeader
@@ -166,19 +166,19 @@ function LiveDashboardView({ leagueId }: { leagueId: string }) {
 
         {/* 경기 요약 */}
         {displayTotal > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-            <div className="grid grid-cols-3 text-center divide-x divide-slate-100">
+          <div className="bg-card rounded-2xl border border-line p-4">
+            <div className="grid grid-cols-3 text-center divide-x divide-line">
               <div>
-                <p className="text-2xl font-black text-slate-900">{displayTotal}</p>
-                <p className="text-[10px] text-slate-400 font-medium">전체 경기</p>
+                <p className="text-2xl font-black text-ink tabular-nums">{displayTotal}</p>
+                <p className="text-[10px] text-ink-mute font-medium">전체 경기</p>
               </div>
               <div>
-                <p className="text-2xl font-black text-green-600">{displayFinished}</p>
-                <p className="text-[10px] text-slate-400 font-medium">완료</p>
+                <p className="text-2xl font-black text-up tabular-nums">{displayFinished}</p>
+                <p className="text-[10px] text-ink-mute font-medium">완료</p>
               </div>
               <div>
-                <p className="text-2xl font-black text-yellow-500">{displayTotal - displayFinished}</p>
-                <p className="text-[10px] text-slate-400 font-medium">진행 중</p>
+                <p className="text-2xl font-black text-amber-500 tabular-nums">{displayTotal - displayFinished}</p>
+                <p className="text-[10px] text-ink-mute font-medium">진행 중</p>
               </div>
             </div>
           </div>
@@ -203,7 +203,7 @@ function LiveDashboardView({ leagueId }: { leagueId: string }) {
         />
 
         {/* 푸터 */}
-        <p className="text-center text-[10px] text-slate-300 pb-4">
+        <p className="text-center text-[10px] text-ink-faint pb-4">
           러브포티 테니스 리그 매니저
         </p>
       </div>
@@ -214,8 +214,8 @@ function LiveDashboardView({ leagueId }: { leagueId: string }) {
 export default function LiveDashboardPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-clay-500 animate-spin" />
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-accent animate-spin" />
       </div>
     }>
       <LiveDashboardContent />

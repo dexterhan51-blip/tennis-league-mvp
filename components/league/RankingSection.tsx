@@ -24,13 +24,13 @@ export default function RankingSection({
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-bold text-slate-500 flex items-center gap-2">
-          <Trophy size={16} /> 실시간 랭킹
+        <h2 className="text-sm font-semibold text-ink tracking-tight flex items-center gap-2">
+          <Trophy size={16} className="text-accent" /> 실시간 랭킹
         </h2>
         {showRecalculate && (
           <button
             onClick={onRecalculateMvp}
-            className="text-xs text-slate-400 hover:text-clay-600 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-clay-50 transition-colors"
+            className="text-xs text-ink-faint hover:text-accent flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-accent-soft transition-colors"
             title="MVP 횟수를 경기 기록 기반으로 재계산합니다"
           >
             <RefreshCw size={12} /> MVP 재계산
@@ -47,10 +47,10 @@ export default function RankingSection({
           />
         ))}
         {rankings.length === 0 && (
-          <div className="text-center py-8 text-slate-400">
+          <div className="text-center py-8 text-ink-mute">
             <Trophy size={32} className="mx-auto mb-2 opacity-30" />
             <p className="text-sm mb-3">아직 랭킹 데이터가 없습니다.</p>
-            <button onClick={onOpenRegistration} className="text-sm text-clay-600 font-bold hover:underline cursor-pointer">
+            <button onClick={onOpenRegistration} className="text-sm text-accent font-bold hover:underline cursor-pointer">
               + 게임 등록하기
             </button>
           </div>

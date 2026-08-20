@@ -41,16 +41,16 @@ export default function UndoButton() {
     <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 animate-slide-up">
       <button
         onClick={undo}
-        className="flex items-center gap-2 px-4 py-3 bg-slate-800 text-white rounded-xl shadow-lg hover:bg-slate-700 transition-colors touch-target"
+        className="flex items-center gap-2 px-4 py-3 bg-clay-900 text-white rounded-xl shadow-lg hover:bg-clay-800 transition-colors touch-target"
         aria-label="실행 취소"
       >
         <Undo2 className="w-5 h-5" />
         <span className="text-sm font-medium">{lastAction.label} 취소</span>
       </button>
       {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-600 rounded-b-xl overflow-hidden">
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-clay-700 rounded-b-xl overflow-hidden">
         <div
-          className="h-full bg-clay-400 transition-all duration-50 ease-linear"
+          className="h-full bg-clay-300 transition-all duration-50 ease-linear"
           style={{ width: `${progress}%` }}
         />
       </div>

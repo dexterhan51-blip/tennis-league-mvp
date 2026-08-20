@@ -22,8 +22,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-clay-600 border-t-transparent rounded-full animate-spin" aria-label="로딩 중" />
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" aria-label="로딩 중" />
       </div>
     );
   }

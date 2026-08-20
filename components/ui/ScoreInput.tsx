@@ -20,7 +20,7 @@ export default function ScoreInput({
   return (
     <div className="flex flex-col gap-2">
       {label && (
-        <label className="text-xs font-bold text-slate-500">{label}</label>
+        <label className="text-xs font-semibold text-ink-mute">{label}</label>
       )}
       <div className="flex gap-1 flex-wrap">
         {scores.map((score) => {
@@ -34,8 +34,8 @@ export default function ScoreInput({
               className={`
                 w-11 h-11 rounded-lg font-bold text-lg transition-all touch-target
                 ${isSelected
-                  ? 'bg-clay-600 text-white shadow-md scale-105'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-accent text-white scale-105'
+                  : 'bg-card-soft text-ink-soft hover:bg-line'
                 }
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}
               `}

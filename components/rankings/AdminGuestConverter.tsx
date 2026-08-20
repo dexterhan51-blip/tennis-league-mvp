@@ -170,11 +170,11 @@ export default function AdminGuestConverter({ leagues, pool, onConverted }: Admi
   if (groups.length === 0) return null;
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-      <h2 className="text-sm font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-        <UserCheck size={15} className="text-clay-600" /> 게스트 실명 전환
+    <section className="bg-card rounded-2xl border border-line p-4">
+      <h2 className="text-sm font-semibold text-ink tracking-tight mb-1 flex items-center gap-1.5">
+        <UserCheck size={15} className="text-accent" /> 게스트 실명 전환
       </h2>
-      <p className="text-xs text-slate-400 mb-3">
+      <p className="text-xs text-ink-mute mb-3">
         과거 경기의 게스트를 실제 선수로 바꿔 종합 랭킹에 포함시킵니다. 날짜 단위로 전환됩니다.
       </p>
 
@@ -183,10 +183,10 @@ export default function AdminGuestConverter({ leagues, pool, onConverted }: Admi
           const sel = selection[g.key] ?? '';
           const busy = convertingKey === g.key;
           return (
-            <div key={g.key} className="border border-slate-100 rounded-xl p-3 bg-slate-50/50">
-              <div className="text-sm font-medium text-slate-800 mb-2">
+            <div key={g.key} className="border border-line rounded-xl p-3 bg-card-soft">
+              <div className="text-sm font-medium text-ink mb-2">
                 {g.guestName}
-                <span className="text-xs text-slate-400 ml-1.5">
+                <span className="text-xs text-ink-mute ml-1.5">
                   {g.leagueName} · {g.date} · {g.matchCount}경기
                 </span>
               </div>
@@ -194,7 +194,7 @@ export default function AdminGuestConverter({ leagues, pool, onConverted }: Admi
                 <select
                   value={sel}
                   onChange={(e) => setSelection((prev) => ({ ...prev, [g.key]: e.target.value }))}
-                  className="flex-1 px-2 py-2 text-sm border border-slate-200 rounded-lg focus:border-clay-500 focus:outline-none bg-white"
+                  className="flex-1 px-2 py-2 text-sm border border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent bg-card text-ink"
                 >
                   <option value="">전환할 선수 선택</option>
                   {pool
@@ -211,13 +211,13 @@ export default function AdminGuestConverter({ leagues, pool, onConverted }: Admi
                     value={newNames[g.key] ?? ''}
                     onChange={(e) => setNewNames((prev) => ({ ...prev, [g.key]: e.target.value }))}
                     placeholder="이름"
-                    className="w-24 px-2 py-2 text-sm border border-slate-200 rounded-lg focus:border-clay-500 focus:outline-none"
+                    className="w-24 px-2 py-2 text-sm bg-card text-ink placeholder:text-ink-faint border border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
                   />
                 )}
                 <button
                   onClick={() => handleConvert(g)}
                   disabled={busy}
-                  className="shrink-0 text-xs font-bold text-white bg-clay-600 hover:bg-clay-700 disabled:bg-slate-300 px-3 py-2 rounded-lg transition-colors touch-target"
+                  className="shrink-0 text-xs font-semibold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 px-3 py-2 rounded-lg transition-colors touch-target"
                 >
                   {busy ? <Loader2 size={14} className="animate-spin" /> : '전환'}
                 </button>

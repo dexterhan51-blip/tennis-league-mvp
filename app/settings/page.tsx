@@ -176,10 +176,10 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24">
-      <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
+    <div className="min-h-screen bg-surface pb-24">
+      <div className="sticky top-0 z-10 bg-card border-b border-line">
         <div className="max-w-md mx-auto px-4 py-4">
-          <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <h1 className="text-lg font-bold text-ink tracking-tight flex items-center gap-2">
             <AppLogo size={26} /> 설정
           </h1>
         </div>
@@ -187,26 +187,26 @@ export default function SettingsPage() {
 
       <div className="max-w-md mx-auto p-4 space-y-6">
         {isConfigured && session && (
-          <section className="bg-white rounded-xl p-4 shadow-sm">
-            <h2 className="text-sm font-bold text-slate-700 mb-4">계정</h2>
+          <section className="bg-card border border-line rounded-xl p-4">
+            <h2 className="text-sm font-semibold text-ink tracking-tight mb-4">계정</h2>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <UserCircle className="w-9 h-9 text-slate-300" />
+                <UserCircle className="w-9 h-9 text-ink-faint" />
                 <div>
-                  <div className="font-medium text-slate-900">
+                  <div className="font-medium text-ink">
                     {profile?.name || session.user.email}
                     {isAdmin && (
-                      <span className="ml-2 text-[10px] font-bold text-clay-600 bg-clay-50 border border-clay-200 rounded px-1.5 py-0.5 align-middle">
+                      <span className="ml-2 text-[10px] font-bold text-accent bg-accent-soft rounded px-1.5 py-0.5 align-middle">
                         관리자
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-slate-500">{session.user.email}</div>
+                  <div className="text-xs text-ink-mute">{session.user.email}</div>
                 </div>
               </div>
               <button
                 onClick={() => signOut()}
-                className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors touch-target"
+                className="flex items-center gap-1.5 text-sm text-ink-mute hover:text-down hover:bg-down/10 px-3 py-2 rounded-lg transition-colors touch-target"
               >
                 <LogOut className="w-4 h-4" /> 로그아웃
               </button>
@@ -214,17 +214,17 @@ export default function SettingsPage() {
             {isAdmin && (
               <a
                 href="/members"
-                className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-sm font-medium text-slate-700 hover:text-clay-600 transition-colors"
+                className="mt-4 flex items-center justify-between border-t border-line pt-4 text-sm font-medium text-ink-soft hover:text-accent transition-colors"
               >
                 회원 관리
-                <span className="text-xs text-slate-400">이름·역할 변경</span>
+                <span className="text-xs text-ink-faint">이름·역할 변경</span>
               </a>
             )}
           </section>
         )}
 
-        <section className="bg-white rounded-xl p-4 shadow-sm">
-          <h2 className="text-sm font-bold text-slate-700 mb-4">테마</h2>
+        <section className="bg-card border border-line rounded-xl p-4">
+          <h2 className="text-sm font-semibold text-ink tracking-tight mb-4">테마</h2>
           <div className="grid grid-cols-3 gap-2">
             {themeOptions.map((option) => (
               <button
@@ -232,23 +232,23 @@ export default function SettingsPage() {
                 onClick={() => setTheme(option.value)}
                 className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all touch-target ${
                   theme === option.value
-                    ? 'bg-clay-100 text-clay-600 ring-2 ring-clay-500'
-                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                    ? 'bg-accent-soft text-accent ring-2 ring-accent'
+                    : 'bg-card-soft text-ink-soft hover:bg-line'
                 }`}
                 aria-pressed={theme === option.value}
               >
                 {option.icon}
                 <span className="text-xs font-medium">{option.label}</span>
-                {theme === option.value && <CheckCircle className="w-4 h-4 text-clay-600" />}
+                {theme === option.value && <CheckCircle className="w-4 h-4 text-accent" />}
               </button>
             ))}
           </div>
         </section>
 
-        <section className="bg-white rounded-xl p-4 shadow-sm">
+        <section className="bg-card border border-line rounded-xl p-4">
           <div className="flex items-center gap-2 mb-4">
-            <Type className="w-5 h-5 text-slate-600" />
-            <h2 className="text-sm font-bold text-slate-700">글꼴 크기</h2>
+            <Type className="w-5 h-5 text-ink-mute" />
+            <h2 className="text-sm font-semibold text-ink tracking-tight">글꼴 크기</h2>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {fontSizeOptions.map((option) => (
@@ -257,8 +257,8 @@ export default function SettingsPage() {
                 onClick={() => handleFontSizeChange(option.value)}
                 className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all touch-target ${
                   fontSize === option.value
-                    ? 'bg-clay-100 text-clay-600 ring-2 ring-clay-500'
-                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                    ? 'bg-accent-soft text-accent ring-2 ring-accent'
+                    : 'bg-card-soft text-ink-soft hover:bg-line'
                 }`}
                 aria-pressed={fontSize === option.value}
               >
@@ -271,50 +271,50 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        <section className="bg-white rounded-xl p-4 shadow-sm">
-          <h2 className="text-sm font-bold text-slate-700 mb-4">데이터 관리</h2>
+        <section className="bg-card border border-line rounded-xl p-4">
+          <h2 className="text-sm font-semibold text-ink tracking-tight mb-4">데이터 관리</h2>
           <div className="space-y-3">
-            <button onClick={handleExport} className="w-full flex items-center gap-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors touch-target">
-              <Download className="w-5 h-5 text-clay-600" />
+            <button onClick={handleExport} className="w-full flex items-center gap-3 p-4 bg-card-soft hover:bg-line rounded-xl transition-colors touch-target">
+              <Download className="w-5 h-5 text-accent" />
               <div className="flex-1 text-left">
-                <div className="font-medium text-slate-900">데이터 내보내기</div>
-                <div className="text-xs text-slate-500">선수, 리그 데이터를 JSON 파일로 백업</div>
+                <div className="font-medium text-ink">데이터 내보내기</div>
+                <div className="text-xs text-ink-mute">선수, 리그 데이터를 JSON 파일로 백업</div>
               </div>
             </button>
 
-            <button onClick={() => fileInputRef.current?.click()} className="w-full flex items-center gap-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors touch-target">
-              <Upload className="w-5 h-5 text-green-600" />
+            <button onClick={() => fileInputRef.current?.click()} className="w-full flex items-center gap-3 p-4 bg-card-soft hover:bg-line rounded-xl transition-colors touch-target">
+              <Upload className="w-5 h-5 text-up" />
               <div className="flex-1 text-left">
-                <div className="font-medium text-slate-900">데이터 가져오기</div>
-                <div className="text-xs text-slate-500">백업 파일에서 데이터 복원</div>
+                <div className="font-medium text-ink">데이터 가져오기</div>
+                <div className="text-xs text-ink-mute">백업 파일에서 데이터 복원</div>
               </div>
             </button>
             <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
 
             {importError && (
-              <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+              <div className="flex items-center gap-2 p-3 bg-down/10 text-down rounded-lg text-sm">
                 <AlertTriangle className="w-4 h-4" />
                 {importError}
               </div>
             )}
 
-            <button onClick={() => setShowResetDialog(true)} className="w-full flex items-center gap-3 p-4 bg-red-50 hover:bg-red-100 rounded-xl transition-colors touch-target">
-              <Trash2 className="w-5 h-5 text-red-600" />
+            <button onClick={() => setShowResetDialog(true)} className="w-full flex items-center gap-3 p-4 bg-down/10 hover:bg-down/20 rounded-xl transition-colors touch-target">
+              <Trash2 className="w-5 h-5 text-down" />
               <div className="flex-1 text-left">
-                <div className="font-medium text-red-700">모든 데이터 초기화</div>
-                <div className="text-xs text-red-500">모든 선수 및 리그 데이터 삭제</div>
+                <div className="font-medium text-down">모든 데이터 초기화</div>
+                <div className="text-xs text-down/80">모든 선수 및 리그 데이터 삭제</div>
               </div>
             </button>
           </div>
         </section>
 
         {seasonHistory.length > 0 && (
-          <section className="bg-white rounded-xl p-4 shadow-sm">
+          <section className="bg-card border border-line rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
-              <FileText className="w-5 h-5 text-slate-600" />
-              <h2 className="text-sm font-bold text-slate-700">시즌 리포트</h2>
+              <FileText className="w-5 h-5 text-ink-mute" />
+              <h2 className="text-sm font-semibold text-ink tracking-tight">시즌 리포트</h2>
             </div>
-            <p className="text-xs text-slate-500 mb-4">
+            <p className="text-xs text-ink-mute mb-4">
               최종 순위와 선수별 파트너 케미·상대 전적을 텍스트로 복사합니다
             </p>
             <div className="space-y-2">
@@ -322,12 +322,12 @@ export default function SettingsPage() {
                 <button
                   key={archive.id}
                   onClick={() => handleCopySeasonReport(archive)}
-                  className="w-full flex items-center gap-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors touch-target"
+                  className="w-full flex items-center gap-3 p-4 bg-card-soft hover:bg-line rounded-xl transition-colors touch-target"
                 >
-                  <Copy className="w-5 h-5 text-clay-600 flex-shrink-0" />
+                  <Copy className="w-5 h-5 text-accent flex-shrink-0" />
                   <div className="flex-1 text-left min-w-0">
-                    <div className="font-medium text-slate-900 truncate">{archive.leagueName}</div>
-                    <div className="text-xs text-slate-500">
+                    <div className="font-medium text-ink truncate">{archive.leagueName}</div>
+                    <div className="text-xs text-ink-mute">
                       {archive.seasonStart} ~ {archive.seasonEnd} · 정규 {archive.totalMatches}경기
                     </div>
                   </div>
@@ -337,7 +337,7 @@ export default function SettingsPage() {
           </section>
         )}
 
-        <section className="text-center text-sm text-slate-400 py-4">
+        <section className="text-center text-sm text-ink-faint py-4">
           <p>러브포티 테니스 리그 매니저 v2.0</p>
           <p className="mt-1">by 한PD</p>
         </section>

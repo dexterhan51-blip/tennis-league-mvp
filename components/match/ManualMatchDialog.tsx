@@ -124,10 +124,10 @@ export default function ManualMatchDialog({
         onClick={() => handleSlotTap(slotKey)}
         className={`w-full px-3 py-2.5 rounded-lg border-2 border-dashed text-sm font-bold transition-all text-left ${
           player
-            ? 'bg-clay-50 border-clay-300 text-clay-700'
+            ? 'bg-accent-soft border-accent/50 text-accent'
             : isActive
-              ? 'bg-yellow-50 border-yellow-400 text-yellow-700 animate-pulse'
-              : 'bg-slate-50 border-slate-300 text-slate-400'
+              ? 'bg-card border-accent text-accent animate-pulse'
+              : 'bg-card-soft border-line-strong text-ink-faint'
         }`}
       >
         {player ? player.name : `${label} 선택`}
@@ -137,24 +137,24 @@ export default function ManualMatchDialog({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center animate-fade-in">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md shadow-2xl animate-scale-in max-h-[90vh] flex flex-col">
+      <div className="bg-card border border-line rounded-t-2xl sm:rounded-2xl w-full max-w-md shadow-xl animate-scale-in max-h-[90vh] flex flex-col">
         {/* 헤더 */}
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
-          <h3 className="text-lg font-bold text-slate-900">수동 대진 편성</h3>
+        <div className="p-4 border-b border-line flex items-center justify-between flex-shrink-0">
+          <h3 className="text-lg font-bold text-ink tracking-tight">수동 대진 편성</h3>
           <div className="flex items-center gap-2">
             <button
               onClick={handleReset}
-              className="p-2 hover:bg-slate-100 rounded-full transition-colors touch-target"
+              className="p-2 hover:bg-card-soft rounded-full transition-colors touch-target"
               aria-label="초기화"
             >
-              <RotateCcw size={18} className="text-slate-400" />
+              <RotateCcw size={18} className="text-ink-faint" />
             </button>
             <button
               onClick={handleClose}
-              className="p-2 hover:bg-slate-100 rounded-full transition-colors touch-target"
+              className="p-2 hover:bg-card-soft rounded-full transition-colors touch-target"
               aria-label="닫기"
             >
-              <X size={20} className="text-slate-400" />
+              <X size={20} className="text-ink-faint" />
             </button>
           </div>
         </div>
@@ -164,17 +164,17 @@ export default function ManualMatchDialog({
           <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center">
             {/* Team A */}
             <div className="space-y-2">
-              <p className="text-xs font-bold text-blue-600 text-center">팀 A</p>
+              <p className="text-xs font-bold text-ink-mute text-center">팀 A</p>
               {renderSlot('a1', SLOT_LABELS.a1)}
               {renderSlot('a2', SLOT_LABELS.a2)}
             </div>
 
             {/* VS */}
-            <div className="text-sm font-black text-slate-300 px-2">VS</div>
+            <div className="text-sm font-black text-ink-faint px-2">VS</div>
 
             {/* Team B */}
             <div className="space-y-2">
-              <p className="text-xs font-bold text-red-500 text-center">팀 B</p>
+              <p className="text-xs font-bold text-ink-mute text-center">팀 B</p>
               {renderSlot('b1', SLOT_LABELS.b1)}
               {renderSlot('b2', SLOT_LABELS.b2)}
             </div>
@@ -183,7 +183,7 @@ export default function ManualMatchDialog({
 
         {/* 안내 텍스트 */}
         <div className="px-4 pb-2 flex-shrink-0">
-          <p className="text-xs text-slate-400 text-center">
+          <p className="text-xs text-ink-mute text-center">
             {activeSlot
               ? `${activeSlot.startsWith('a') ? '팀 A' : '팀 B'}의 ${SLOT_LABELS[activeSlot]}를 선택하세요`
               : isFull
@@ -195,24 +195,24 @@ export default function ManualMatchDialog({
 
         {/* 게스트 추가 (리그 미소속 선수) */}
         <div className="px-4 pb-3 flex-shrink-0">
-          <div className="p-2.5 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+          <div className="p-2.5 bg-card-soft rounded-lg border border-dashed border-line-strong">
             <div className="flex items-center gap-2">
               <input
                 value={guestName}
                 onChange={e => setGuestName(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleAddGuest(); }}
                 placeholder="게스트 이름"
-                className="flex-1 min-w-0 px-2.5 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-clay-500 focus:outline-none"
+                className="flex-1 min-w-0 px-2.5 py-2 text-sm border border-line-strong rounded-lg bg-card text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
               />
-              <div className="flex rounded-lg overflow-hidden border border-slate-200 flex-shrink-0">
+              <div className="flex rounded-lg overflow-hidden border border-line-strong flex-shrink-0">
                 {(['MALE', 'FEMALE'] as Gender[]).map(g => (
                   <button
                     key={g}
                     onClick={() => setGuestGender(g)}
                     className={`px-2.5 py-2 text-xs font-bold transition-colors ${
                       guestGender === g
-                        ? g === 'MALE' ? 'bg-blue-500 text-white' : 'bg-pink-500 text-white'
-                        : 'bg-white text-slate-400'
+                        ? g === 'MALE' ? 'bg-tint-m-bg text-tint-m-fg' : 'bg-tint-f-bg text-tint-f-fg'
+                        : 'bg-card text-ink-faint'
                     }`}
                   >
                     {g === 'MALE' ? '남' : '여'}
@@ -222,13 +222,13 @@ export default function ManualMatchDialog({
               <button
                 onClick={handleAddGuest}
                 disabled={!guestName.trim()}
-                className="p-2 rounded-lg bg-clay-600 text-white disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors flex-shrink-0 touch-target"
+                className="p-2 rounded-lg bg-accent hover:bg-accent-strong text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0 touch-target"
                 aria-label="게스트 추가"
               >
                 <UserPlus size={16} />
               </button>
             </div>
-            <p className="text-[10px] text-slate-400 mt-1.5">
+            <p className="text-[10px] text-ink-mute mt-1.5">
               리그 미소속 게스트 — 개인 기록(상대전적)에는 남지만 리그 랭킹에는 반영되지 않습니다
             </p>
           </div>
@@ -246,18 +246,18 @@ export default function ManualMatchDialog({
                   onClick={() => handlePlayerTap(p)}
                   className={`p-3 rounded-lg border text-center text-xs font-bold transition-all touch-target ${
                     isAssigned
-                      ? 'bg-clay-100 border-clay-400 text-clay-700'
+                      ? 'bg-accent-soft border-accent/50 text-accent'
                       : isGuest
-                        ? 'bg-slate-50 border-dashed border-slate-300 text-slate-500'
-                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        ? 'bg-card-soft border-dashed border-line-strong text-ink-mute'
+                        : 'bg-card border-line text-ink-soft hover:bg-card-soft'
                   }`}
                 >
                   {p.name}
                   {isNamedGuest(p.id) && (
-                    <span className="block text-[10px] text-slate-400 mt-0.5">게스트</span>
+                    <span className="block text-[10px] text-ink-faint mt-0.5">게스트</span>
                   )}
                   {isAssigned && (
-                    <span className="block text-[10px] text-clay-500 mt-0.5">
+                    <span className="block text-[10px] text-accent mt-0.5">
                       {Object.entries(slots).find(([, v]) => v?.id === p.id)?.[0]?.startsWith('a') ? '팀A' : '팀B'}
                     </span>
                   )}
@@ -268,17 +268,17 @@ export default function ManualMatchDialog({
         </div>
 
         {/* 하단 버튼 */}
-        <div className="flex gap-3 p-4 border-t border-slate-100 flex-shrink-0">
+        <div className="flex gap-3 p-4 border-t border-line flex-shrink-0">
           <button
             onClick={handleClose}
-            className="flex-1 py-3 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors touch-target"
+            className="flex-1 py-3 rounded-xl font-semibold text-ink-soft bg-card-soft hover:bg-line transition-colors touch-target"
           >
             취소
           </button>
           <button
             onClick={handleConfirm}
             disabled={!isFull}
-            className="flex-1 py-3 rounded-xl font-bold text-white bg-clay-600 hover:bg-clay-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors touch-target"
+            className="flex-1 py-3 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
           >
             경기 생성
           </button>

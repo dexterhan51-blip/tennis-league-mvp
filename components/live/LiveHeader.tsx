@@ -24,21 +24,21 @@ function formatTimeAgo(isoString: string): string {
 }
 
 const statusConfig: Record<ConnectionStatus, { icon: typeof Wifi; label: string; color: string }> = {
-  connecting: { icon: Loader2, label: '연결 중', color: 'text-yellow-600 bg-yellow-50' },
-  connected: { icon: Wifi, label: '실시간', color: 'text-green-600 bg-green-50' },
-  disconnected: { icon: WifiOff, label: '연결 끊김', color: 'text-slate-500 bg-slate-100' },
-  error: { icon: AlertTriangle, label: '오류', color: 'text-red-600 bg-red-50' },
+  connecting: { icon: Loader2, label: '연결 중', color: 'text-amber-500 bg-amber-500/10' },
+  connected: { icon: Wifi, label: '실시간', color: 'text-up bg-up/10' },
+  disconnected: { icon: WifiOff, label: '연결 끊김', color: 'text-ink-mute bg-card-soft' },
+  error: { icon: AlertTriangle, label: '오류', color: 'text-down bg-down/10' },
 };
 
 export function LiveHeader({ leagueName, connectionStatus, updatedAt }: LiveHeaderProps) {
   const { icon: Icon, label, color } = statusConfig[connectionStatus];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+    <div className="bg-card rounded-2xl border border-line p-4">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <AppLogo size={28} />
-          <h1 className="text-xl font-black text-slate-900 truncate">{leagueName || '리그'}</h1>
+          <h1 className="text-xl font-black text-ink tracking-tight truncate">{leagueName || '리그'}</h1>
         </div>
         <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${color}`}>
           <Icon className={`w-3 h-3 ${connectionStatus === 'connecting' ? 'animate-spin' : ''}`} />
@@ -46,7 +46,7 @@ export function LiveHeader({ leagueName, connectionStatus, updatedAt }: LiveHead
         </div>
       </div>
       {updatedAt && (
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-ink-faint">
           마지막 업데이트: {formatTimeAgo(updatedAt)}
         </p>
       )}

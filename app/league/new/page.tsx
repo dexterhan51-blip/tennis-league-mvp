@@ -91,29 +91,29 @@ export default function NewLeaguePage() {
   };
 
   return (
-    <main className="max-w-md mx-auto min-h-screen bg-slate-50 pb-32">
-      <header className="bg-white p-4 sticky top-0 z-10 border-b border-slate-200">
-        <h1 className="text-xl font-bold text-slate-800">새 리그 설정</h1>
+    <main className="max-w-md mx-auto min-h-screen bg-surface pb-32">
+      <header className="bg-surface p-4 sticky top-0 z-10 border-b border-line">
+        <h1 className="text-xl font-bold text-ink tracking-tight">새 리그 설정</h1>
       </header>
 
       <div className="p-6 space-y-8">
         <section>
-          <label className="block text-sm font-bold text-slate-500 mb-2">리그 이름</label>
+          <label className="block text-sm font-bold text-ink-mute mb-2">리그 이름</label>
           <div className="relative">
-            <Trophy className="absolute left-4 top-3.5 text-slate-400" size={20} />
+            <Trophy className="absolute left-4 top-3.5 text-ink-faint" size={20} />
             <input
               type="text"
               value={leagueName}
               onChange={(e) => setLeagueName(e.target.value)}
               placeholder="예: 2026 수요테니스"
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-clay-500 focus:ring-2 focus:ring-clay-100 outline-none font-bold text-slate-800"
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-card border border-line-strong placeholder:text-ink-faint focus:border-accent focus:ring-2 focus:ring-accent/40 outline-none font-bold text-ink"
               aria-label="리그 이름"
             />
           </div>
         </section>
 
         <section>
-          <label className="block text-sm font-bold text-slate-500 mb-2">저장할 슬롯 선택</label>
+          <label className="block text-sm font-bold text-ink-mute mb-2">저장할 슬롯 선택</label>
           <div className="flex gap-2" role="radiogroup" aria-label="저장 슬롯 선택">
             {[1, 2, 3].map((num) => (
               <button
@@ -121,14 +121,14 @@ export default function NewLeaguePage() {
                 onClick={() => setTargetSlot(num)}
                 className={`flex-1 py-3 rounded-xl border-2 flex flex-col items-center justify-center transition-all touch-target ${
                   targetSlot === num
-                    ? 'border-clay-600 bg-clay-50 text-clay-700'
-                    : 'border-slate-200 bg-white text-slate-400'
+                    ? 'border-accent bg-accent-soft text-accent'
+                    : 'border-line bg-card text-ink-faint'
                 }`}
                 role="radio"
                 aria-checked={targetSlot === num}
               >
                 <span className="font-bold text-lg">SLOT {num}</span>
-                <span className={`text-xs ${existingSlots[num-1] ? 'text-orange-500' : 'text-slate-400'}`}>
+                <span className={`text-xs ${existingSlots[num-1] ? 'text-amber-500' : 'text-ink-faint'}`}>
                   {existingSlots[num-1] ? '(데이터 있음)' : '(비어 있음)'}
                 </span>
               </button>
@@ -137,14 +137,14 @@ export default function NewLeaguePage() {
         </section>
 
         <section>
-          <label className="block text-sm font-bold text-slate-500 mb-2">시즌 종료일 (옵션)</label>
+          <label className="block text-sm font-bold text-ink-mute mb-2">시즌 종료일 (옵션)</label>
           <div className="relative">
-            <Calendar className="absolute left-4 top-3.5 text-slate-400" size={20} />
+            <Calendar className="absolute left-4 top-3.5 text-ink-faint" size={20} />
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-clay-500 focus:ring-2 focus:ring-clay-100 outline-none font-medium"
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-card border border-line-strong text-ink focus:border-accent focus:ring-2 focus:ring-accent/40 outline-none font-medium"
               aria-label="시즌 종료일"
             />
           </div>
@@ -152,22 +152,22 @@ export default function NewLeaguePage() {
 
         <section>
           <div className="flex justify-between items-end mb-3">
-            <label className="text-sm font-bold text-slate-500">선수 풀 (터치하여 참가)</label>
+            <label className="text-sm font-bold text-ink-mute">선수 풀 (터치하여 참가)</label>
             <div className="flex items-center gap-2">
-              <button onClick={selectAll} className="text-xs font-medium text-clay-600 hover:text-clay-700 touch-target">
+              <button onClick={selectAll} className="text-xs font-medium text-accent hover:opacity-80 touch-target">
                 {selectedIds.length === allPlayers.length ? '전체 해제' : '전체 선택'}
               </button>
-              <span className="text-clay-600 font-bold text-sm bg-clay-50 px-2 py-1 rounded-lg">
+              <span className="text-accent font-bold text-sm bg-accent-soft px-2 py-1 rounded-lg tabular-nums">
                 현재 {selectedIds.length}명
               </span>
             </div>
           </div>
 
           {allPlayers.length === 0 ? (
-            <div className="text-center py-10 bg-white rounded-xl border border-dashed border-slate-300">
-              <User size={40} className="mx-auto mb-2 text-slate-300" />
-              <p className="text-slate-400 text-sm">등록된 선수가 없습니다.</p>
-              <Link href="/players" className="inline-block mt-3 text-clay-600 font-medium text-sm hover:underline">
+            <div className="text-center py-10 bg-card rounded-xl border border-dashed border-line-strong">
+              <User size={40} className="mx-auto mb-2 text-ink-faint" />
+              <p className="text-ink-mute text-sm">등록된 선수가 없습니다.</p>
+              <Link href="/players" className="inline-block mt-3 text-accent font-medium text-sm hover:underline">
                 선수 등록하러 가기 →
               </Link>
             </div>
@@ -180,25 +180,25 @@ export default function NewLeaguePage() {
                     key={player.id}
                     onClick={() => togglePlayer(player.id)}
                     className={`p-3 rounded-xl border-2 transition-all flex items-center gap-3 touch-target ${
-                      isSelected ? 'border-clay-500 bg-clay-50/50' : 'border-transparent bg-white hover:bg-slate-50'
+                      isSelected ? 'border-accent bg-accent-soft' : 'border-line bg-card hover:bg-card-soft'
                     }`}
                     aria-pressed={isSelected}
                   >
                     {isSelected ? (
-                      <CheckCircle className="text-clay-500 flex-shrink-0" size={20} />
+                      <CheckCircle className="text-accent flex-shrink-0" size={20} />
                     ) : (
-                      <Circle className="text-slate-300 flex-shrink-0" size={20} />
+                      <Circle className="text-ink-faint flex-shrink-0" size={20} />
                     )}
                     {player.photo ? (
-                      <img src={player.photo} alt={player.name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                      <img src={player.photo} alt={player.name} className="w-8 h-8 rounded-full object-cover border border-line-strong flex-shrink-0" />
                     ) : (
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        player.gender === 'MALE' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'
+                        player.gender === 'MALE' ? 'bg-tint-m-bg text-tint-m-fg' : 'bg-tint-f-bg text-tint-f-fg'
                       }`}>
-                        <User size={16} />
+                        <span className="text-xs font-bold">{player.name.charAt(0)}</span>
                       </div>
                     )}
-                    <span className={`font-bold truncate ${isSelected ? 'text-clay-700' : 'text-slate-600'}`}>
+                    <span className={`font-bold truncate ${isSelected ? 'text-accent' : 'text-ink-soft'}`}>
                       {player.name}
                     </span>
                   </button>
@@ -209,14 +209,14 @@ export default function NewLeaguePage() {
         </section>
       </div>
 
-      <div className="fixed bottom-20 left-0 right-0 p-4 bg-white border-t border-slate-100 max-w-md mx-auto">
+      <div className="fixed bottom-20 left-0 right-0 p-4 bg-card border-t border-line max-w-md mx-auto">
         <button
           onClick={handleCreateLeague}
           disabled={!leagueName.trim() || selectedIds.length < 2}
-          className={`w-full py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition-all touch-target ${
+          className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all touch-target ${
             leagueName.trim() && selectedIds.length >= 2
-              ? 'bg-slate-800 text-white hover:bg-slate-900'
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              ? 'bg-accent text-white hover:bg-accent-strong'
+              : 'bg-card-soft text-ink-faint cursor-not-allowed'
           }`}
         >
           <Save size={20} />
