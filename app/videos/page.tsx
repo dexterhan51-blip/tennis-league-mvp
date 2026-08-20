@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Youtube, Video, AlertTriangle } from 'lucide-react';
-import { getSupabase } from '@/lib/supabase';
+import { fetchAllSeasonsWithMatches } from '@/lib/seasonApi';
 import { parseYouTube } from '@/lib/youtube';
 import { useAuth } from '@/contexts/AuthContext';
 import AdminVideoManager from '@/components/videos/AdminVideoManager';
@@ -96,19 +96,19 @@ export default function VideosPage() {
   const [calMonth, setCalMonth] = useState<number | null>(null); // 0-11
 
   useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase) {
-      setError(true);
-      return;
-    }
-    supabase
-      .from('shared_leagues')
-      .select('id, name, players, matches')
-      .eq('is_active', true)
-      .then(({ data, error: err }) => {
-        if (err) setError(true);
-        else setLeagues((data as LeagueRow[]) ?? []);
-      });
+    // 전체 시즌(아카이브 포함)의 경기 영상을 모은다
+    fetchAllSeasonsWithMatches()
+      .then((seasonData) =>
+        setLeagues(
+          seasonData.map(({ season, matches }) => ({
+            id: season.id,
+            name: season.name,
+            players: season.players ?? [],
+            matches,
+          }))
+        )
+      )
+      .catch(() => setError(true));
   }, []);
 
   const videos = useMemo<VideoEntry[]>(() => {

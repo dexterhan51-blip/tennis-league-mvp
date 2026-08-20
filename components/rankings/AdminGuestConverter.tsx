@@ -5,13 +5,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { UserCheck, Loader2 } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { isGuestPlayer } from '@/utils/tennisLogic';
-import { safeGetAsync, safeSetAsync } from '@/lib/storage';
-import { LeagueDataSchema } from '@/lib/schemas';
+import { MatchSchema } from '@/lib/schemas';
+import { upsertLeagueMatch, updateSeasonPlayers } from '@/lib/seasonApi';
 import { useToast } from '@/contexts/ToastContext';
 import type { Player, Match, Gender } from '@/types';
 
 interface LeagueForConvert {
-  id: string;
+  id: string; // season id
   name: string;
   players: Player[];
   matches: Match[];
@@ -107,54 +107,35 @@ export default function AdminGuestConverter({ leagues, pool, onConverted }: Admi
 
     setConvertingKey(group.key);
     try {
-      // 서버 최신 상태를 읽어 해당 (날짜, 게스트)만 치환
-      const { data: row, error: readErr } = await supabase
-        .from('shared_leagues')
-        .select('players, matches')
-        .eq('id', group.leagueId)
-        .single();
-      if (readErr || !row) throw readErr ?? new Error('read failed');
+      // 해당 (시즌, 날짜)의 경기 행만 읽어 게스트를 치환 — 행 단위라 다른 기록과 충돌 없음
+      const [{ data: seasonRow, error: sErr }, { data: matchRows, error: mErr }] = await Promise.all([
+        supabase.from('seasons').select('players').eq('id', group.leagueId).single(),
+        supabase
+          .from('league_matches')
+          .select('id, match')
+          .eq('season_id', group.leagueId)
+          .eq('match_date', group.date),
+      ]);
+      if (sErr || !seasonRow) throw sErr ?? new Error('season read failed');
+      if (mErr) throw mErr;
 
-      const newMatches = (row.matches as Match[]).map((m) => {
-        if (m.date !== group.date) return m;
-        return {
+      for (const row of matchRows ?? []) {
+        const parsed = MatchSchema.safeParse(row.match);
+        if (!parsed.success) continue;
+        const m = parsed.data;
+        const replaced: Match = {
           ...m,
           teamA: replaceInTeam(m.teamA, group.guestId, target),
           teamB: replaceInTeam(m.teamB, group.guestId, target),
         };
-      });
-      const players = row.players as Player[];
-      const newPlayers = players.some((p) => p.id === target.id) ? players : [...players, target];
-
-      const { data: updated, error: writeErr } = await supabase
-        .from('shared_leagues')
-        .update({ players: newPlayers, matches: newMatches, updated_at: new Date().toISOString() })
-        .eq('id', group.leagueId)
-        .select('id, updated_at');
-      if (writeErr || !updated || updated.length === 0) throw writeErr ?? new Error('write failed');
-
-      // 이 기기가 편집 중인 리그라면 로컬에도 반영 후 잠금 기준값 갱신
-      if (localStorage.getItem('shared-league-id') === group.leagueId) {
-        try {
-          const local = await safeGetAsync('current-league', LeagueDataSchema);
-          if (local) {
-            const localMatches = local.matches.map((m) => {
-              if (m.date !== group.date) return m;
-              return {
-                ...m,
-                teamA: replaceInTeam(m.teamA, group.guestId, target),
-                teamB: replaceInTeam(m.teamB, group.guestId, target),
-              };
-            });
-            const localPlayers = local.players.some((p) => p.id === target.id)
-              ? local.players
-              : [...local.players, target];
-            await safeSetAsync('current-league', { ...local, matches: localMatches, players: localPlayers });
-          }
-          localStorage.setItem('shared-league-updated-at', updated[0].updated_at);
-        } catch {
-          // 로컬 반영 실패 시 기준값 미갱신 → 다음 동기화에서 충돌 감지로 안전 처리
+        if (JSON.stringify(replaced) !== JSON.stringify(m)) {
+          await upsertLeagueMatch(group.leagueId, replaced);
         }
+      }
+
+      const players = (seasonRow.players as Player[]) ?? [];
+      if (!players.some((p) => p.id === target.id)) {
+        await updateSeasonPlayers(group.leagueId, [...players, target]);
       }
 
       showToast(`${group.guestName} → ${target.name} 전환 완료 (${group.matchCount}경기)`, 'success');

@@ -4,10 +4,12 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Undo2, Circle, Flag, Check, Trophy } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
-import { safeGetAsync, safeSetAsync, safeGetString } from "@/lib/storage";
-import { LeagueDataSchema } from "@/lib/schemas";
+import { MatchSchema, LiveSeasonCacheSchema } from "@/lib/schemas";
+import { getSupabase } from "@/lib/supabase";
+import { safeGetAsync } from "@/lib/storage";
+import { enqueue } from "@/lib/writeQueue";
 import AppLogo from "@/components/ui/AppLogo";
-import type { LeagueData, Match, Player, PointLogEntry } from "@/types";
+import type { Match, Player, PointLogEntry } from "@/types";
 import {
   addPoint,
   gameWinner,
@@ -23,8 +25,8 @@ import { getScoringConfig, saveScoringConfig } from "@/lib/scoringConfig";
 type Phase = "loading" | "notfound" | "setup" | "play";
 
 interface LoadedCtx {
-  league: LeagueData;
-  slotIndex: string | null;
+  /** 리그전이면 소속 시즌 id, 친선경기면 null */
+  seasonId: string | null;
   match: Match;
 }
 
@@ -74,20 +76,59 @@ export default function RefereePage() {
   const [startTime, setStartTime] = useState<number>(0);
   const [showFinish, setShowFinish] = useState(false);
 
-  // 마운트 시 URL의 ?id 로 경기 로드 (클라이언트 전용)
+  // 마운트 시 URL의 ?id 로 경기 로드 (서버가 원본 — 리그 경기 → 친선경기 순으로 조회)
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       const id = new URLSearchParams(window.location.search).get("id");
-      const league = await safeGetAsync("current-league", LeagueDataSchema);
-      const slotIndex = safeGetString("current-slot-index") ?? null;
-      if (cancelled) return;
-      const match = id ? league?.matches.find((m) => m.id === id) : undefined;
-      if (!league || !match) {
+      const supabase = getSupabase();
+      if (!id || !supabase) {
         setPhase("notfound");
         return;
       }
-      setCtx({ league, slotIndex, match });
+
+      let match: Match | null = null;
+      let seasonId: string | null = null;
+
+      const { data: leagueRow } = await supabase
+        .from("league_matches")
+        .select("season_id, match")
+        .eq("id", id)
+        .maybeSingle();
+      if (leagueRow) {
+        const parsed = MatchSchema.safeParse(leagueRow.match);
+        if (parsed.success) {
+          match = parsed.data;
+          seasonId = leagueRow.season_id as string;
+        }
+      } else {
+        const { data: friendlyRow } = await supabase
+          .from("friendly_matches")
+          .select("match")
+          .eq("id", id)
+          .maybeSingle();
+        if (friendlyRow) {
+          const parsed = MatchSchema.safeParse(friendlyRow.match);
+          if (parsed.success) match = { ...parsed.data, isFriendly: true };
+        }
+      }
+
+      // 방금 생성돼 아직 서버에 안 올라간 경기 대비: 오프라인 캐시에서 조회
+      if (!match) {
+        const cache = await safeGetAsync("live-season-cache", LiveSeasonCacheSchema);
+        const cached = cache?.matches.find((m) => m.id === id);
+        if (cached) {
+          match = cached;
+          seasonId = cached.isFriendly ? null : (cache!.season.id as string);
+        }
+      }
+
+      if (cancelled) return;
+      if (!match) {
+        setPhase("notfound");
+        return;
+      }
+      setCtx({ seasonId, match });
       setConfig(getScoringConfig());
       // 기본 서브 순서: A남 → B남 → A여 → B여 (중복 제거)
       const def = [match.teamA.man, match.teamB.man, match.teamA.woman, match.teamB.woman]
@@ -207,10 +248,12 @@ export default function RefereePage() {
       serveOrder,
       pointLog,
     };
-    const newMatches = ctx.league.matches.map((m) => (m.id === updated.id ? updated : m));
-    const newData: LeagueData = { ...ctx.league, matches: newMatches };
-    await safeSetAsync("current-league", newData);
-    if (ctx.slotIndex) await safeSetAsync(`league-slot-${ctx.slotIndex}`, newData);
+    // 전송 대기열 경유: 네트워크가 끊겨도 기록이 유실되지 않는다
+    if (updated.isFriendly || !ctx.seasonId) {
+      enqueue({ kind: "friendly-upsert", match: updated });
+    } else {
+      enqueue({ kind: "match-upsert", seasonId: ctx.seasonId, match: updated });
+    }
     showToast("경기 결과가 반영되었습니다.", "success");
     router.push("/league");
   }, [ctx, progress.ga, progress.gb, config.rule, serveOrder, pointLog, showToast, router]);

@@ -470,7 +470,7 @@ export const calculateRanking = (players: Player[], matches: Match[]): PlayerSta
   const getTeamPlayers = (team: Match['teamA']) =>
     team.man.id === team.woman.id ? [team.man] : [team.man, team.woman];
 
-  const rankedMatches = matches.filter(m => !m.isExhibition);
+  const rankedMatches = matches.filter(m => !m.isExhibition && !m.isFriendly);
 
   rankedMatches.forEach((m) => {
     if (!m.isFinished) return;
@@ -520,7 +520,7 @@ export const calculateRanking = (players: Player[], matches: Match[]): PlayerSta
 export const calculateDailyMvp = (players: Player[], matches: Match[], date: string) => {
     const dailyStats = new Map<string, { wins: number, played: number, scoreDiff: number, name: string, gender: string }>();
 
-    const targetMatches = matches.filter(m => m.date === date && m.isFinished && !m.isExhibition);
+    const targetMatches = matches.filter(m => m.date === date && m.isFinished && !m.isExhibition && !m.isFriendly);
 
     targetMatches.forEach(m => {
         const diffA = m.scoreA - m.scoreB; // 팀A 기준 득실차 (양수면 승리, 음수면 패배)

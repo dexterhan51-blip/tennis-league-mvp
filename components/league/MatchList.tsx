@@ -138,6 +138,7 @@ export default function MatchList({
                   <span className="text-xs font-bold text-accent">GAME {idx + 1}</span>
                   {isSingles && <span className="bg-accent-soft text-accent px-1.5 py-0.5 rounded text-xs font-bold">단식</span>}
                   {m.isExhibition && <span className="bg-amber-500/15 text-amber-600 px-1.5 py-0.5 rounded text-xs font-bold">시범</span>}
+                  {m.isFriendly && <span className="bg-accent-soft text-accent px-1.5 py-0.5 rounded text-xs font-bold">친선</span>}
                 </div>
                 {m.isFinished && <span className="bg-up/10 text-up px-2 py-0.5 rounded text-xs font-bold">경기종료</span>}
               </div>

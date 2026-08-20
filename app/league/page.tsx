@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Player } from '@/types';
-import { Table, Save, Medal, Flag, Film, Pencil } from 'lucide-react';
+import { Table, Save, Medal, Flag, Film, Pencil, Radio, CloudOff, CloudUpload, CheckCircle2, Play, Database } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
 import { copyToClipboard, generateBracketText } from '@/utils/shareUtils';
 import { generateTimelineText, hasTimelineData } from '@/lib/timelineExport';
@@ -14,7 +15,6 @@ import ManualMatchDialog from '@/components/match/ManualMatchDialog';
 import SlotAssignmentDialog from '@/components/match/SlotAssignmentDialog';
 import PlayerStatsModal from '@/components/ranking/PlayerStatsModal';
 import ShareButton from '@/components/share/ShareButton';
-import { LiveShareControl } from '@/components/live/LiveShareControl';
 import EndSeasonDialog from '@/components/season/EndSeasonDialog';
 import RankingSection from '@/components/league/RankingSection';
 import MatchRegistrationPanel from '@/components/league/MatchRegistrationPanel';
@@ -24,16 +24,16 @@ import MvpAwardDialog from '@/components/league/MvpAwardDialog';
 import { useLeagueData } from '@/hooks/useLeagueData';
 import { useLeagueRankings } from '@/hooks/useLeagueRankings';
 import { useMatchManagement, type MatchCreationType } from '@/hooks/useMatchManagement';
-import { useLeagueSync } from '@/hooks/useLeagueSync';
 import { usePlayerCareerStats } from '@/hooks/usePlayerCareerStats';
 
 export default function LeaguePage() {
   const router = useRouter();
   const { showToast } = useToast();
   const {
-    leagueName, players, setPlayers, matches, setMatches,
-    slotIndex, previousRankings, finishedDates, setFinishedDates,
-    isLoading, handleManualSave, handleEndSeason, handleRenameLeague,
+    leagueName, seasonNo, players, setPlayers, matches, setMatches,
+    previousRankings, finishedDates, setFinishedDates,
+    isLoading, noLiveSeason, needsMigration, isOffline, pendingWrites,
+    handleManualSave, handleEndSeason, handleRenameLeague,
   } = useLeagueData();
 
   const handleExportTimeline = async () => {
@@ -62,16 +62,12 @@ export default function LeaguePage() {
   const { careerStats, getPlayerCareer, reload: reloadCareerStats } = usePlayerCareerStats();
   const { rankings, rankingsWithChange, matchDates } = useLeagueRankings(players, matches, previousRankings, careerStats);
 
-  const {
-    isConfigured: isSyncConfigured,
-    isPublished,
-    isSyncing,
-    shareUrl,
-    serverNewer,
-    publish: publishLeague,
-    unpublish: unpublishLeague,
-    pullFromServer,
-  } = useLeagueSync({ leagueName, players, matches, ready: !isLoading });
+  const liveUrl = typeof window !== 'undefined' ? `${window.location.origin}/live` : '/live';
+
+  const handleCopyLiveUrl = async () => {
+    const ok = await copyToClipboard(liveUrl);
+    showToast(ok ? '라이브 주소가 복사되었습니다. 단톡방에 공유하세요!' : '복사에 실패했습니다.', ok ? 'success' : 'error');
+  };
 
   const {
     pendingScores,
@@ -98,7 +94,7 @@ export default function LeaguePage() {
       leagueName,
       matchDate,
       createdMatches || [],
-      isPublished ? shareUrl : null
+      liveUrl
     );
     const ok = await copyToClipboard(text);
     showToast(
@@ -141,22 +137,68 @@ export default function LeaguePage() {
     );
   }
 
+  // 서버 마이그레이션 전: seasons 테이블 없음
+  if (needsMigration) {
+    return (
+      <main className="max-w-md mx-auto min-h-screen bg-surface flex flex-col items-center justify-center p-8 text-center gap-4">
+        <Database size={40} className="text-accent" />
+        <h1 className="text-lg font-bold text-ink tracking-tight">서버 준비가 필요합니다</h1>
+        <p className="text-sm text-ink-mute leading-relaxed">
+          시즌 타임라인 방식으로 전환되었습니다.<br />
+          Supabase SQL Editor에서 <span className="font-mono text-xs bg-card-soft px-1.5 py-0.5 rounded">supabase-migration-seasons.sql</span>을 실행한 뒤,<br />
+          데이터 이전을 진행해주세요.
+        </p>
+        <Link href="/load" className="px-5 py-3 bg-accent hover:bg-accent-strong text-white rounded-xl font-bold text-sm transition-colors touch-target">
+          데이터 이전으로 가기
+        </Link>
+      </main>
+    );
+  }
+
+  // 진행 중인 시즌 없음: 새 시즌 시작 안내
+  if (noLiveSeason) {
+    return (
+      <main className="max-w-md mx-auto min-h-screen bg-surface flex flex-col items-center justify-center p-8 text-center gap-4">
+        <AppLogo size={48} />
+        <h1 className="text-lg font-bold text-ink tracking-tight">진행 중인 시즌이 없습니다</h1>
+        <p className="text-sm text-ink-mute leading-relaxed">
+          지난 시즌 기록은 통산 랭킹과 시즌 히스토리에 안전하게 보관되어 있어요.
+        </p>
+        <Link href="/league/new" className="flex items-center gap-2 px-5 py-3 bg-accent hover:bg-accent-strong text-white rounded-xl font-bold transition-colors touch-target">
+          <Play size={18} /> 새 시즌 시작
+        </Link>
+        <Link href="/rankings" className="text-sm text-accent font-medium hover:underline">
+          통산 랭킹 · 시즌 히스토리 보기 →
+        </Link>
+      </main>
+    );
+  }
+
   return (
     <main className="max-w-md mx-auto min-h-screen bg-surface pb-40 relative">
       <header className="p-4 flex items-center justify-between sticky top-0 bg-surface z-10 border-b border-line">
         <div className="flex items-center gap-2">
           <AppLogo size={28} />
-          {slotIndex && <span className="bg-card-soft text-ink-mute text-xs px-2 py-1 rounded font-bold">SLOT {slotIndex}</span>}
+          {seasonNo !== null && <span className="bg-card-soft text-ink-mute text-xs px-2 py-1 rounded font-bold tabular-nums">시즌 {seasonNo}</span>}
+          {/* 서버 반영 상태 */}
+          {pendingWrites > 0 ? (
+            <span className="flex items-center gap-1 text-[11px] font-medium text-amber-500" title="네트워크 연결 시 자동 전송됩니다">
+              <CloudUpload size={13} /> 전송 대기 {pendingWrites}
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 text-[11px] font-medium text-up" title="모든 기록이 서버에 반영되었습니다">
+              <CheckCircle2 size={13} /> 서버 반영됨
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
-          <LiveShareControl
-            isConfigured={isSyncConfigured}
-            isPublished={isPublished}
-            isSyncing={isSyncing}
-            shareUrl={shareUrl}
-            onPublish={publishLeague}
-            onUnpublish={unpublishLeague}
-          />
+          <button
+            onClick={handleCopyLiveUrl}
+            className="flex items-center gap-1 bg-accent-soft text-accent px-3 py-1.5 rounded-lg font-bold text-xs border border-accent/20 touch-target cursor-pointer active:scale-[0.98] transition-transform"
+            aria-label="라이브 주소 복사"
+          >
+            <Radio size={14}/> 라이브
+          </button>
           <button
             onClick={() => setIsHistoryOpen(true)}
             className="flex items-center gap-1 bg-card-soft text-ink-soft px-3 py-1.5 rounded-lg font-bold text-xs border border-line touch-target cursor-pointer active:scale-[0.98] transition-transform"
@@ -167,19 +209,14 @@ export default function LeaguePage() {
         </div>
       </header>
 
-      {/* 서버에 더 최신 데이터가 있을 때: 동기화 전까지 이 기기의 업로드는 차단됨 */}
-      {serverNewer && (
-        <div className="mx-4 mt-4 bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
-          <p className="text-sm text-amber-600 font-medium mb-3">
-            서버에 이 기기보다 최신 리그 데이터가 있습니다.
-            덮어쓰기를 막기 위해 동기화 전까지 이 기기의 변경사항은 서버에 올라가지 않습니다.
+      {/* 오프라인 캐시로 동작 중: 기록은 대기열에 쌓였다가 연결되면 자동 전송 */}
+      {isOffline && (
+        <div className="mx-4 mt-4 bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-start gap-3">
+          <CloudOff size={18} className="text-amber-500 shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-600 font-medium">
+            서버에 연결되지 않아 이 기기의 캐시로 표시 중입니다.
+            지금 입력하는 기록은 연결이 복구되면 자동으로 서버에 전송됩니다.
           </p>
-          <button
-            onClick={() => pullFromServer()}
-            className="w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold transition-colors touch-target"
-          >
-            서버와 동기화 (최신 데이터 불러오기)
-          </button>
         </div>
       )}
 
@@ -404,8 +441,8 @@ export default function LeaguePage() {
         isOpen={showManualDialog}
         players={players}
         guestPlayers={guestPlayers}
-        onConfirm={(teamA, teamB) => {
-          confirmManualMatch(teamA, teamB);
+        onConfirm={(teamA, teamB, isFriendly) => {
+          confirmManualMatch(teamA, teamB, isFriendly);
           setIsMatchViewOpen(false);
         }}
         onClose={() => setShowManualDialog(false)}

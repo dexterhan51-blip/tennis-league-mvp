@@ -4,21 +4,11 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Radio, ChevronRight, Youtube, Trophy, Loader2, AlertTriangle } from 'lucide-react';
 import AppLogo from '@/components/ui/AppLogo';
-import { getSupabase } from '@/lib/supabase';
+import { fetchLiveSeason, fetchSeasonMatches } from '@/lib/seasonApi';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Player, Match } from '@/types';
-
-interface SharedLeagueRow {
-  id: string;
-  name: string;
-  players: Player[];
-  matches: Match[];
-  updated_at: string;
-}
+import type { Match, SeasonRow } from '@/types';
 
 interface RecentResult {
-  leagueId: string;
-  leagueName: string;
   match: Match;
 }
 
@@ -27,27 +17,34 @@ function teamLabel(match: Match, side: 'A' | 'B'): string {
   return [team?.man?.name, team?.woman?.name].filter(Boolean).join('·') || '미정';
 }
 
-// 회원용 홈: 서버에 공개된 리그와 최근 경기 결과를 보여준다
+// 회원용 홈: 진행 중(live) 시즌과 최근 경기 결과를 보여준다
 export default function MemberHome() {
   const { profile } = useAuth();
-  const [leagues, setLeagues] = useState<SharedLeagueRow[] | null>(null);
+  const [season, setSeason] = useState<SeasonRow | null>(null);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase) {
-      setError(true);
-      return;
-    }
-    supabase
-      .from('shared_leagues')
-      .select('id, name, players, matches, updated_at')
-      .eq('is_active', true)
-      .order('updated_at', { ascending: false })
-      .then(({ data, error: err }) => {
-        if (err) setError(true);
-        else setLeagues((data as SharedLeagueRow[]) ?? []);
-      });
+    let cancelled = false;
+    (async () => {
+      try {
+        const live = await fetchLiveSeason();
+        if (cancelled) return;
+        if (live) {
+          const seasonMatches = await fetchSeasonMatches(live.id);
+          if (cancelled) return;
+          setSeason(live);
+          setMatches(seasonMatches);
+        }
+      } catch {
+        if (!cancelled) setError(true);
+      }
+      if (!cancelled) setIsLoaded(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (error) {
@@ -61,7 +58,7 @@ export default function MemberHome() {
     );
   }
 
-  if (!leagues) {
+  if (!isLoaded) {
     return (
       <main className="max-w-md mx-auto min-h-screen bg-surface flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-accent animate-spin" aria-label="로딩 중" />
@@ -69,12 +66,9 @@ export default function MemberHome() {
     );
   }
 
-  const recentResults: RecentResult[] = leagues
-    .flatMap((l) =>
-      (l.matches || [])
-        .filter((m) => m.isFinished)
-        .map((m) => ({ leagueId: l.id, leagueName: l.name, match: m }))
-    )
+  const recentResults: RecentResult[] = matches
+    .filter((m) => m.isFinished)
+    .map((m) => ({ match: m }))
     .sort((a, b) => (b.match.date || '').localeCompare(a.match.date || ''))
     .slice(0, 5);
 
@@ -91,37 +85,29 @@ export default function MemberHome() {
         </div>
       </div>
 
-      {/* 진행 중인 리그 */}
+      {/* 진행 중인 시즌 */}
       <section className="mb-8">
         <h2 className="text-sm font-semibold text-ink tracking-tight mb-3 flex items-center gap-1.5">
-          <Radio className="w-4 h-4 text-accent" /> 진행 중인 리그
+          <Radio className="w-4 h-4 text-accent" /> 진행 중인 시즌
         </h2>
-        {leagues.length === 0 ? (
+        {!season ? (
           <div className="bg-card rounded-2xl border border-line p-8 text-center">
-            <p className="text-sm text-ink-mute">아직 공개된 리그가 없습니다.</p>
+            <p className="text-sm text-ink-mute">지금은 시즌 준비 기간입니다. 새 시즌이 시작되면 여기에 표시돼요.</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {leagues.map((league) => {
-              const total = league.matches?.length ?? 0;
-              const finished = league.matches?.filter((m) => m.isFinished).length ?? 0;
-              return (
-                <Link
-                  key={league.id}
-                  href={`/live?id=${league.id}`}
-                  className="flex items-center justify-between bg-card rounded-2xl border border-line p-4 hover:border-accent transition-colors active:scale-[0.99]"
-                >
-                  <div>
-                    <div className="font-bold text-ink">{league.name}</div>
-                    <div className="text-xs text-ink-faint mt-0.5 tabular-nums">
-                      선수 {league.players?.length ?? 0}명 · 경기 {finished}/{total}
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-ink-faint" />
-                </Link>
-              );
-            })}
-          </div>
+          <Link
+            href="/live"
+            className="flex items-center justify-between bg-card rounded-2xl border border-line p-4 hover:border-accent transition-colors active:scale-[0.99]"
+          >
+            <div>
+              <div className="font-bold text-ink">{season.name}</div>
+              <div className="text-xs text-ink-faint mt-0.5 tabular-nums">
+                시즌 {season.season_no} · 선수 {season.players?.length ?? 0}명 · 경기{' '}
+                {matches.filter((m) => m.isFinished).length}/{matches.length}
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-ink-faint" />
+          </Link>
         )}
       </section>
 
@@ -132,7 +118,7 @@ export default function MemberHome() {
             <Trophy className="w-4 h-4 text-accent" /> 최근 경기 결과
           </h2>
           <div className="space-y-2">
-            {recentResults.map(({ leagueId, leagueName, match }) => (
+            {recentResults.map(({ match }) => (
               <div
                 key={match.id}
                 className="bg-card rounded-xl border border-line p-3"
@@ -150,8 +136,8 @@ export default function MemberHome() {
                         {teamLabel(match, 'B')}
                       </span>
                     </div>
-                    <Link href={`/live?id=${leagueId}`} className="text-[11px] text-ink-faint hover:text-accent">
-                      {leagueName}{match.date ? ` · ${match.date}` : ''}
+                    <Link href="/live" className="text-[11px] text-ink-faint hover:text-accent">
+                      {season?.name ?? ''}{match.date ? ` · ${match.date}` : ''}
                     </Link>
                   </div>
                   {match.videoUrl && (

@@ -2,10 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { Youtube, Loader2, Check, Trash2 } from 'lucide-react';
-import { getSupabase } from '@/lib/supabase';
 import { parseYouTube } from '@/lib/youtube';
-import { safeGetAsync, safeSetAsync } from '@/lib/storage';
-import { LeagueDataSchema } from '@/lib/schemas';
+import { upsertLeagueMatch } from '@/lib/seasonApi';
 import { useToast } from '@/contexts/ToastContext';
 import type { Match } from '@/types';
 
@@ -33,8 +31,7 @@ function teamLabel(m: Match, side: 'A' | 'B'): string {
 }
 
 // 관리자용: 지난 경기 목록에서 바로 유튜브 URL을 등록/수정한다.
-// 저장은 서버 행을 다시 읽어(read-modify-write) 해당 경기만 갱신 — 다른 기기의
-// 최신 변경을 덮어쓸 위험을 줄인다.
+// 경기 1건 = 행 1개라서 해당 경기 행만 갱신하면 된다.
 export default function AdminVideoManager({ leagues, onSaved }: AdminVideoManagerProps) {
   const { showToast } = useToast();
   const [onlyMissing, setOnlyMissing] = useState(true);
@@ -54,9 +51,6 @@ export default function AdminVideoManager({ leagues, onSaved }: AdminVideoManage
   const visible = onlyMissing ? matchRefs.filter((r) => !r.match.videoUrl) : matchRefs;
 
   const handleSave = async (ref: MatchRef, rawInput: string) => {
-    const supabase = getSupabase();
-    if (!supabase) return;
-
     const trimmed = rawInput.trim();
     let normalized: string | undefined;
     if (trimmed) {
@@ -70,51 +64,14 @@ export default function AdminVideoManager({ leagues, onSaved }: AdminVideoManage
 
     setSavingId(ref.match.id);
     try {
-      // 서버 최신 상태를 읽어 해당 경기만 수정
-      const { data: row, error: readErr } = await supabase
-        .from('shared_leagues')
-        .select('matches')
-        .eq('id', ref.leagueId)
-        .single();
-      if (readErr || !row) throw readErr ?? new Error('read failed');
+      const next = { ...ref.match };
+      if (normalized) next.videoUrl = normalized;
+      else delete next.videoUrl;
+      await upsertLeagueMatch(ref.leagueId, next);
 
-      const matches = (row.matches as Match[]).map((m) => {
-        if (m.id !== ref.match.id) return m;
-        const next = { ...m };
-        if (normalized) next.videoUrl = normalized;
-        else delete next.videoUrl;
-        return next;
-      });
-
-      const { data: updated, error: writeErr } = await supabase
-        .from('shared_leagues')
-        .update({ matches, updated_at: new Date().toISOString() })
-        .eq('id', ref.leagueId)
-        .select('id, updated_at');
-      if (writeErr || !updated || updated.length === 0) throw writeErr ?? new Error('write failed');
-
-      // 이 기기가 편집 중인 리그라면: 로컬 저장본에도 영상을 반영한 뒤에만
-      // 낙관적 잠금 기준값을 갱신한다. (로컬 반영 없이 기준값만 올리면
-      // 다음 동기화 때 영상 없는 로컬 데이터가 서버를 덮어쓴다)
-      if (localStorage.getItem('shared-league-id') === ref.leagueId) {
-        try {
-          const local = await safeGetAsync('current-league', LeagueDataSchema);
-          if (local) {
-            const localMatches = local.matches.map((m) => {
-              if (m.id !== ref.match.id) return m;
-              const next = { ...m };
-              if (normalized) next.videoUrl = normalized;
-              else delete next.videoUrl;
-              return next;
-            });
-            await safeSetAsync('current-league', { ...local, matches: localMatches });
-          }
-          localStorage.setItem('shared-league-updated-at', updated[0].updated_at);
-        } catch {
-          // 로컬 반영 실패 시 기준값을 갱신하지 않음 → 다음 동기화에서 충돌 감지로 안전하게 처리
-        }
-      }
-
+      const matches = (leagues.find((l) => l.id === ref.leagueId)?.matches ?? []).map((m) =>
+        m.id === next.id ? next : m
+      );
       onSaved(ref.leagueId, matches);
       setInputs((prev) => ({ ...prev, [ref.match.id]: '' }));
       showToast(normalized ? '영상을 등록했습니다.' : '영상 링크를 삭제했습니다.', 'success');

@@ -38,6 +38,8 @@ export interface Match {
   scoreB: number;
   isFinished: boolean;
   isExhibition?: boolean;
+  /** 리그 밖 친선경기 — 시즌 랭킹/MVP 미반영, friendly_matches 테이블에 저장 (투어 랭킹 반영) */
+  isFriendly?: boolean;
   videoUrl?: string; // 운영자가 연결한 유튜브 경기 영상 (정규화된 watch URL)
   // ── 실시간 점수 입력(심판 모드) 기록 ──
   scoringRule?: ScoringRule;  // 이 경기에 적용된 듀스/노애드 규칙
@@ -168,6 +170,24 @@ export interface ScheduleConfig {
   date: string;
 }
 
+export type SeasonStatus = 'live' | 'archived';
+
+/** 서버 seasons 테이블 행 — 클럽의 시즌 하나 (live는 항상 최대 1개) */
+export interface SeasonRow {
+  id: string;
+  season_no: number;
+  name: string;
+  status: SeasonStatus;
+  players: Player[];
+  starts_on: string | null;
+  ends_on: string | null;
+  final_rankings: PlayerStat[] | null;
+  champion_player_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** @deprecated 구 JSONB 블랍 모델 — seasons/league_matches로 이전됨. 데이터 이전 용도로만 유지. */
 export interface SharedLeague {
   id: string;
   name: string;

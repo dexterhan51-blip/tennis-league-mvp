@@ -37,6 +37,7 @@ export const MatchSchema = z.object({
   scoreB: z.number(),
   isFinished: z.boolean(),
   isExhibition: z.boolean().optional(),
+  isFriendly: z.boolean().optional(),
   videoUrl: z.string().optional(),
   scoringRule: z.enum(['no-ad', 'deuce']).optional(),
   serveOrder: z.array(z.string()).optional(),
@@ -62,6 +63,28 @@ export const LeagueDataSchema = z.object({
   createdAt: z.string(),
   savedAt: z.string().optional(),
   endDate: z.string().optional(),
+});
+
+// 서버 seasons 행 (오프라인 캐시 검증용)
+export const SeasonRowSchema = z.object({
+  id: z.string(),
+  season_no: z.number(),
+  name: z.string(),
+  status: z.enum(['live', 'archived']),
+  players: z.array(PlayerSchema),
+  starts_on: z.string().nullable(),
+  ends_on: z.string().nullable(),
+  final_rankings: z.array(z.unknown()).nullable(),
+  champion_player_id: z.string().nullable(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+// live 시즌 오프라인 캐시 ({season, matches})
+export const LiveSeasonCacheSchema = z.object({
+  season: SeasonRowSchema,
+  matches: z.array(MatchSchema),
+  cachedAt: z.string(),
 });
 
 export const AppSettingsSchema = z.object({

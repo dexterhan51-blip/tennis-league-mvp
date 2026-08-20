@@ -1,23 +1,31 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Player, Match, SharedLeague } from '@/types';
+import { Player, Match, SeasonRow } from '@/types';
 import { calculateRanking } from '@/utils/tennisLogic';
-import { getSupabase } from '@/lib/supabase';
+import {
+  fetchLiveSeason,
+  fetchSeasonById,
+  fetchSeasonMatches,
+  subscribeLiveSeason,
+  isMissingTableError,
+} from '@/lib/seasonApi';
 import type { PlayerStat } from '@/types';
-import type { RealtimeChannel } from '@supabase/supabase-js';
 
 type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
 interface LiveDashboardData {
   leagueName: string;
+  seasonNo: number | null;
+  seasonStatus: SeasonRow['status'] | null;
   players: Player[];
   matches: Match[];
   rankings: PlayerStat[];
-  seasonEnd?: string;
   updatedAt: string;
   connectionStatus: ConnectionStatus;
   error: string | null;
+  /** 진행 중인 시즌이 없음 (에러 아님) */
+  noLiveSeason: boolean;
   selectedDate: string;
   setSelectedDate: (date: string) => void;
   matchDates: string[];
@@ -26,86 +34,85 @@ interface LiveDashboardData {
   todayTotal: number;
 }
 
-export function useLiveDashboard(leagueId: string): LiveDashboardData {
-  const [leagueName, setLeagueName] = useState('');
-  const [players, setPlayers] = useState<Player[]>([]);
+/**
+ * 라이브 대시보드 데이터.
+ * @param seasonId 지정하면 해당 시즌(아카이브 포함), 없으면 진행 중(live) 시즌을 보여준다.
+ */
+export function useLiveDashboard(seasonId?: string | null): LiveDashboardData {
+  const [season, setSeason] = useState<SeasonRow | null>(null);
   const [matches, setMatches] = useState<Match[]>([]);
-  const [seasonEnd, setSeasonEnd] = useState<string | undefined>();
   const [updatedAt, setUpdatedAt] = useState('');
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting');
   const [error, setError] = useState<string | null>(null);
+  const [noLiveSeason, setNoLiveSeason] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
 
-  const applyData = useCallback((data: SharedLeague) => {
-    setLeagueName(data.name);
-    setPlayers(data.players || []);
-    setMatches(data.matches || []);
-    setSeasonEnd(data.season_end || undefined);
-    setUpdatedAt(data.updated_at);
+  const upsertMatch = useCallback((match: Match) => {
+    setMatches((prev) => {
+      const idx = prev.findIndex((m) => m.id === match.id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = match;
+        return next;
+      }
+      return [...prev, match];
+    });
+    setUpdatedAt(new Date().toISOString());
   }, []);
 
-  // 초기 로드 + 실시간 구독
-  useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase) {
-      setError('서비스가 설정되지 않았습니다.');
-      setConnectionStatus('error');
-      return;
-    }
+  const removeMatch = useCallback((matchId: string) => {
+    setMatches((prev) => prev.filter((m) => m.id !== matchId));
+    setUpdatedAt(new Date().toISOString());
+  }, []);
 
-    let channel: RealtimeChannel | null = null;
+  // 초기 로드 + 실시간 구독 (경기 행 단위라 갱신이 즉각적이고 충돌이 없다)
+  useEffect(() => {
+    let cancelled = false;
+    let unsubscribe: (() => void) | null = null;
 
     async function init() {
       try {
-        // 1. 초기 데이터 로드 — pin_code는 가져오지 않는다 (열람자에게 PIN 노출 방지)
-        const { data, error: fetchError } = await supabase!
-          .from('shared_leagues')
-          .select('id, name, players, matches, season_end, created_at, updated_at, is_active')
-          .eq('id', leagueId)
-          .eq('is_active', true)
-          .single();
-
-        if (fetchError || !data) {
-          console.warn('[live] Fetch error:', fetchError);
-          setError('리그를 찾을 수 없습니다.');
-          setConnectionStatus('error');
+        const row = seasonId ? await fetchSeasonById(seasonId) : await fetchLiveSeason();
+        if (cancelled) return;
+        if (!row) {
+          if (seasonId) {
+            setError('시즌을 찾을 수 없습니다.');
+            setConnectionStatus('error');
+          } else {
+            setNoLiveSeason(true);
+            setConnectionStatus('connected');
+          }
           return;
         }
-
-        applyData(data as SharedLeague);
+        const seasonMatches = await fetchSeasonMatches(row.id);
+        if (cancelled) return;
+        setSeason(row);
+        setMatches(seasonMatches);
+        setUpdatedAt(row.updated_at);
         setConnectionStatus('connected');
 
-        // 2. 실시간 구독
-        channel = supabase!
-          .channel(`league-${leagueId}`)
-          .on(
-            'postgres_changes',
-            {
-              event: 'UPDATE',
-              schema: 'public',
-              table: 'shared_leagues',
-              filter: `id=eq.${leagueId}`,
+        // 아카이브 시즌은 더 이상 변하지 않으므로 live만 구독
+        if (row.status === 'live') {
+          unsubscribe = subscribeLiveSeason(row.id, {
+            onMatchUpsert: upsertMatch,
+            onMatchDelete: removeMatch,
+            onSeasonChange: (next) => {
+              setSeason(next);
+              setUpdatedAt(next.updated_at);
+              if (next.status !== 'live') setConnectionStatus('disconnected');
             },
-            (payload) => {
-              const newData = payload.new as SharedLeague;
-              if (newData.is_active) {
-                applyData(newData);
-              } else {
-                setError('리그가 비활성화되었습니다.');
-                setConnectionStatus('disconnected');
-              }
-            }
-          )
-          .subscribe((status) => {
-            if (status === 'SUBSCRIBED') {
-              setConnectionStatus('connected');
-            } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-              setConnectionStatus('disconnected');
-            }
+            onStatus: (status) =>
+              setConnectionStatus(status === 'connected' ? 'connected' : 'disconnected'),
           });
+        }
       } catch (e) {
-        console.error('[live] Init error:', e);
-        setError('데이터를 불러오는 중 오류가 발생했습니다.');
+        if (cancelled) return;
+        console.warn('[live] Init error:', e);
+        setError(
+          isMissingTableError(e)
+            ? '서버 마이그레이션이 필요합니다. 관리자에게 문의하세요.'
+            : '데이터를 불러오는 중 오류가 발생했습니다.'
+        );
         setConnectionStatus('error');
       }
     }
@@ -113,12 +120,12 @@ export function useLiveDashboard(leagueId: string): LiveDashboardData {
     init();
 
     return () => {
-      if (channel) {
-        const supabase = getSupabase();
-        supabase?.removeChannel(channel);
-      }
+      cancelled = true;
+      unsubscribe?.();
     };
-  }, [leagueId, applyData]);
+  }, [seasonId, upsertMatch, removeMatch]);
+
+  const players = season?.players ?? [];
 
   // 랭킹 계산 (안전하게)
   let rankings: PlayerStat[] = [];
@@ -129,20 +136,22 @@ export function useLiveDashboard(leagueId: string): LiveDashboardData {
   }
 
   // 날짜별 데이터
-  const matchDates = [...new Set(matches.map(m => m.date))].sort().reverse();
-  const todayMatches = matches.filter(m => m.date === selectedDate);
-  const todayFinished = todayMatches.filter(m => m.isFinished).length;
+  const matchDates = [...new Set(matches.map((m) => m.date))].sort().reverse();
+  const todayMatches = matches.filter((m) => m.date === selectedDate);
+  const todayFinished = todayMatches.filter((m) => m.isFinished).length;
   const todayTotal = todayMatches.length;
 
   return {
-    leagueName,
+    leagueName: season?.name ?? '',
+    seasonNo: season?.season_no ?? null,
+    seasonStatus: season?.status ?? null,
     players,
     matches,
     rankings,
-    seasonEnd,
     updatedAt,
     connectionStatus,
     error,
+    noLiveSeason,
     selectedDate,
     setSelectedDate,
     matchDates,

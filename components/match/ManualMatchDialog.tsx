@@ -9,7 +9,8 @@ interface ManualMatchDialogProps {
   isOpen: boolean;
   players: Player[];       // 등록 선수 목록
   guestPlayers: Player[];  // 게스트 선수 목록
-  onConfirm: (teamA: [Player, Player], teamB: [Player, Player]) => void;
+  /** isFriendly=true면 리그 밖 친선경기로 저장된다 (시즌 랭킹 미반영, 투어 랭킹 반영) */
+  onConfirm: (teamA: [Player, Player], teamB: [Player, Player], isFriendly: boolean) => void;
   onClose: () => void;
 }
 
@@ -33,6 +34,7 @@ export default function ManualMatchDialog({
     a1: null, a2: null, b1: null, b2: null,
   });
   const [activeSlot, setActiveSlot] = useState<SlotKey | null>(null);
+  const [isFriendly, setIsFriendly] = useState(false);
 
   // 리그 미소속 실명 게스트 (이 다이얼로그에서 직접 추가)
   const [namedGuests, setNamedGuests] = useState<Player[]>([]);
@@ -102,15 +104,17 @@ export default function ManualMatchDialog({
 
   const handleConfirm = () => {
     if (!slots.a1 || !slots.a2 || !slots.b1 || !slots.b2) return;
-    onConfirm([slots.a1, slots.a2], [slots.b1, slots.b2]);
+    onConfirm([slots.a1, slots.a2], [slots.b1, slots.b2], isFriendly);
     handleReset();
     setNamedGuests([]);
+    setIsFriendly(false);
   };
 
   const handleClose = () => {
     handleReset();
     setNamedGuests([]);
     setGuestName('');
+    setIsFriendly(false);
     onClose();
   };
 
@@ -265,6 +269,37 @@ export default function ManualMatchDialog({
               );
             })}
           </div>
+        </div>
+
+        {/* 경기 종류: 리그전 / 친선 */}
+        <div className="px-4 pb-3 flex-shrink-0">
+          <div className="flex rounded-xl border border-line overflow-hidden text-sm font-bold" role="radiogroup" aria-label="경기 종류">
+            <button
+              onClick={() => setIsFriendly(false)}
+              role="radio"
+              aria-checked={!isFriendly}
+              className={`flex-1 py-2.5 transition-colors touch-target ${
+                !isFriendly ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft hover:bg-line'
+              }`}
+            >
+              리그전
+            </button>
+            <button
+              onClick={() => setIsFriendly(true)}
+              role="radio"
+              aria-checked={isFriendly}
+              className={`flex-1 py-2.5 transition-colors touch-target ${
+                isFriendly ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft hover:bg-line'
+              }`}
+            >
+              친선경기
+            </button>
+          </div>
+          {isFriendly && (
+            <p className="text-[10px] text-ink-mute mt-1.5">
+              친선경기는 시즌 랭킹에는 반영되지 않고, 종합(투어) 랭킹과 개인 기록에 누적됩니다.
+            </p>
+          )}
         </div>
 
         {/* 하단 버튼 */}

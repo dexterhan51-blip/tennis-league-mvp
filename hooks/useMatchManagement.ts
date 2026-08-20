@@ -271,7 +271,7 @@ export function useMatchManagement({
     setSlotAssignment(null);
   }, []);
 
-  const confirmManualMatch = useCallback((teamA: [Player, Player], teamB: [Player, Player]) => {
+  const confirmManualMatch = useCallback((teamA: [Player, Player], teamB: [Player, Player], isFriendly = false) => {
     if (!matchDate) return;
     const newMatch: Match = {
       id: uuidv4(),
@@ -282,13 +282,14 @@ export function useMatchManagement({
       scoreB: 0,
       isFinished: false,
       ...(isExhibition ? { isExhibition: true } : {}),
+      ...(isFriendly ? { isFriendly: true } : {}),
     };
     setMatches(prev => [...prev, newMatch]);
     setShowManualDialog(false);
     setSelectedForMatch([]);
     setMaleGuestCount(0);
     setFemaleGuestCount(0);
-    showToast('경기가 생성되었습니다.', 'success');
+    showToast(isFriendly ? '친선경기가 생성되었습니다. (시즌 랭킹 미반영)' : '경기가 생성되었습니다.', 'success');
   }, [matchDate, showToast, setMatches, isExhibition]);
 
   const closeCreatedDialog = useCallback(() => {

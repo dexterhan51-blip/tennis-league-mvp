@@ -29,28 +29,31 @@ export default function Home() {
       {/* 2. 메뉴 버튼 영역 */}
       <nav className="space-y-4 w-full">
         
-        {/* 버튼 1: [ + 새 리그 만들기 ] (가장 강조) */}
-        <Link href="/league/new" className="group block w-full">
+        {/* 버튼 1: [ 이번 시즌 리그 ] (가장 강조) — 진행 중 시즌으로 바로 진입 */}
+        <Link href="/league" className="group block w-full">
             <div className="bg-accent hover:bg-accent-strong text-white p-5 rounded-2xl transition-all active:scale-95 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <div className="bg-white/20 p-2 rounded-lg">
                         <PlayCircle size={24} />
                     </div>
                     <div className="text-left">
-                        <div className="font-bold text-lg">+ 새 리그 만들기</div>
-                        <div className="text-white/80 text-xs font-medium">새로운 매치 생성 및 시작</div>
+                        <div className="font-bold text-lg">이번 시즌 리그</div>
+                        <div className="text-white/80 text-xs font-medium">경기 입력 · 랭킹 · 시즌 관리</div>
                     </div>
                 </div>
             </div>
         </Link>
 
-        {/* 버튼 2: [ > 불러오기 ] */}
+        {/* 버튼 2: [ 지난 시즌 · 데이터 ] */}
         <Link href="/load" className="block w-full">
             <div className="bg-card hover:bg-card-soft border border-line text-ink-soft p-5 rounded-2xl transition-all active:scale-95 flex items-center gap-4">
                 <div className="bg-card-soft p-2 rounded-lg text-ink-mute">
                     <FolderOpen size={24} />
                 </div>
-                <div className="font-bold text-lg">불러오기</div>
+                <div className="text-left">
+                    <div className="font-bold text-lg">지난 시즌 · 데이터</div>
+                    <div className="text-ink-faint text-xs font-medium">시즌 히스토리와 서버 데이터 이전</div>
+                </div>
             </div>
         </Link>
 
