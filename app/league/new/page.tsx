@@ -8,7 +8,7 @@ import { Player, SeasonRow } from "@/types";
 import { useToast } from "@/contexts/ToastContext";
 import { safeGetAsync } from "@/lib/storage";
 import { PlayersArraySchema } from "@/lib/schemas";
-import { fetchSeasons, createSeason, isMissingTableError } from "@/lib/seasonApi";
+import { fetchSeasons, createSeason, isMissingTableError, fetchMembers } from "@/lib/seasonApi";
 
 export default function NewSeasonPage() {
   const router = useRouter();
@@ -25,8 +25,13 @@ export default function NewSeasonPage() {
 
   useEffect(() => {
     const load = async () => {
-      const savedPlayers = await safeGetAsync("tennis-players", PlayersArraySchema);
-      if (savedPlayers) setAllPlayers(savedPlayers);
+      // 회원 명단의 원본은 서버 — 못 읽으면 이 기기에 저장된 사본을 쓴다
+      try {
+        setAllPlayers(await fetchMembers());
+      } catch {
+        const savedPlayers = await safeGetAsync("tennis-players", PlayersArraySchema);
+        if (savedPlayers) setAllPlayers(savedPlayers);
+      }
 
       try {
         const rows = await fetchSeasons();
@@ -198,7 +203,7 @@ export default function NewSeasonPage() {
           disabled={!seasonName.trim() || selectedIds.length < 2 || isCreating || !!liveSeason || seasons === null}
           className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all touch-target ${
             seasonName.trim() && selectedIds.length >= 2 && !isCreating && !liveSeason && seasons !== null
-              ? "bg-accent text-white hover:bg-accent-strong"
+              ? "bg-accent text-accent-ink hover:bg-accent-strong"
               : "bg-card-soft text-ink-faint cursor-not-allowed"
           }`}
         >

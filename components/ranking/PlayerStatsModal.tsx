@@ -377,7 +377,7 @@ export default function PlayerStatsModal({
         {/* Total Points */}
         {stats && (
           <div className="px-6 pb-6">
-            <div className="p-4 bg-accent rounded-xl text-white">
+            <div className="p-4 bg-accent rounded-xl text-accent-ink">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium opacity-90">총 점수</span>
                 <span className="text-3xl font-bold tabular-nums">{stats.totalPoints}</span>

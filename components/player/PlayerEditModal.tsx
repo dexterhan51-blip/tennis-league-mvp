@@ -222,7 +222,7 @@ export default function PlayerEditModal({
           <button
             onClick={handleSave}
             disabled={!name.trim()}
-            className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
+            className="flex-1 py-3 px-4 rounded-xl font-semibold text-accent-ink bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
           >
             저장
           </button>

@@ -74,7 +74,7 @@ function MatchVideoControl({
         <div className="flex gap-2">
           <button
             onClick={() => { if (onSave(value)) { setEditing(false); setValue(''); } }}
-            className="flex-1 py-2 rounded-lg font-bold text-sm bg-accent text-white hover:bg-accent-strong transition-colors touch-target"
+            className="flex-1 py-2 rounded-lg font-bold text-sm bg-accent text-accent-ink hover:bg-accent-strong transition-colors touch-target"
           >
             저장
           </button>
@@ -188,7 +188,7 @@ export default function MatchList({
                     <button
                       onClick={() => onCommitScore(m.id)}
                       disabled={!hasPendingScore}
-                      className={`w-full py-2.5 rounded-lg font-bold text-sm transition-colors touch-target ${hasPendingScore ? 'bg-accent text-white hover:bg-accent-strong' : 'bg-card-soft text-ink-faint cursor-not-allowed'}`}
+                      className={`w-full py-2.5 rounded-lg font-bold text-sm transition-colors touch-target ${hasPendingScore ? 'bg-accent text-accent-ink hover:bg-accent-strong' : 'bg-card-soft text-ink-faint cursor-not-allowed'}`}
                     >
                       완료
                     </button>

@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 러브포티 테니스 리그
 
-## Getting Started
+러브포티 클럽의 시즌 순위·경기 기록 앱. 휴대폰 세로 화면 기준.
 
-First, run the development server:
+- 주소: https://tennis-league-mvp.vercel.app (깃허브 `main` 에 올리면 버셀이 자동 배포)
+- 깃허브: dexterhan51-blip/tennis-league-mvp — **공개 저장소**다. 회원 실명이 든 파일(`backup/`)과 열쇠(`.env.local`)는 올리지 않는다
+- 기술: Next.js 16 · Tailwind 4 · 버셀 서버 함수 · Upstash Redis
+
+## 구조 (2026-11 개편)
+
+| 탭 | 주소 | 내용 |
+|---|---|---|
+| 오늘 | `/` | 내 순위, 진행 중 경기, 내 최근 경기, 시즌 상위권 |
+| 랭킹 | `/rankings` | 시즌 / 연도 종합 / 통산, 남·여 필터, (운영진) 친선경기·게스트 전환 |
+| 경기 | `/live` | 경기일별 MVP와 결과. `/live?id=시즌id` 로 지난 시즌 열람. 영상 달력은 `/videos` |
+| 나 | `/me` | 내 이름 고르기, 순위 흐름, 파트너·상대 전적. 설정 입구 |
+| 운영 | `/admin` | 운영진 전용. 그날 모임 기록(`/session`)·편집 파일 올리기(`/import`)·회원 관리(`/players`)·시즌(`/league`) |
+
+## 기록하는 법 (운영진)
+
+요즘은 시즌 없이 그날 모인 사람끼리 친다. 그래서 기본 흐름은 **그날 모임**이다.
+
+1. 운영 → **그날 모임 기록하기** (`/session`)
+2. 온 사람을 누른다. 게스트는 이름을 직접 적어 넣는다(같은 이름은 다음에도 같은 사람, 순위에는 안 들어감)
+3. 대진표: 남·여 인원이 정해 둔 공식(2-3, 3-2, 2-4, 3-3, 3-4, 4-5)에 맞으면 **공식 대진**, 아니면 **고르게 섞기**(경기 수·쉬는 순서 균등). 공식 대진은 누른 순서가 남 1·2…, 여 1·2… 자리가 된다
+4. 경기를 눌러 점수를 넣는다. 포인트 단위로 적으려면 「포인트 단위 입력」(심판 화면)
+5. 여기서 기록한 경기는 서버에 "그날 경기"(옛 친선경기 저장 칸)로 쌓이고, 오늘·나·랭킹의 **올해 전체** 기록에 들어간다
+
+### 영상 편집 파일로 상세 기록 올리기 (`/import`)
+
+파이널컷 편집본(.fcpxmld / .fcpxml)의 점수판·기록용 자막을 읽어 포인트 흐름과 득점·아웃·네트·폴트·더블폴트를 경기에 붙인다.
+같은 날 같은 선수 구성의 경기가 있으면 거기에 붙이고, 없으면 새 경기로 등록한다. 기록은 **팀 단위**다(자막이 A팀/B팀 기준).
+읽는 규칙은 `lib/fcpxmlImport.ts` 맨 위 주석 참고 — 날짜는 프로젝트 이름 앞 6자리(YYMMDD), 선수 이름은 점수판 글자에서 읽는다.
+
+### 시즌을 따로 돌릴 때
+
+운영 → **새 시즌 시작**(`/league/new`)에서 참가 회원을 고르면 진행 중 시즌이 생기고, 그동안은 오늘·나 화면이 그 시즌 순위를 보여준다.
+시즌 경기는 `/league`에서 입력하고, 끝나면 그 화면의 시즌 종료를 누른다. 진행 중 시즌은 항상 하나뿐이다.
+
+## 회원
+
+- 회원 명단은 서버(`lf:members`)가 원본이다. 운영 → 회원 관리에서 추가·수정한다
+- 화면에 나오는 이름은 실명이 아니라 웹툰 닉네임이다. 캐릭터 그림은 `public/avatars/`
+- 탈퇴한 회원은 경기 기록 속에서 「탈퇴한 멤버」로 남는다(다른 회원의 파트너·상대 전적은 유지, 순위·개인 기록에서는 빠짐)
+- 이름 게스트와 탈퇴한 멤버는 id 가 `guest-named-…` 이고, 이 접두사가 순위 집계 제외의 기준이다
+
+- 색·글꼴 토큰은 `app/globals.css` 한 곳. 라이트 = 데이 코트(기본), 다크 = 나이트 매치
+- 순위 규칙은 `utils/tennisLogic.ts` 의 `calculateRanking` 하나만 쓴다 (참석 1점/일 + 승리 1점)
+- 진행 중 시즌이 없으면 "올해 전체 경기"를 한 묶음으로 본다 — `lib/clubView.ts` 의 `currentScope`
+- 선수 한 명 기준 계산(순위 흐름·파트너 전적)은 `utils/playerInsights.ts`
+
+## 데이터와 권한
+
+로그인이 없다. **읽기는 누구나, 쓰기는 운영진 코드**가 있어야 한다.
+
+- 서버 함수: `app/api/league/route.ts` — `GET ?view=…` 읽기, `POST` 쓰기(머리말 `x-admin-code`)
+- 저장소: `lib/server/store.ts` — 쭈갑과 같은 Upstash Redis, 키 이름표 `lf:` (키 목록은 그 파일 맨 위)
+- 앱 쪽 접근 계층: `lib/backend.ts`(요청) → `lib/seasonApi.ts`(시즌·경기 함수) → `lib/writeQueue.ts`(오프라인 재시도)
+- 운영진 코드: 버셀 환경변수 `LF_ADMIN_CODE`. 앱에서는 「나 → 설정 → 운영진 모드」 또는 `/login` 에서 한 번 입력하면 그 기기에 저장된다. 바꾸려면 버셀에서 값을 바꾸고 다시 배포
+- "내 순위"는 「나」 탭에서 고른 이름을 기기에만 저장해 보여준다 (서버에 보내지 않음)
+- 실시간: 10초마다 변경 번호(`lf:rev`)만 확인하고 바뀌었을 때만 다시 읽는다
+- 검색 엔진에는 올리지 않는다(`robots: noindex`). 다만 주소를 아는 사람은 누구나 순위·실명을 볼 수 있다
+
+### 환경변수
+
+| 이름 | 어디에 | 내용 |
+|---|---|---|
+| `KV_REST_API_URL` · `KV_REST_API_TOKEN` | 버셀, `.env.local` | Upstash 접속 정보 (쭈갑 프로젝트와 같은 값) |
+| `LF_ADMIN_CODE` | 버셀, `.env.local` | 운영진 코드 |
+| `NEXT_PUBLIC_DEMO=1` | 로컬에서만 | 서버 없이 예시 데이터로 화면만 확인 |
+
+## 로컬에서 띄우기
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev            # 실제 데이터 (.env.local 필요)
+NEXT_PUBLIC_DEMO=1 npm run dev   # 예시 데이터
+npm test               # 계산 로직 테스트
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+미리보기 서버 이름: `tennis-league-mvp`(8772, 실제 데이터) · `tennis-league-mvp-demo`(8771, 예시).
+화면 색이 옛 것으로 보이면 개발 서버를 끄고 `.next` 폴더를 지운 뒤 다시 띄운다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 2026-11-20 회원 정리
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+한 번에 처리했다: 실명→닉네임, 캐릭터 사진, 탈퇴 회원 처리, 시즌 5의 이름 게스트 2명을 같은 사람인 회원으로 합침, 신규 회원 2명 추가, 시즌 5 종료.
+탈퇴 회원이 우승했던 시즌 1·3은 우승자를 비워 뒀다.
+정리 스크립트는 실명 대응표가 들어 있어 저장소에 올리지 않고 `backup/tools/` (깃 제외)에 둔다. 되돌리려면 `backup/` 의 Supabase 백업에서 `tools/migrate-to-upstash.mjs` 로 다시 넣는다.
 
-## Learn More
+## Supabase에서 옮긴 기록 (2026-11-19)
 
-To learn more about Next.js, take a look at the following resources:
+- 무료 Supabase 프로젝트가 자꾸 멈춰서 Upstash로 옮겼다. 시즌 5개·리그 경기 156건을 옮기고 전 시즌의 내용·순서가 백업과 같은지 대조했다
+- 백업: `backup/supabase-2026-11-19/` (깃 제외). 이전 도구: `tools/migrate-to-upstash.mjs` (여러 번 돌려도 결과 같음)
+- 옮기지 못한 것: 친선경기·회원 프로필은 로그인해야 읽히는 표라 백업에 0건으로 잡혔다. 친선경기가 실제로 있었다면 따로 내보내야 한다
+- 없앤 것: 이메일 로그인·회원 관리 화면, 토스 미니앱 배포 설정, 코트 예약 실시간 공유(서버에 표가 없어 원래 동작하지 않았음), 구버전 데이터 이전 화면
+- 옛 SQL은 `docs/legacy-supabase/` 에 기록으로만 남겼다
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 2026-11-20 기능 정리
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+안 쓰는 화면을 지웠다: 테니스 사주·궁합 관계도, 점수제 시뮬레이터, 코트예약 도우미, 지난 시즌 화면(랭킹 화면 아래 목록으로 대체), 랭킹 관리 모드의 친선경기 등록(그날 모임 기록으로 대체), 설정의 데이터 내보내기·가져오기·초기화. 되살리려면 깃 기록에서 꺼낸다.

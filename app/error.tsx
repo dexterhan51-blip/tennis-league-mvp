@@ -22,7 +22,7 @@ export default function Error({
       <p className="text-sm text-ink-mute text-center">{error.message || '예상치 못한 오류가 발생했습니다.'}</p>
       <button
         onClick={reset}
-        className="px-6 py-3 bg-accent text-white rounded-xl font-bold hover:bg-accent-strong transition-colors"
+        className="px-6 py-3 bg-accent text-accent-ink rounded-xl font-bold hover:bg-accent-strong transition-colors"
       >
         다시 시도
       </button>

@@ -29,6 +29,23 @@ export interface PointLogEntry {
 
 export type ScoringRule = 'no-ad' | 'deuce';
 
+/** 포인트가 어떻게 끝났는지 — 편집 파일의 기록용 자막에서 읽어 온 값 */
+export type RallyEventKind = 'winner' | 'net' | 'out' | 'fault' | 'double-fault';
+
+export interface RallyEvent {
+  t: number;            // 편집본 기준 초
+  team: 'A' | 'B';      // 그 플레이를 한 팀 (득점이면 득점한 팀, 에러면 에러를 낸 팀)
+  kind: RallyEventKind;
+}
+
+/** 영상 편집 파일(FCPXML)에서 가져온 상세 기록 */
+export interface MatchDetail {
+  source: 'fcpxml';
+  place?: string;
+  importedAt: string;
+  events: RallyEvent[];
+}
+
 export interface Match {
   id: string;
   date: string;
@@ -45,6 +62,7 @@ export interface Match {
   scoringRule?: ScoringRule;  // 이 경기에 적용된 듀스/노애드 규칙
   serveOrder?: string[];      // 서브 순서 (선수 id, 최대 4인)
   pointLog?: PointLogEntry[]; // 포인트 타임라인
+  detail?: MatchDetail;       // 편집 파일에서 가져온 상세 기록 (팀 단위 득점·에러)
 }
 
 export interface PlayerStat {
@@ -68,6 +86,8 @@ export interface FriendlyMatchRow {
   id: string;
   match_date: string; // 'YYYY-MM-DD'
   match: Match;
+  /** 처음 등록된 시각(ms) — 같은 날 경기의 순서를 유지하는 데 쓴다 */
+  at?: number;
 }
 
 /** 투어 종합 랭킹에서 리그(대회) 하나가 기여한 몫 */

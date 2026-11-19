@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-export default function LoginPage() {
-  const { signIn } = useAuth();
+// 운영진 코드 입력. 순위·경기 기록은 누구나 볼 수 있고, 점수 입력 등 쓰기만 이 코드로 막는다.
+export default function AdminCodePage() {
+  const { signIn, signOut, isAdmin } = useAuth();
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -18,75 +18,64 @@ export default function LoginPage() {
     if (isSubmitting) return;
     setError(null);
     setIsSubmitting(true);
-    const result = await signIn(email.trim(), password);
+    const result = await signIn(code);
     setIsSubmitting(false);
-    if (result.success) {
-      router.replace('/');
-    } else {
-      setError(result.error ?? '로그인에 실패했습니다.');
-    }
+    if (result.success) router.replace('/admin');
+    else setError(result.error ?? '확인에 실패했습니다.');
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-surface">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <Image src="/icon.png" alt="러브포티" width={72} height={72} className="mx-auto rounded-2xl mb-4" unoptimized />
-          <h1 className="text-2xl font-bold text-ink tracking-tight">러브포티 테니스</h1>
-          <p className="text-sm text-ink-mute mt-1">회원 전용 리그 서비스입니다</p>
+    <main className="max-w-md mx-auto min-h-screen bg-surface px-5 pt-4">
+      <button
+        onClick={() => router.back()}
+        className="w-11 h-11 -ml-2 flex items-center justify-center rounded-full text-ink-mute"
+        aria-label="뒤로 가기"
+      >
+        <ArrowLeft size={20} />
+      </button>
+      <h1 className="mt-2 text-[22px] font-extrabold tracking-tight text-ink">운영진 모드</h1>
+      <p className="mt-2 text-sm text-ink-mute leading-relaxed">
+        경기 입력·시즌 관리는 운영진만 할 수 있습니다. 코드는 이 기기에 저장되어 다음부터는 묻지 않습니다.
+      </p>
+
+      {isAdmin ? (
+        <div className="mt-6">
+          <p className="text-sm font-bold text-up">이 기기는 운영진 모드입니다.</p>
+          <button
+            onClick={() => signOut()}
+            className="mt-4 w-full h-12 rounded-[14px] bg-card-soft text-ink-soft text-sm font-bold"
+          >
+            운영진 모드 끄기
+          </button>
         </div>
-
-        <form onSubmit={handleSubmit} className="bg-card border border-line rounded-2xl p-6 space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-ink-mute mb-1">
-              아이디 (이메일)
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="username"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-card border border-line-strong text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-ink-mute mb-1">
-              비밀번호
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-card border border-line-strong text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
-              placeholder="••••••••"
-            />
-          </div>
-
+      ) : (
+        <form onSubmit={handleSubmit} className="mt-6">
+          <label htmlFor="admin-code" className="block text-[11px] font-extrabold tracking-[0.08em] text-ink-mute">
+            운영진 코드
+          </label>
+          <input
+            id="admin-code"
+            type="password"
+            autoComplete="current-password"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className="mt-2 w-full h-12 px-4 rounded-[14px] bg-card border border-line text-ink text-base outline-none focus:border-accent"
+            required
+          />
           {error && (
-            <p className="text-sm text-down" role="alert">
+            <p className="mt-2 text-sm font-bold text-down" role="alert">
               {error}
             </p>
           )}
-
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 rounded-xl bg-accent text-white font-semibold hover:bg-accent-strong active:scale-95 transition-colors disabled:opacity-50"
+            className="mt-4 w-full h-14 rounded-[14px] bg-accent text-accent-ink font-extrabold text-base disabled:opacity-50"
           >
-            {isSubmitting ? '로그인 중…' : '로그인'}
+            {isSubmitting ? '확인 중...' : '확인'}
           </button>
         </form>
-
-        <p className="text-xs text-ink-faint text-center mt-6">
-          계정은 리그 관리자에게 문의해 발급받을 수 있습니다.
-        </p>
-      </div>
-    </div>
+      )}
+    </main>
   );
 }

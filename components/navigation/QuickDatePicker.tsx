@@ -86,7 +86,7 @@ export default function QuickDatePicker({
           onClick={() => onChange(today)}
           className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors touch-target ${
             selectedDate === today
-              ? 'bg-accent text-white'
+              ? 'bg-accent text-accent-ink'
               : 'bg-card-soft text-ink-soft hover:bg-line'
           }`}
         >
@@ -96,7 +96,7 @@ export default function QuickDatePicker({
           onClick={() => onChange(yesterday)}
           className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors touch-target ${
             selectedDate === yesterday
-              ? 'bg-accent text-white'
+              ? 'bg-accent text-accent-ink'
               : 'bg-card-soft text-ink-soft hover:bg-line'
           }`}
         >
@@ -140,7 +140,7 @@ export default function QuickDatePicker({
               className={`
                 flex-shrink-0 flex flex-col items-center px-3 py-2 rounded-xl transition-all touch-target
                 ${isSelected
-                  ? 'bg-accent text-white'
+                  ? 'bg-accent text-accent-ink'
                   : hasMatch
                   ? 'bg-accent-soft text-accent border border-line'
                   : isFuture

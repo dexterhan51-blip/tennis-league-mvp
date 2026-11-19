@@ -137,20 +137,13 @@ export default function LeaguePage() {
     );
   }
 
-  // 서버 마이그레이션 전: seasons 테이블 없음
+  // 서버에서 시즌을 읽지 못함
   if (needsMigration) {
     return (
       <main className="max-w-md mx-auto min-h-screen bg-surface flex flex-col items-center justify-center p-8 text-center gap-4">
         <Database size={40} className="text-accent" />
-        <h1 className="text-lg font-bold text-ink tracking-tight">서버 준비가 필요합니다</h1>
-        <p className="text-sm text-ink-mute leading-relaxed">
-          시즌 타임라인 방식으로 전환되었습니다.<br />
-          Supabase SQL Editor에서 <span className="font-mono text-xs bg-card-soft px-1.5 py-0.5 rounded">supabase-migration-seasons.sql</span>을 실행한 뒤,<br />
-          데이터 이전을 진행해주세요.
-        </p>
-        <Link href="/load" className="px-5 py-3 bg-accent hover:bg-accent-strong text-white rounded-xl font-bold text-sm transition-colors touch-target">
-          데이터 이전으로 가기
-        </Link>
+        <h1 className="text-lg font-bold text-ink tracking-tight">서버에 연결할 수 없습니다</h1>
+        <p className="text-sm text-ink-mute leading-relaxed">네트워크를 확인한 뒤 다시 열어주세요.</p>
       </main>
     );
   }
@@ -164,7 +157,7 @@ export default function LeaguePage() {
         <p className="text-sm text-ink-mute leading-relaxed">
           지난 시즌 기록은 통산 랭킹과 시즌 히스토리에 안전하게 보관되어 있어요.
         </p>
-        <Link href="/league/new" className="flex items-center gap-2 px-5 py-3 bg-accent hover:bg-accent-strong text-white rounded-xl font-bold transition-colors touch-target">
+        <Link href="/league/new" className="flex items-center gap-2 px-5 py-3 bg-accent hover:bg-accent-strong text-accent-ink rounded-xl font-bold transition-colors touch-target">
           <Play size={18} /> 새 시즌 시작
         </Link>
         <Link href="/rankings" className="text-sm text-accent font-medium hover:underline">
@@ -289,7 +282,7 @@ export default function LeaguePage() {
             ) : (
               <button
                 onClick={handleFinishDailyGame}
-                className="flex-1 bg-accent text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-accent-strong transition-colors touch-target"
+                className="flex-1 bg-accent text-accent-ink py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-accent-strong transition-colors touch-target"
               >
                 <Medal size={20} className="text-amber-300" /> [{matchDate}] 게임 종료
               </button>
@@ -310,7 +303,7 @@ export default function LeaguePage() {
 
         {/* Bottom Action Bar */}
         <div className="fixed bottom-20 left-0 right-0 p-4 bg-card border-t border-line max-w-md mx-auto flex gap-2 z-30">
-          <button onClick={() => handleManualSave(rankings)} className="flex-1 bg-accent hover:bg-accent-strong text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors touch-target">
+          <button onClick={() => handleManualSave(rankings)} className="flex-1 bg-accent hover:bg-accent-strong text-accent-ink py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors touch-target">
             <Save size={18}/> 저장하기
           </button>
           <button onClick={() => setShowEndSeasonDialog(true)} className="px-4 bg-amber-500/10 text-amber-600 border border-amber-500/30 rounded-xl font-bold touch-target" aria-label="시즌 종료">
@@ -371,7 +364,7 @@ export default function LeaguePage() {
               <button
                 onClick={() => { handleRenameLeague(renameInput); setShowRenameDialog(false); }}
                 disabled={!renameInput.trim()}
-                className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
+                className="flex-1 py-3 px-4 rounded-xl font-semibold text-accent-ink bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
               >
                 변경
               </button>

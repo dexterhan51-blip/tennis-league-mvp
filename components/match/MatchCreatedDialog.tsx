@@ -106,7 +106,7 @@ export default function MatchCreatedDialog({
               )}
               <button
                 onClick={onConfirm}
-                className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong transition-colors touch-target"
+                className="flex-1 py-3 px-4 rounded-xl font-semibold text-accent-ink bg-accent hover:bg-accent-strong transition-colors touch-target"
               >
                 생성
               </button>
@@ -123,7 +123,7 @@ export default function MatchCreatedDialog({
               )}
               <button
                 onClick={onClose}
-                className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong transition-colors touch-target"
+                className="flex-1 py-3 px-4 rounded-xl font-semibold text-accent-ink bg-accent hover:bg-accent-strong transition-colors touch-target"
               >
                 확인
               </button>

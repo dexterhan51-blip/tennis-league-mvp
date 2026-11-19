@@ -1,100 +1,29 @@
 "use client";
 
-import Link from "next/link";
-import { PlayCircle, FolderOpen, Users, Smartphone, CalendarDays } from "lucide-react";
-import AppLogo from "@/components/ui/AppLogo";
-import MemberHome from "@/components/home/MemberHome";
+import TodayView from "@/components/home/TodayView";
+import { FullError, FullLoading } from "@/components/ui/DataState";
 import { useAuth } from "@/contexts/AuthContext";
+import { useClubData } from "@/hooks/useClubData";
+import { currentScope } from "@/lib/clubView";
+import { DEMO_MY_PLAYER_ID } from "@/lib/demoData";
 
+// 오늘(홈) — 진행 중 시즌이 있으면 그 시즌, 없으면 올해 전체 경기 기준으로 내 순위를 보여준다.
+// 기록·관리 기능은 하단 「운영」 탭(/admin)에 모여 있다.
 export default function Home() {
-  const { isAdmin, isConfigured, session } = useAuth();
+  const { profile } = useAuth();
+  const { data, status, isDemo } = useClubData(true);
 
-  // 일반 회원은 서버 데이터 기반 홈 (리그 생성 등 관리 기능은 관리자 전용)
-  if (isConfigured && session && !isAdmin) {
-    return <MemberHome />;
+  if (status === "loading") return <FullLoading />;
+  if (status === "error" || !data) {
+    return <FullError message="기록을 불러올 수 없습니다. 네트워크를 확인해주세요." />;
   }
 
   return (
-    <main className="max-w-md mx-auto min-h-screen bg-surface flex flex-col justify-center p-6">
-
-      {/* 1. 로고 영역 */}
-      <div className="text-center mb-12 space-y-2">
-        <div className="inline-flex justify-center items-center mb-4">
-            <AppLogo size={112} />
-        </div>
-        <h1 className="text-3xl font-extrabold text-ink tracking-tight">러브포티 테니스</h1>
-        <p className="text-ink-mute font-medium">러브포티 테니스 리그 매니저</p>
-      </div>
-
-      {/* 2. 메뉴 버튼 영역 */}
-      <nav className="space-y-4 w-full">
-        
-        {/* 버튼 1: [ 이번 시즌 리그 ] (가장 강조) — 진행 중 시즌으로 바로 진입 */}
-        <Link href="/league" className="group block w-full">
-            <div className="bg-accent hover:bg-accent-strong text-white p-5 rounded-2xl transition-all active:scale-95 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="bg-white/20 p-2 rounded-lg">
-                        <PlayCircle size={24} />
-                    </div>
-                    <div className="text-left">
-                        <div className="font-bold text-lg">이번 시즌 리그</div>
-                        <div className="text-white/80 text-xs font-medium">경기 입력 · 랭킹 · 시즌 관리</div>
-                    </div>
-                </div>
-            </div>
-        </Link>
-
-        {/* 버튼 2: [ 지난 시즌 · 데이터 ] */}
-        <Link href="/load" className="block w-full">
-            <div className="bg-card hover:bg-card-soft border border-line text-ink-soft p-5 rounded-2xl transition-all active:scale-95 flex items-center gap-4">
-                <div className="bg-card-soft p-2 rounded-lg text-ink-mute">
-                    <FolderOpen size={24} />
-                </div>
-                <div className="text-left">
-                    <div className="font-bold text-lg">지난 시즌 · 데이터</div>
-                    <div className="text-ink-faint text-xs font-medium">시즌 히스토리와 서버 데이터 이전</div>
-                </div>
-            </div>
-        </Link>
-
-        {/* 버튼 3: [ & 선수 관리 ] */}
-        <Link href="/players" className="block w-full">
-            <div className="bg-card hover:bg-card-soft border border-line text-ink-soft p-5 rounded-2xl transition-all active:scale-95 flex items-center gap-4">
-                <div className="bg-card-soft p-2 rounded-lg text-ink-mute">
-                    <Users size={24} />
-                </div>
-                <div className="font-bold text-lg">선수 관리</div>
-            </div>
-        </Link>
-
-        {/* 버튼 4: [ 스코어보드 ] */}
-        <Link href="/scoreboard" className="block w-full">
-            <div className="bg-card hover:bg-card-soft border border-line text-ink-soft p-5 rounded-2xl transition-all active:scale-95 flex items-center gap-4">
-                <div className="bg-card-soft p-2 rounded-lg text-ink-mute">
-                    <Smartphone size={24} />
-                </div>
-                <div className="font-bold text-lg">스코어보드</div>
-            </div>
-        </Link>
-
-        {/* 버튼 5: [ 코트예약 도우미 ] */}
-        <Link href="/booking" className="block w-full">
-            <div className="bg-card hover:bg-card-soft border border-line text-ink-soft p-5 rounded-2xl transition-all active:scale-95 flex items-center gap-4">
-                <div className="bg-card-soft p-2 rounded-lg text-ink-mute">
-                    <CalendarDays size={24} />
-                </div>
-                <div className="text-left">
-                    <div className="font-bold text-lg">코트예약 도우미</div>
-                    <div className="text-ink-faint text-xs font-medium">팀원과 코트 예약 현황 공유</div>
-                </div>
-            </div>
-        </Link>
-
-      </nav>
-
-      <footer className="mt-12 text-center text-xs text-ink-faint font-medium">
-        v2.0 러브포티 테니스 리그 매니저
-      </footer>
-    </main>
+    <TodayView
+      scope={currentScope(data)}
+      myPlayerId={isDemo ? DEMO_MY_PLAYER_ID : profile.player_id}
+      displayName={isDemo ? "한씨" : profile.name}
+      isDemo={isDemo}
+    />
   );
 }

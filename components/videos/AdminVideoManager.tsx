@@ -95,7 +95,7 @@ export default function AdminVideoManager({ leagues, onSaved }: AdminVideoManage
           onClick={() => setOnlyMissing(!onlyMissing)}
           className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors touch-target ${
             onlyMissing
-              ? 'bg-accent text-white border-accent'
+              ? 'bg-accent text-accent-ink border-accent'
               : 'bg-card-soft text-ink-soft border-line'
           }`}
         >
@@ -154,7 +154,7 @@ export default function AdminVideoManager({ leagues, onSaved }: AdminVideoManage
                     <button
                       onClick={() => handleSave(ref, inputValue)}
                       disabled={isSaving || (!inputValue.trim() && !ref.match.videoUrl)}
-                      className="shrink-0 text-xs font-bold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 px-3 py-2 rounded-lg transition-colors touch-target"
+                      className="shrink-0 text-xs font-bold text-accent-ink bg-accent hover:bg-accent-strong disabled:opacity-50 px-3 py-2 rounded-lg transition-colors touch-target"
                     >
                       {isSaving ? <Loader2 size={14} className="animate-spin" /> : '저장'}
                     </button>

@@ -18,7 +18,7 @@ export default function GlobalError({
           <p className="text-sm text-ink-mute">앱을 다시 시작해주세요.</p>
           <button
             onClick={reset}
-            className="px-6 py-3 bg-accent text-white rounded-xl font-bold hover:bg-accent-strong"
+            className="px-6 py-3 bg-accent text-accent-ink rounded-xl font-bold hover:bg-accent-strong"
           >
             다시 시도
           </button>

@@ -226,7 +226,7 @@ export default function ManualMatchDialog({
               <button
                 onClick={handleAddGuest}
                 disabled={!guestName.trim()}
-                className="p-2 rounded-lg bg-accent hover:bg-accent-strong text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0 touch-target"
+                className="p-2 rounded-lg bg-accent hover:bg-accent-strong text-accent-ink disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0 touch-target"
                 aria-label="게스트 추가"
               >
                 <UserPlus size={16} />
@@ -279,7 +279,7 @@ export default function ManualMatchDialog({
               role="radio"
               aria-checked={!isFriendly}
               className={`flex-1 py-2.5 transition-colors touch-target ${
-                !isFriendly ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft hover:bg-line'
+                !isFriendly ? 'bg-accent text-accent-ink' : 'bg-card-soft text-ink-soft hover:bg-line'
               }`}
             >
               리그전
@@ -289,7 +289,7 @@ export default function ManualMatchDialog({
               role="radio"
               aria-checked={isFriendly}
               className={`flex-1 py-2.5 transition-colors touch-target ${
-                isFriendly ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft hover:bg-line'
+                isFriendly ? 'bg-accent text-accent-ink' : 'bg-card-soft text-ink-soft hover:bg-line'
               }`}
             >
               친선경기
@@ -313,7 +313,7 @@ export default function ManualMatchDialog({
           <button
             onClick={handleConfirm}
             disabled={!isFull}
-            className="flex-1 py-3 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
+            className="flex-1 py-3 rounded-xl font-semibold text-accent-ink bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
           >
             경기 생성
           </button>

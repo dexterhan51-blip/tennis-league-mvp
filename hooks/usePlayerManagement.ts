@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/contexts/ToastContext';
 import { safeGetAsync, safeSetAsync } from '@/lib/storage';
 import { PlayersArraySchema } from '@/lib/schemas';
+import { fetchMembers, saveMembers } from '@/lib/seasonApi';
 
 const PLAYERS_KEY = 'tennis-players';
 
@@ -22,19 +23,44 @@ export function usePlayerManagement() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  // Load from IndexedDB
+  // 회원 명단의 원본은 서버다. 기기 저장분은 오프라인일 때 보여 줄 사본.
+  const lastSavedRef = useRef<string>('');
   useEffect(() => {
-    safeGetAsync(PLAYERS_KEY, PlayersArraySchema).then(data => {
-      if (data) setPlayers(data);
-      setIsLoading(false);
-    });
-  }, []);
+    let cancelled = false;
+    (async () => {
+      try {
+        const members = await fetchMembers();
+        if (cancelled) return;
+        lastSavedRef.current = JSON.stringify(members);
+        setPlayers(members);
+      } catch {
+        const cached = await safeGetAsync(PLAYERS_KEY, PlayersArraySchema);
+        if (cancelled) return;
+        if (cached) {
+          lastSavedRef.current = JSON.stringify(cached);
+          setPlayers(cached);
+        }
+        showToast('서버에서 회원 명단을 불러오지 못했습니다. 이 기기에 저장된 명단을 보여줍니다.', 'warning');
+      }
+      if (!cancelled) setIsLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [showToast]);
 
-  // Auto-save to IndexedDB
+  // 바뀌면 서버에 저장 (불러온 직후처럼 내용이 같을 때는 보내지 않는다)
   useEffect(() => {
     if (isLoading) return;
+    const snapshot = JSON.stringify(players);
+    if (snapshot === lastSavedRef.current) return;
+    lastSavedRef.current = snapshot;
     safeSetAsync(PLAYERS_KEY, players);
-  }, [players, isLoading]);
+    saveMembers(players).catch(() => {
+      lastSavedRef.current = '';
+      showToast('회원 명단을 서버에 저장하지 못했습니다. 운영진 코드와 네트워크를 확인해주세요.', 'error');
+    });
+  }, [players, isLoading, showToast]);
 
   const filteredPlayers = useMemo(() => {
     if (!searchQuery.trim()) return players;

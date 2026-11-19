@@ -21,6 +21,7 @@ import {
   archiveSeason,
   deleteSeason,
   isMissingTableError,
+  fetchMembers,
 } from '@/lib/seasonApi';
 import { enqueue, flushOrThrow, subscribePending } from '@/lib/writeQueue';
 import type { EndSeasonOption } from '@/components/season/EndSeasonDialog';
@@ -79,7 +80,10 @@ export function useLeagueData(): UseLeagueDataResult {
 
   // 전역 선수 풀의 최신 프로필 사진을 시즌 스냅샷에 입힌다
   const enrichPhotos = useCallback(async (base: Player[]): Promise<Player[]> => {
-    const globalPlayers = (await safeGetAsync('tennis-players', PlayersArraySchema)) ?? [];
+    // 회원 명단의 원본은 서버 — 못 읽으면 이 기기에 저장된 사본을 쓴다
+    const globalPlayers = await fetchMembers().catch(
+      async () => (await safeGetAsync('tennis-players', PlayersArraySchema)) ?? []
+    );
     const globalPhotoOf = new Map(globalPlayers.map((p) => [p.id, p.photo]));
     return base.map((p) => {
       const photo = globalPhotoOf.get(p.id) ?? p.photo;

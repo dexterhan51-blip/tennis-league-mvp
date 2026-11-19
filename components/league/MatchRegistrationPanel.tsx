@@ -55,7 +55,7 @@ export default function MatchRegistrationPanel({
     <section>
       <button
         onClick={onToggle}
-        className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all touch-target ${isOpen ? 'bg-card-soft text-ink-soft' : 'bg-accent hover:bg-accent-strong text-white'}`}
+        className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all touch-target ${isOpen ? 'bg-card-soft text-ink-soft' : 'bg-accent hover:bg-accent-strong text-accent-ink'}`}
         aria-expanded={isOpen}
       >
         {isOpen ? <XCircle size={20}/> : <PlusCircle size={20}/>}
@@ -133,7 +133,7 @@ export default function MatchRegistrationPanel({
                       onClick={() => setCourtMinutes(min)}
                       className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                         courtMinutes === min
-                          ? 'bg-accent text-white'
+                          ? 'bg-accent text-accent-ink'
                           : 'bg-card-soft text-ink-soft hover:bg-line'
                       }`}
                     >
@@ -151,7 +151,7 @@ export default function MatchRegistrationPanel({
                       onClick={() => setGameMinutes(min)}
                       className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                         gameMinutes === min
-                          ? 'bg-accent text-white'
+                          ? 'bg-accent text-accent-ink'
                           : 'bg-card-soft text-ink-soft hover:bg-line'
                       }`}
                     >
@@ -212,7 +212,7 @@ export default function MatchRegistrationPanel({
                       isSelected
                         ? isGuest
                           ? 'bg-accent-soft border-accent/40 border-dashed text-accent cursor-default'
-                          : 'bg-accent border-accent text-white'
+                          : 'bg-accent border-accent text-accent-ink'
                         : 'bg-card border-line text-ink-soft hover:bg-card-soft'
                     }`}
                     aria-pressed={isSelected}

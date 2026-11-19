@@ -1,13 +1,9 @@
-// Toss Mini App: 기능스킴은 토스 개발자센터에서 등록
-// 홈 바로가기: / (루트 URL)
-
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/contexts/ToastContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { UndoProvider } from "@/contexts/UndoContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import AuthGuard from "@/components/auth/AuthGuard";
 import ToastContainer from "@/components/ui/Toast";
 import BottomTabBar from "@/components/navigation/BottomTabBar";
 import UndoButton from "@/components/match/UndoButton";
@@ -33,6 +29,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
   },
+  // 회원 실명이 들어 있는 클럽 내부용 페이지 — 주소를 아는 사람만 보도록 검색에는 올리지 않는다
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({
@@ -48,12 +46,10 @@ export default function RootLayout({
             <UndoProvider>
               <AuthProvider>
                 <StorageMigration />
-                <AuthGuard>
-                  <main className="pb-16">
-                    {children}
-                  </main>
-                  <BottomTabBar />
-                </AuthGuard>
+                <main className="pb-16">
+                  {children}
+                </main>
+                <BottomTabBar />
                 <UndoButton />
                 <ToastContainer />
               </AuthProvider>

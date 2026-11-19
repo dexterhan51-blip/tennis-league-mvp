@@ -200,7 +200,7 @@ export default function VideosPage() {
               <button
                 onClick={() => setMode('view')}
                 className={`px-3 py-1.5 transition-colors touch-target ${
-                  mode === 'view' ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft'
+                  mode === 'view' ? 'bg-accent text-accent-ink' : 'bg-card-soft text-ink-soft'
                 }`}
               >
                 보기
@@ -208,7 +208,7 @@ export default function VideosPage() {
               <button
                 onClick={() => setMode('manage')}
                 className={`px-3 py-1.5 transition-colors touch-target ${
-                  mode === 'manage' ? 'bg-accent text-white' : 'bg-card-soft text-ink-soft'
+                  mode === 'manage' ? 'bg-accent text-accent-ink' : 'bg-card-soft text-ink-soft'
                 }`}
               >
                 등록
@@ -244,7 +244,7 @@ export default function VideosPage() {
                   onClick={() => setSelectedPlayer(null)}
                   className={`shrink-0 text-xs font-bold px-3 py-2 rounded-full border transition-colors touch-target ${
                     selectedPlayer === null
-                      ? 'bg-accent text-white border-accent'
+                      ? 'bg-accent text-accent-ink border-accent'
                       : 'bg-card-soft text-ink-soft border-line hover:bg-line'
                   }`}
                 >
@@ -256,7 +256,7 @@ export default function VideosPage() {
                     onClick={() => setSelectedPlayer(name === selectedPlayer ? null : name)}
                     className={`shrink-0 text-xs font-bold px-3 py-2 rounded-full border transition-colors touch-target ${
                       selectedPlayer === name
-                        ? 'bg-accent text-white border-accent'
+                        ? 'bg-accent text-accent-ink border-accent'
                         : 'bg-card-soft text-ink-soft border-line hover:bg-line'
                     }`}
                   >
@@ -322,7 +322,7 @@ export default function VideosPage() {
                           disabled={count === 0}
                           className={`relative mx-auto w-9 h-9 rounded-full text-sm tabular-nums flex flex-col items-center justify-center transition-colors touch-target ${
                             isSelected
-                              ? 'bg-accent text-white font-bold'
+                              ? 'bg-accent text-accent-ink font-bold'
                               : count > 0
                               ? 'text-ink font-bold hover:bg-accent-soft'
                               : 'text-ink-faint'

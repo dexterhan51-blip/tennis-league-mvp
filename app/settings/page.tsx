@@ -1,18 +1,16 @@
 'use client';
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
-  Sun, Moon, Monitor, Type, Download, Upload, Trash2, CheckCircle, AlertTriangle, FileText, Copy, LogOut, UserCircle,
+  Sun, Moon, Monitor, Type, CheckCircle, FileText, Copy, LogOut, UserCircle,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/contexts/ToastContext';
 import { useAuth } from '@/contexts/AuthContext';
-import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import AppLogo from '@/components/ui/AppLogo';
-import type { AppSettings, ExportData, Player, LeagueData, SeasonArchive, PlayerCareerStats } from '@/types';
-import { safeGetAsync, safeSetAsync, safeRemoveAsync } from '@/lib/storage';
-import { safeGetString, safeSetString, safeRemove } from '@/lib/storage';
-import { PlayersArraySchema, LeagueDataSchema, SeasonHistorySchema, PlayerCareerStatsArraySchema } from '@/lib/schemas';
+import type { AppSettings, SeasonArchive } from '@/types';
+import { safeGetAsync, safeGetString, safeSetString } from '@/lib/storage';
+import { SeasonHistorySchema } from '@/lib/schemas';
 import { generateSeasonReportText } from '@/lib/seasonReport';
 import { copyToClipboard } from '@/utils/shareUtils';
 
@@ -21,12 +19,9 @@ const FONT_SIZE_KEY = 'tennis-app-font-size';
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const { showToast } = useToast();
-  const { session, profile, isAdmin, isConfigured, signOut } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isAdmin, isConfigured, signOut } = useAuth();
 
   const [fontSize, setFontSizeState] = useState<AppSettings['fontSize']>('normal');
-  const [showResetDialog, setShowResetDialog] = useState(false);
-  const [importError, setImportError] = useState<string | null>(null);
   const [seasonHistory, setSeasonHistory] = useState<SeasonArchive[]>([]);
 
   useEffect(() => {
@@ -60,109 +55,6 @@ export default function SettingsPage() {
     showToast('글꼴 크기가 변경되었습니다', 'success');
   };
 
-  const handleExport = useCallback(async () => {
-    try {
-      const players = await safeGetAsync('tennis-players', PlayersArraySchema) ?? [];
-      const leagues: (LeagueData | null)[] = await Promise.all([
-        safeGetAsync('league-slot-1', LeagueDataSchema).then(d => d ?? null),
-        safeGetAsync('league-slot-2', LeagueDataSchema).then(d => d ?? null),
-        safeGetAsync('league-slot-3', LeagueDataSchema).then(d => d ?? null),
-      ]);
-      const seasonHistory = await safeGetAsync('season-history', SeasonHistorySchema) ?? [];
-      const playerCareerStats = await safeGetAsync('player-career-stats', PlayerCareerStatsArraySchema) ?? [];
-
-      const exportData: ExportData = {
-        version: '1.0.0',
-        exportedAt: new Date().toISOString(),
-        players,
-        leagues,
-        settings: { theme, fontSize },
-        seasonHistory,
-        playerCareerStats,
-      };
-
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `tennis-league-backup-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      showToast('데이터가 내보내기되었습니다', 'success');
-    } catch {
-      showToast('내보내기에 실패했습니다', 'error');
-    }
-  }, [theme, fontSize, showToast]);
-
-  const handleImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      try {
-        const data = JSON.parse(event.target?.result as string) as ExportData;
-
-        if (!data.version || !data.players || !Array.isArray(data.players)) {
-          throw new Error('잘못된 데이터 형식입니다');
-        }
-
-        await safeSetAsync('tennis-players', data.players);
-
-        if (data.leagues) {
-          for (let i = 0; i < data.leagues.length; i++) {
-            if (data.leagues[i]) {
-              await safeSetAsync(`league-slot-${i + 1}`, data.leagues[i]);
-            }
-          }
-        }
-
-        if (data.settings) {
-          if (data.settings.theme) setTheme(data.settings.theme);
-          if (data.settings.fontSize) handleFontSizeChange(data.settings.fontSize);
-        }
-
-        if (data.seasonHistory) {
-          await safeSetAsync('season-history', data.seasonHistory);
-        }
-        if (data.playerCareerStats) {
-          await safeSetAsync('player-career-stats', data.playerCareerStats);
-        }
-
-        showToast('데이터를 가져왔습니다', 'success');
-        setImportError(null);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : '가져오기에 실패했습니다';
-        setImportError(message);
-        showToast(message, 'error');
-      }
-    };
-    reader.readAsText(file);
-
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  }, [setTheme, showToast]);
-
-  const handleReset = useCallback(async () => {
-    await safeRemoveAsync('tennis-players');
-    await safeRemoveAsync('league-slot-1');
-    await safeRemoveAsync('league-slot-2');
-    await safeRemoveAsync('league-slot-3');
-    await safeRemoveAsync('current-league');
-    await safeRemoveAsync('previous-rankings');
-    await safeRemoveAsync('finished-dates');
-    await safeRemoveAsync('season-history');
-    await safeRemoveAsync('player-career-stats');
-    await safeRemoveAsync('current-season-peaks');
-    safeRemove('current-slot-index');
-
-    setSeasonHistory([]);
-    setShowResetDialog(false);
-    showToast('모든 데이터가 초기화되었습니다', 'success');
-  }, [showToast]);
-
   const themeOptions: { value: AppSettings['theme']; icon: React.ReactNode; label: string }[] = [
     { value: 'light', icon: <Sun className="w-5 h-5" />, label: '라이트' },
     { value: 'dark', icon: <Moon className="w-5 h-5" />, label: '다크' },
@@ -186,40 +78,32 @@ export default function SettingsPage() {
       </div>
 
       <div className="max-w-md mx-auto p-4 space-y-6">
-        {isConfigured && session && (
+        {isConfigured && (
           <section className="bg-card border border-line rounded-xl p-4">
-            <h2 className="text-sm font-semibold text-ink tracking-tight mb-4">계정</h2>
+            <h2 className="text-sm font-semibold text-ink tracking-tight mb-4">운영진 모드</h2>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <UserCircle className="w-9 h-9 text-ink-faint" />
                 <div>
-                  <div className="font-medium text-ink">
-                    {profile?.name || session.user.email}
-                    {isAdmin && (
-                      <span className="ml-2 text-[10px] font-bold text-accent bg-accent-soft rounded px-1.5 py-0.5 align-middle">
-                        관리자
-                      </span>
-                    )}
+                  <div className="font-medium text-ink">{isAdmin ? '켜져 있음' : '꺼져 있음'}</div>
+                  <div className="text-xs text-ink-mute">
+                    {isAdmin ? '이 기기에서 경기 입력·시즌 관리를 할 수 있습니다' : '경기 입력은 운영진 코드가 있어야 합니다'}
                   </div>
-                  <div className="text-xs text-ink-mute">{session.user.email}</div>
                 </div>
               </div>
-              <button
-                onClick={() => signOut()}
-                className="flex items-center gap-1.5 text-sm text-ink-mute hover:text-down hover:bg-down/10 px-3 py-2 rounded-lg transition-colors touch-target"
-              >
-                <LogOut className="w-4 h-4" /> 로그아웃
-              </button>
+              {isAdmin ? (
+                <button
+                  onClick={() => signOut()}
+                  className="flex items-center gap-1.5 text-sm text-ink-mute hover:text-down hover:bg-down/10 px-3 py-2 rounded-lg transition-colors touch-target"
+                >
+                  <LogOut className="w-4 h-4" /> 끄기
+                </button>
+              ) : (
+                <a href="/login" className="text-sm font-bold text-accent px-3 py-2 touch-target flex items-center">
+                  코드 입력
+                </a>
+              )}
             </div>
-            {isAdmin && (
-              <a
-                href="/members"
-                className="mt-4 flex items-center justify-between border-t border-line pt-4 text-sm font-medium text-ink-soft hover:text-accent transition-colors"
-              >
-                회원 관리
-                <span className="text-xs text-ink-faint">이름·역할 변경</span>
-              </a>
-            )}
           </section>
         )}
 
@@ -271,43 +155,6 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        <section className="bg-card border border-line rounded-xl p-4">
-          <h2 className="text-sm font-semibold text-ink tracking-tight mb-4">데이터 관리</h2>
-          <div className="space-y-3">
-            <button onClick={handleExport} className="w-full flex items-center gap-3 p-4 bg-card-soft hover:bg-line rounded-xl transition-colors touch-target">
-              <Download className="w-5 h-5 text-accent" />
-              <div className="flex-1 text-left">
-                <div className="font-medium text-ink">데이터 내보내기</div>
-                <div className="text-xs text-ink-mute">선수, 리그 데이터를 JSON 파일로 백업</div>
-              </div>
-            </button>
-
-            <button onClick={() => fileInputRef.current?.click()} className="w-full flex items-center gap-3 p-4 bg-card-soft hover:bg-line rounded-xl transition-colors touch-target">
-              <Upload className="w-5 h-5 text-up" />
-              <div className="flex-1 text-left">
-                <div className="font-medium text-ink">데이터 가져오기</div>
-                <div className="text-xs text-ink-mute">백업 파일에서 데이터 복원</div>
-              </div>
-            </button>
-            <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
-
-            {importError && (
-              <div className="flex items-center gap-2 p-3 bg-down/10 text-down rounded-lg text-sm">
-                <AlertTriangle className="w-4 h-4" />
-                {importError}
-              </div>
-            )}
-
-            <button onClick={() => setShowResetDialog(true)} className="w-full flex items-center gap-3 p-4 bg-down/10 hover:bg-down/20 rounded-xl transition-colors touch-target">
-              <Trash2 className="w-5 h-5 text-down" />
-              <div className="flex-1 text-left">
-                <div className="font-medium text-down">모든 데이터 초기화</div>
-                <div className="text-xs text-down/80">모든 선수 및 리그 데이터 삭제</div>
-              </div>
-            </button>
-          </div>
-        </section>
-
         {seasonHistory.length > 0 && (
           <section className="bg-card border border-line rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -342,17 +189,6 @@ export default function SettingsPage() {
           <p className="mt-1">by 한PD</p>
         </section>
       </div>
-
-      <ConfirmDialog
-        isOpen={showResetDialog}
-        title="모든 데이터 초기화"
-        message="선수 정보, 리그 데이터가 모두 삭제됩니다. 복원할 수 없습니다."
-        confirmText="초기화"
-        variant="danger"
-        requireDoubleConfirm
-        onConfirm={handleReset}
-        onCancel={() => setShowResetDialog(false)}
-      />
     </div>
   );
 }

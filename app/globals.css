@@ -4,82 +4,90 @@
 /* ============================================================
    러브포티 디자인 토큰
    - 라이트/다크는 html.light / html.dark 클래스로 전환됨 (ThemeContext)
+   - 라이트 = 데이 코트, 다크 = 나이트 매치 (2026-11 개편)
    - 컴포넌트는 아래 시맨틱 유틸리티만 사용:
      bg-surface / bg-card / bg-card-soft
      border-line / border-line-strong
      text-ink / text-ink-soft / text-ink-mute / text-ink-faint
-     accent(클레이) / up / down / tint-m / tint-f
+     accent / accent-ink(accent 면 위 글자) / up / down / live / tint-m / tint-f
    ============================================================ */
 
 :root {
   --font-scale: 1;
 
-  /* Light */
-  --surface: #f6f4f1;
+  /* Light — 데이 코트 (밝은 바탕 + 코트 초록) */
+  --surface: #f3f2ec;
   --card: #ffffff;
-  --card-soft: #f1eeea;
-  --line: #e9e4de;
-  --line-strong: #d9d2c9;
-  --ink: #201c18;
-  --ink-soft: #4c463f;
-  --ink-mute: #7d766d;
-  --ink-faint: #aaa39a;
-  --accent: #bf633a;
-  --accent-strong: #a0522f;
-  --accent-soft: #f7ece5;
-  --up: #48876f;
-  --down: #c05b52;
-  --tint-m-bg: #e3e9ef;
-  --tint-m-fg: #46596b;
-  --tint-f-bg: #f4e4dc;
-  --tint-f-fg: #a05537;
+  --card-soft: #e9e7df;
+  --line: #dcd9cf;
+  --line-strong: #c9c5b8;
+  --ink: #14181a;
+  --ink-soft: #454b4d;
+  --ink-mute: #6f7572;
+  --ink-faint: #9ea39f;
+  --accent: #14513c;
+  --accent-strong: #0e3d2d;
+  --accent-soft: #e1ebe4;
+  --accent-ink: #f6f3e4; /* accent 면 위에 올라가는 글자색 */
+  --up: #1d8a57;
+  --down: #c94a3c;
+  --live: #d93a2d;
+  --tint-m-bg: #e2eaf2;
+  --tint-m-fg: #2f6aa3;
+  --tint-f-bg: #f5e5df;
+  --tint-f-fg: #b8553c;
 
   /* 하위 호환 */
   --background: var(--surface);
   --foreground: var(--ink);
 }
 
+/* Dark — 나이트 매치 (경기 영상 점수판 색: 검정 + 노랑) */
 html.dark {
-  --surface: #161311;
-  --card: #1f1b18;
-  --card-soft: #282320;
-  --line: #322c27;
-  --line-strong: #453e36;
-  --ink: #ece7e1;
-  --ink-soft: #c7c0b8;
-  --ink-mute: #918a81;
-  --ink-faint: #665f57;
-  --accent: #d0815b;
-  --accent-strong: #dda283;
-  --accent-soft: #33251d;
-  --up: #6fae91;
-  --down: #d17b71;
-  --tint-m-bg: #26303a;
-  --tint-m-fg: #9db4c8;
-  --tint-f-bg: #3a2a22;
-  --tint-f-fg: #d8a385;
+  --surface: #121314;
+  --card: #1b1c1e;
+  --card-soft: #242528;
+  --line: #2e3033;
+  --line-strong: #3d4044;
+  --ink: #f4f4f1;
+  --ink-soft: #b9bab6;
+  --ink-mute: #8d8f8b;
+  --ink-faint: #5f615e;
+  --accent: #efc23c;
+  --accent-strong: #f5d36b;
+  --accent-soft: #2e2a1a;
+  --accent-ink: #18191b;
+  --up: #6fd19a;
+  --down: #ff7a6b;
+  --live: #ff5a4d;
+  --tint-m-bg: #1f2a36;
+  --tint-m-fg: #7fb2e6;
+  --tint-f-bg: #36251f;
+  --tint-f-fg: #f0a08a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light):not(.dark) {
-    --surface: #161311;
-    --card: #1f1b18;
-    --card-soft: #282320;
-    --line: #322c27;
-    --line-strong: #453e36;
-    --ink: #ece7e1;
-    --ink-soft: #c7c0b8;
-    --ink-mute: #918a81;
-    --ink-faint: #665f57;
-    --accent: #d0815b;
-    --accent-strong: #dda283;
-    --accent-soft: #33251d;
-    --up: #6fae91;
-    --down: #d17b71;
-    --tint-m-bg: #26303a;
-    --tint-m-fg: #9db4c8;
-    --tint-f-bg: #3a2a22;
-    --tint-f-fg: #d8a385;
+    --surface: #121314;
+    --card: #1b1c1e;
+    --card-soft: #242528;
+    --line: #2e3033;
+    --line-strong: #3d4044;
+    --ink: #f4f4f1;
+    --ink-soft: #b9bab6;
+    --ink-mute: #8d8f8b;
+    --ink-faint: #5f615e;
+    --accent: #efc23c;
+    --accent-strong: #f5d36b;
+    --accent-soft: #2e2a1a;
+    --accent-ink: #18191b;
+    --up: #6fd19a;
+    --down: #ff7a6b;
+    --live: #ff5a4d;
+    --tint-m-bg: #1f2a36;
+    --tint-m-fg: #7fb2e6;
+    --tint-f-bg: #36251f;
+    --tint-f-fg: #f0a08a;
   }
 }
 
@@ -98,26 +106,34 @@ html.dark {
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
   --color-up: var(--up);
   --color-down: var(--down);
+  --color-live: var(--live);
   --color-tint-m-bg: var(--tint-m-bg);
   --color-tint-m-fg: var(--tint-m-fg);
   --color-tint-f-bg: var(--tint-f-bg);
   --color-tint-f-fg: var(--tint-f-fg);
 }
 
-/* 러브포티 브랜드 클레이 팔레트 (로고 배경색 #BF633A 기준) */
+/* 구 clay-* 클래스 호환용 — 코트 초록 단계로 다시 매핑 (새 코드는 accent 토큰만 사용) */
 @theme {
-  --color-clay-50: #faf1ec;
-  --color-clay-100: #f4e0d5;
-  --color-clay-200: #e9c2ac;
-  --color-clay-300: #dda283;
-  --color-clay-400: #d0815b;
-  --color-clay-500: #c56f45;
-  --color-clay-600: #bf633a;
-  --color-clay-700: #a0522f;
-  --color-clay-800: #814226;
-  --color-clay-900: #66351f;
+  --color-clay-50: #eef4f0;
+  --color-clay-100: #dce9e1;
+  --color-clay-200: #b9d3c4;
+  --color-clay-300: #8fb8a1;
+  --color-clay-400: #5f977c;
+  --color-clay-500: #2f755a;
+  --color-clay-600: #14513c;
+  --color-clay-700: #0e3d2d;
+  --color-clay-800: #0b3024;
+  --color-clay-900: #082419;
+}
+
+/* 점수·순위 숫자: 고정폭 + 좁은 자간 */
+.num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
 body {

@@ -34,7 +34,7 @@ export default function ScoreInput({
               className={`
                 w-11 h-11 rounded-lg font-bold text-lg transition-all touch-target
                 ${isSelected
-                  ? 'bg-accent text-white scale-105'
+                  ? 'bg-accent text-accent-ink scale-105'
                   : 'bg-card-soft text-ink-soft hover:bg-line'
                 }
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}

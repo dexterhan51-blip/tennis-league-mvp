@@ -3,10 +3,8 @@
 import { useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { UserCheck, Loader2 } from 'lucide-react';
-import { getSupabase } from '@/lib/supabase';
 import { isGuestPlayer } from '@/utils/tennisLogic';
-import { MatchSchema } from '@/lib/schemas';
-import { upsertLeagueMatch, updateSeasonPlayers } from '@/lib/seasonApi';
+import { fetchSeasonById, fetchSeasonMatches, upsertLeagueMatch, updateSeasonPlayers } from '@/lib/seasonApi';
 import { useToast } from '@/contexts/ToastContext';
 import type { Player, Match, Gender } from '@/types';
 
@@ -82,9 +80,6 @@ export default function AdminGuestConverter({ leagues, pool, onConverted }: Admi
   }, [leagues]);
 
   const handleConvert = async (group: GuestGroup) => {
-    const supabase = getSupabase();
-    if (!supabase) return;
-
     const chosen = selection[group.key];
     if (!chosen) {
       showToast('전환할 선수를 선택해주세요.', 'warning');
@@ -108,21 +103,13 @@ export default function AdminGuestConverter({ leagues, pool, onConverted }: Admi
     setConvertingKey(group.key);
     try {
       // 해당 (시즌, 날짜)의 경기 행만 읽어 게스트를 치환 — 행 단위라 다른 기록과 충돌 없음
-      const [{ data: seasonRow, error: sErr }, { data: matchRows, error: mErr }] = await Promise.all([
-        supabase.from('seasons').select('players').eq('id', group.leagueId).single(),
-        supabase
-          .from('league_matches')
-          .select('id, match')
-          .eq('season_id', group.leagueId)
-          .eq('match_date', group.date),
+      const [seasonRow, seasonMatches] = await Promise.all([
+        fetchSeasonById(group.leagueId),
+        fetchSeasonMatches(group.leagueId),
       ]);
-      if (sErr || !seasonRow) throw sErr ?? new Error('season read failed');
-      if (mErr) throw mErr;
+      if (!seasonRow) throw new Error('season read failed');
 
-      for (const row of matchRows ?? []) {
-        const parsed = MatchSchema.safeParse(row.match);
-        if (!parsed.success) continue;
-        const m = parsed.data;
+      for (const m of seasonMatches.filter((x) => x.date === group.date)) {
         const replaced: Match = {
           ...m,
           teamA: replaceInTeam(m.teamA, group.guestId, target),
@@ -133,7 +120,7 @@ export default function AdminGuestConverter({ leagues, pool, onConverted }: Admi
         }
       }
 
-      const players = (seasonRow.players as Player[]) ?? [];
+      const players = seasonRow.players ?? [];
       if (!players.some((p) => p.id === target.id)) {
         await updateSeasonPlayers(group.leagueId, [...players, target]);
       }
@@ -142,7 +129,7 @@ export default function AdminGuestConverter({ leagues, pool, onConverted }: Admi
       onConverted();
     } catch (e) {
       console.warn('[guest-convert] failed:', e);
-      showToast('전환에 실패했습니다. 관리자 권한과 네트워크를 확인해주세요.', 'error');
+      showToast('전환에 실패했습니다. 운영진 코드와 네트워크를 확인해주세요.', 'error');
     } finally {
       setConvertingKey(null);
     }
@@ -198,7 +185,7 @@ export default function AdminGuestConverter({ leagues, pool, onConverted }: Admi
                 <button
                   onClick={() => handleConvert(g)}
                   disabled={busy}
-                  className="shrink-0 text-xs font-semibold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 px-3 py-2 rounded-lg transition-colors touch-target"
+                  className="shrink-0 text-xs font-semibold text-accent-ink bg-accent hover:bg-accent-strong disabled:opacity-50 px-3 py-2 rounded-lg transition-colors touch-target"
                 >
                   {busy ? <Loader2 size={14} className="animate-spin" /> : '전환'}
                 </button>

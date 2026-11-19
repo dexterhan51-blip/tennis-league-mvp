@@ -294,7 +294,7 @@ export default function SlotAssignmentDialog({
           <button
             onClick={handleConfirm}
             disabled={!isFull}
-            className="flex-1 py-3 rounded-xl font-semibold text-white bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
+            className="flex-1 py-3 rounded-xl font-semibold text-accent-ink bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
           >
             대진 생성
           </button>

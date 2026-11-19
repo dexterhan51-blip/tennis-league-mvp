@@ -11,6 +11,8 @@ import {
   isMissingTableError,
 } from '@/lib/seasonApi';
 import type { PlayerStat } from '@/types';
+import { isDemoMode } from '@/lib/backend';
+import { DEMO_MATCHES, DEMO_SEASON } from '@/lib/demoData';
 
 type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
@@ -71,6 +73,14 @@ export function useLiveDashboard(seasonId?: string | null): LiveDashboardData {
     let unsubscribe: (() => void) | null = null;
 
     async function init() {
+      // 서버 미설정(로컬 개발): 예시 데이터로 화면만 확인
+      if (isDemoMode()) {
+        setSeason(DEMO_SEASON);
+        setMatches(DEMO_MATCHES);
+        setUpdatedAt(DEMO_SEASON.updated_at);
+        setConnectionStatus('disconnected');
+        return;
+      }
       try {
         const row = seasonId ? await fetchSeasonById(seasonId) : await fetchLiveSeason();
         if (cancelled) return;

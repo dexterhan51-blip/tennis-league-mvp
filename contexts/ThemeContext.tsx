@@ -16,7 +16,8 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 const THEME_KEY = 'tennis-app-theme';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('system');
+  // 기본은 데이 코트(라이트). 다크(나이트 매치)·시스템 따라가기는 설정에서 고른 사람만 적용된다.
+  const [theme, setThemeState] = useState<Theme>('light');
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
   // Load theme from localStorage

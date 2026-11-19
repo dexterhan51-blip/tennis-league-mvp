@@ -50,3 +50,6 @@ docs/
 # Granite config
 granite.config.mts
 .env*.local
+
+# 서버 데이터 백업 (회원 실명·사진 포함 — 커밋 금지)
+backup/

@@ -93,7 +93,7 @@ export default function PlayersPage() {
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
             aria-label="선수 이름"
           />
-          <button onClick={handleAdd} className="bg-accent text-white px-5 rounded-xl font-semibold hover:bg-accent-strong transition-colors touch-target">
+          <button onClick={handleAdd} className="bg-accent text-accent-ink px-5 rounded-xl font-semibold hover:bg-accent-strong transition-colors touch-target">
             추가
           </button>
         </div>
