@@ -149,7 +149,9 @@ const EVENT_KINDS: [RegExp, RallyEventKind][] = [
   [/더블폴트/, 'double-fault'],
   [/폴트/, 'fault'],
   [/아웃/, 'out'],
+  [/네트코드/, 'net-cord'],
   [/네트/, 'net'],
+  [/에이스/, 'ace'],
   [/서브득점/, 'serve-winner'],
   [/발리득점|발리위너/, 'volley-winner'],
   [/포핸드위너/, 'forehand-winner'],
@@ -243,13 +245,14 @@ export function parseFcpxml(xml: string, fileName = ''): ImportedMatch {
   for (const title of titles) {
     const m = title.effect.match(/^([AB])_\d+_(.+)$/);
     if (!m) continue;
-    const kind = EVENT_KINDS.find(([re]) => re.test(m[2]))?.[1];
+    const codeKind: Record<string, RallyEventKind> = { FH_WINNER: 'forehand-winner', BH_WINNER: 'backhand-winner', RETURN_WINNER: 'return-winner', VOLLEY_WINNER: 'volley-winner', SERVE_POINT: 'serve-winner', ACE: 'ace', NET_CORD: 'net-cord', UE: 'miss' };
+    const kind = title.texts.map((text) => codeKind[text]).find(Boolean) ?? EVENT_KINDS.find(([re]) => re.test(m[2]))?.[1];
     if (!kind) continue;
     const team = m[1] as 'A' | 'B';
     const roster = team === 'A' ? teamA : teamB;
     const named = title.texts.filter((x) => [...teamA, ...teamB].includes(x));
     const captionName = named.length === 1 && roster.includes(named[0]) ? named[0] : undefined;
-    const serving = ['fault', 'double-fault', 'let', 'serve-winner'].includes(kind) ? serverAt(title.t) : undefined;
+    const serving = ['fault', 'double-fault', 'let', 'serve-winner', 'ace'].includes(kind) ? serverAt(title.t) : undefined;
     const playerName = captionName ?? (named.length === 0 && serving && roster.includes(serving) ? serving : undefined);
     if (named.length && !captionName) warnings.push(`${Math.round(title.t)}초: 선수 이름과 팀 표시가 맞지 않아 개인 귀속을 보류했습니다.`);
     events.push({ t: Math.round(title.t * 10) / 10, team, kind,
@@ -359,6 +362,8 @@ export type EventTally = Record<RallyEventKind, number>;
 
 export const EVENT_LABEL: Record<RallyEventKind, string> = {
   winner: '기타 득점',
+  ace: '서브에이스',
+  'net-cord': '네트코드',
   'serve-winner': '서브득점',
   'volley-winner': '발리득점',
   'forehand-winner': '포핸드 위너',

@@ -38,7 +38,7 @@ export const MatchDetailSchema = z.object({
     z.object({
       t: z.number(),
       team: z.enum(['A', 'B']),
-      kind: z.enum(['winner', 'net', 'out', 'fault', 'double-fault', 'serve-winner', 'volley-winner', 'forehand-winner', 'return-winner', 'backhand-winner', 'miss', 'let']),
+      kind: z.enum(['winner', 'net', 'out', 'fault', 'double-fault', 'serve-winner', 'volley-winner', 'forehand-winner', 'return-winner', 'backhand-winner', 'miss', 'let', 'ace', 'net-cord']),
       playerName: z.string().optional(),
       playerId: z.string().optional(),
       attribution: z.enum(['caption', 'server']).optional(),

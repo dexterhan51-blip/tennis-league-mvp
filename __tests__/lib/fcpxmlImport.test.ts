@@ -134,3 +134,13 @@ describe('1121 수정 편집본 개인 기록', () => {
     expect(MatchDetailSchema.parse(detail)).toEqual(detail);
   });
 });
+
+it('에이스·네트코드를 구분하고 템플릿 안의 샷 코드를 읽는다', () => {
+  const body = board('100s', '0', '0', 0, 0).replace('<text>', '<param name="A팀 서브" value="1"/><text>') +
+    '<title name="A_07_에이스" offset="101s"><text>ACE</text></title>' +
+    '<title name="A_20_네트코드" offset="102s"><text>NET_CORD</text><text>가</text></title>' +
+    '<title ref="r4" offset="103s"><text>FH_WINNER</text></title>';
+  const events = parseFcpxml(xml(body)).events;
+  expect(events).toMatchObject([{ kind: 'ace', playerName: '가', attribution: 'server' }, { kind: 'net-cord', playerName: '가' }, { kind: 'forehand-winner' }]);
+  expect(events[2].playerName).toBeUndefined();
+});

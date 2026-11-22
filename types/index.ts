@@ -30,7 +30,7 @@ export interface PointLogEntry {
 export type ScoringRule = 'no-ad' | 'deuce';
 
 /** 포인트가 어떻게 끝났는지 — 편집 파일의 기록용 자막에서 읽어 온 값 */
-export type RallyEventKind = 'winner' | 'net' | 'out' | 'fault' | 'double-fault' | 'serve-winner' | 'volley-winner' | 'forehand-winner' | 'return-winner' | 'backhand-winner' | 'miss' | 'let';
+export type RallyEventKind = 'winner' | 'net' | 'out' | 'fault' | 'double-fault' | 'serve-winner' | 'volley-winner' | 'forehand-winner' | 'return-winner' | 'backhand-winner' | 'miss' | 'let' | 'ace' | 'net-cord';
 
 export interface RallyEvent {
   t: number;            // 편집본 기준 초
