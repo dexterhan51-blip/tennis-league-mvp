@@ -5,7 +5,8 @@ import { ChevronDown, Play } from 'lucide-react';
 import { displayPoint, DEFAULT_SCORING_CONFIG } from '@/lib/liveScoring';
 import { EVENT_LABEL, tallyEvents } from '@/lib/fcpxmlImport';
 import { shortDate } from '@/lib/date';
-import { teamLabel } from '@/utils/playerInsights';
+import PersonalEventTable from './PersonalEventTable';
+import { teamLabel, teamMembers } from '@/utils/playerInsights';
 import type { RallyEventKind } from '@/types';
 import type { Match } from '@/types';
 
@@ -56,7 +57,7 @@ export default function ScoreRow({ match, label, highlightPlayerId }: ScoreRowPr
     <div className="bg-card rounded-[14px] px-3.5 py-3">
       <div className="flex items-center justify-between mb-2 text-[11px] font-bold text-ink-mute">
         <span>
-          {label ?? shortDate(match.date)}
+          {match.matchNumber ? `${shortDate(match.date)} · ${match.matchNumber}경기` : label ?? shortDate(match.date)}
           {match.isFriendly && ' · 친선'}
           {match.isExhibition && ' · 시범'}
         </span>
@@ -94,6 +95,7 @@ export default function ScoreRow({ match, label, highlightPlayerId }: ScoreRowPr
             const tally = tallyEvents(detail.events);
             return (
               <div className="mt-2 pb-1">
+                <PersonalEventTable events={detail.events} players={[...teamMembers(match.teamA), ...teamMembers(match.teamB)]} />
                 {(Object.keys(EVENT_LABEL) as RallyEventKind[]).map((kind) => (
                   <div key={kind} className="grid grid-cols-[40px_1fr_40px] items-center h-7 text-xs">
                     <span className="num text-left font-extrabold text-ink">{tally.A[kind]}</span>

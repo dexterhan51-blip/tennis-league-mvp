@@ -86,6 +86,7 @@ interface Title {
   t: number;
   effect: string;
   texts: string[];
+  servers: string[];
 }
 
 const TIMED = new Set(['asset-clip', 'clip', 'gap', 'title', 'video', 'ref-clip', 'sync-clip', 'mc-clip', 'audition']);
@@ -105,6 +106,7 @@ function collectTitles(spine: XmlNode, effectName: Map<string, string>): Title[]
         titles.push({
           t: at,
           effect: effectName.get(c.attrs.ref ?? '') ?? c.attrs.name ?? '',
+          servers: c.children.filter((x) => x.tag === 'param' && /^(A|B)팀2? 서브$/.test(x.attrs.name ?? '') && x.attrs.value === '1').map((x) => x.attrs.name),
           texts: c.children.filter((x) => x.tag === 'text').map((x) => allText(x).trim()),
         });
       }
@@ -120,6 +122,8 @@ function collectTitles(spine: XmlNode, effectName: Map<string, string>): Title[]
 export interface ImportedMatch {
   /** 편집 프로젝트 이름 (예: 261004_10경기) */
   projectName: string;
+  projectUid?: string;
+  matchNumber: number | null;
   /** 'YYYY-MM-DD' — 프로젝트 이름 앞 6자리(YYMMDD)에서. 못 읽으면 null */
   date: string | null;
   place: string | null;
@@ -127,7 +131,7 @@ export interface ImportedMatch {
   teamB: string[];
   scoreA: number;
   scoreB: number;
-  pointLog: PointLogEntry[];
+  pointLog: (PointLogEntry & { serverName?: string })[];
   events: RallyEvent[];
   /** 읽으면서 확신하지 못한 부분 (화면에 그대로 보여준다) */
   warnings: string[];
@@ -146,7 +150,14 @@ const EVENT_KINDS: [RegExp, RallyEventKind][] = [
   [/폴트/, 'fault'],
   [/아웃/, 'out'],
   [/네트/, 'net'],
-  [/득점/, 'winner'],
+  [/서브득점/, 'serve-winner'],
+  [/발리득점|발리위너/, 'volley-winner'],
+  [/포핸드위너/, 'forehand-winner'],
+  [/백핸드위너/, 'backhand-winner'],
+  [/리턴위너/, 'return-winner'],
+  [/미스샷/, 'miss'],
+  [/렛/, 'let'],
+  [/득점|위너/, 'winner'],
 ];
 
 interface Board {
@@ -180,7 +191,7 @@ function readBoard(title: Title): Board | null {
   return null;
 }
 
-export function parseFcpxml(xml: string): ImportedMatch {
+export function parseFcpxml(xml: string, fileName = ''): ImportedMatch {
   // 맥에서 만든 파일은 한글이 자모로 풀려(NFD) 저장되는 경우가 있어 먼저 합친다 — 안 그러면 '점수판' 같은 이름이 안 맞는다
   const root = parseXml(xml.normalize('NFC'));
   if (findAll(root, 'fcpxml').length === 0) throw new FcpxmlImportError('파이널컷 편집 파일(FCPXML)이 아닙니다.');
@@ -219,13 +230,31 @@ export function parseFcpxml(xml: string): ImportedMatch {
     throw new FcpxmlImportError('점수판에서 선수 이름을 읽지 못했습니다.');
   }
 
-  // 기록용 자막
+  // 선수 이름을 적은 자막을 우선하고, 서브 관련 기록만 점수판의 서브 표시로 귀속한다.
+  const serverSlots: Record<string, string | undefined> = {
+    'A팀 서브': teamA[0], 'A팀2 서브': teamA[1],
+    'B팀 서브': teamB[0], 'B팀2 서브': teamB[1],
+  };
+  const serverAt = (t: number) => {
+    const board = titles.filter((x) => /점수판/.test(x.effect) && x.t <= t).pop();
+    return board?.servers.length === 1 ? serverSlots[board.servers[0]] : undefined;
+  };
   const events: RallyEvent[] = [];
   for (const title of titles) {
     const m = title.effect.match(/^([AB])_\d+_(.+)$/);
     if (!m) continue;
     const kind = EVENT_KINDS.find(([re]) => re.test(m[2]))?.[1];
-    if (kind) events.push({ t: Math.round(title.t * 10) / 10, team: m[1] as 'A' | 'B', kind });
+    if (!kind) continue;
+    const team = m[1] as 'A' | 'B';
+    const roster = team === 'A' ? teamA : teamB;
+    const named = title.texts.filter((x) => [...teamA, ...teamB].includes(x));
+    const captionName = named.length === 1 && roster.includes(named[0]) ? named[0] : undefined;
+    const serving = ['fault', 'double-fault', 'let', 'serve-winner'].includes(kind) ? serverAt(title.t) : undefined;
+    const playerName = captionName ?? (named.length === 0 && serving && roster.includes(serving) ? serving : undefined);
+    if (named.length && !captionName) warnings.push(`${Math.round(title.t)}초: 선수 이름과 팀 표시가 맞지 않아 개인 귀속을 보류했습니다.`);
+    events.push({ t: Math.round(title.t * 10) / 10, team, kind,
+      ...(playerName ? { playerName, attribution: captionName ? 'caption' as const : 'server' as const } : {}),
+    });
   }
 
   // 최종 스코어: 경기종료 자막의 "4 : 0"
@@ -234,15 +263,28 @@ export function parseFcpxml(xml: string): ImportedMatch {
     if (!/경기종료/.test(title.effect)) continue;
     for (const text of title.texts) {
       const m = text.match(/^(\d{1,2})\s*:\s*(\d{1,2})$/);
-      if (m) finalScore = { a: Number(m[1]), b: Number(m[2]), t: title.t };
+      if (m) {
+        let a = Number(m[1]); let b = Number(m[2]);
+        // 템플릿 이름의 승리_A는 레이아웃 이름일 뿐. 실제 승리 문구/상대 이름으로 점수 방향을 정한다.
+        const winnerText = title.texts.find((x) => /승리/.test(x)) ?? '';
+        const opponentText = title.texts.find((x) => /^vs\s/i.test(x)) ?? '';
+        const includesTeam = (text: string, team: string[]) => team.every((n) => text.split(/\s+|[·&,]/).includes(n));
+        const winnerA = includesTeam(winnerText, teamA) || includesTeam(opponentText, teamB);
+        const winnerB = includesTeam(winnerText, teamB) || includesTeam(opponentText, teamA);
+        if (winnerA && winnerB) throw new FcpxmlImportError('경기종료 자막의 승리팀과 상대팀이 모순됩니다. 자막을 확인해주세요.');
+        if (winnerA) [a, b] = [Math.max(a, b), Math.min(a, b)];
+        if (winnerB) [a, b] = [Math.min(a, b), Math.max(a, b)];
+        finalScore = { a, b, t: title.t };
+      }
     }
   }
 
   // 포인트 흐름: 점수판이 바뀔 때마다 한 포인트
-  const pointLog: PointLogEntry[] = [];
+  const pointLog: ImportedMatch['pointLog'] = [];
   const push = (t: number, prev: Board, winner: 'A' | 'B', gameWon: boolean, next: { ga: number; gb: number }) => {
     pointLog.push({
       t: Math.round(t),
+      ...(serverAt(prev.t) ? { serverName: serverAt(prev.t) } : {}),
       winner,
       // 게임을 따낸 포인트는 점수판이 0-0 으로 돌아가므로, 직전 점수에 한 점을 더한 값으로 남긴다
       pointA: prev.pa + (winner === 'A' ? 1 : 0),
@@ -282,21 +324,33 @@ export function parseFcpxml(xml: string): ImportedMatch {
     warnings.push('경기종료 자막이 없어 마지막 점수판의 게임 수를 최종 스코어로 삼았습니다.');
   }
 
-  // 날짜: 프로젝트 이름 앞 6자리 YYMMDD
+  // 파일명/프로젝트 YYYYMMDD_01경기, 기존 YYMMDD 및 점수판 YYYYMMDD도 지원.
   const projectName = project.attrs.name ?? '';
-  let date: string | null = null;
-  const d = projectName.match(/^(\d{2})(\d{2})(\d{2})/);
-  if (d && Number(d[2]) >= 1 && Number(d[2]) <= 12 && Number(d[3]) >= 1 && Number(d[3]) <= 31) {
-    date = `20${d[1]}-${d[2]}-${d[3]}`;
-  } else {
-    warnings.push('프로젝트 이름에서 날짜를 읽지 못했습니다. 날짜를 직접 골라주세요.');
-  }
+  const dateOf = (value: string): string | null => {
+    const m = value.normalize('NFC').match(/^(?:(20\d{2})(\d{2})(\d{2})|(\d{2})(\d{2})(\d{2}))(?=\D|$)/);
+    if (!m) return null;
+    const year = m[1] ?? `20${m[4]}`; const month = m[2] ?? m[5]; const day = m[3] ?? m[6];
+    const date = `${year}-${month}-${day}`;
+    const time = new Date(`${date}T00:00:00Z`);
+    return Number.isFinite(time.getTime()) && time.toISOString().slice(0, 10) === date ? date : null;
+  };
+  const filenameBase = fileName.normalize('NFC').split('/').filter((x) => !/^Info\.fcpxml$/i.test(x)).pop() ?? '';
+  const dates = [...new Set([dateOf(filenameBase), dateOf(projectName), ...boards.map((x) => dateOf(x.label))].filter((x): x is string => !!x))];
+  if (dates.length > 1) throw new FcpxmlImportError('파일명·프로젝트·점수판 날짜가 서로 다릅니다. 같은 날짜로 맞춰주세요.');
+  const date = dates[0] ?? null;
+  const numbers = [...new Set([filenameBase, projectName].flatMap((x) => {
+    const m = x.match(/(?:^|[_\s-])(\d+)경기/); return m && Number(m[1]) > 0 ? [Number(m[1])] : [];
+  }))];
+  if (numbers.length > 1) throw new FcpxmlImportError('파일명과 프로젝트의 경기번호가 다릅니다. 같은 번호로 맞춰주세요.');
+  const matchNumber = numbers[0] ?? null;
+  if (!date) warnings.push('날짜를 읽지 못했습니다. 날짜를 직접 골라주세요.');
+  if (!matchNumber) warnings.push('경기번호를 읽지 못했습니다. 경기번호를 직접 입력해주세요.');
 
   // 장소: 장소 자막의 첫 줄, 없으면 점수판 머리글에서 숫자를 뗀 값
   const placeTitle = titles.find((x) => /장소/.test(x.effect));
   const place = placeTitle?.texts[0] || lastBoard.label.replace(/^\d+\s*/, '').trim() || null;
 
-  return { projectName, date, place, teamA, teamB, scoreA, scoreB, pointLog, events, warnings };
+  return { projectName, projectUid: project.attrs.uid, matchNumber, date, place, teamA, teamB, scoreA, scoreB, pointLog, events, warnings };
 }
 
 // ── 집계 ─────────────────────────────────────────────────────
@@ -304,7 +358,14 @@ export function parseFcpxml(xml: string): ImportedMatch {
 export type EventTally = Record<RallyEventKind, number>;
 
 export const EVENT_LABEL: Record<RallyEventKind, string> = {
-  winner: '득점',
+  winner: '기타 득점',
+  'serve-winner': '서브득점',
+  'volley-winner': '발리득점',
+  'forehand-winner': '포핸드 위너',
+  'backhand-winner': '백핸드 위너',
+  'return-winner': '리턴 위너',
+  miss: '미스샷',
+  let: '렛',
   net: '네트',
   out: '아웃',
   fault: '폴트',
@@ -312,7 +373,7 @@ export const EVENT_LABEL: Record<RallyEventKind, string> = {
 };
 
 export function emptyTally(): EventTally {
-  return { winner: 0, net: 0, out: 0, fault: 0, 'double-fault': 0 };
+  return Object.fromEntries(Object.keys(EVENT_LABEL).map((k) => [k, 0])) as EventTally;
 }
 
 /** 팀별 득점·에러 횟수 */

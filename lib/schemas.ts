@@ -30,19 +30,25 @@ export const PointLogEntrySchema = z.object({
 
 export const MatchDetailSchema = z.object({
   source: z.literal('fcpxml'),
+  projectName: z.string().optional(),
+  projectUid: z.string().optional(),
   place: z.string().optional(),
   importedAt: z.string(),
   events: z.array(
     z.object({
       t: z.number(),
       team: z.enum(['A', 'B']),
-      kind: z.enum(['winner', 'net', 'out', 'fault', 'double-fault']),
+      kind: z.enum(['winner', 'net', 'out', 'fault', 'double-fault', 'serve-winner', 'volley-winner', 'forehand-winner', 'return-winner', 'backhand-winner', 'miss', 'let']),
+      playerName: z.string().optional(),
+      playerId: z.string().optional(),
+      attribution: z.enum(['caption', 'server']).optional(),
     })
   ),
 });
 
 export const MatchSchema = z.object({
   id: z.string(),
+  matchNumber: z.number().int().positive().optional(),
   date: z.string(),
   teamA: TeamSchema,
   teamB: TeamSchema,

@@ -8,6 +8,7 @@ import { FullError, FullLoading } from '@/components/ui/DataState';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClubData } from '@/hooks/useClubData';
 import { currentScope, photoMap } from '@/lib/clubView';
+import PersonalEventTable from '@/components/match/PersonalEventTable';
 import { EVENT_LABEL, emptyTally, type EventTally } from '@/lib/fcpxmlImport';
 import { DEMO_MY_PLAYER_ID } from '@/lib/demoData';
 import {
@@ -208,6 +209,7 @@ export default function MePage() {
 
           {detailed.length > 0 && (
             <section className="mt-[22px]">
+              <PersonalEventTable events={detailed.flatMap((m) => m.detail?.events ?? [])} players={[{ id: myPlayerId ?? undefined, name }]} />
               <div className="mb-1.5"><Eyebrow>상세 기록 · 영상 편집본 {detailed.length}경기</Eyebrow></div>
               <div className="grid grid-cols-[1fr_56px_56px] items-center text-[10px] font-extrabold tracking-[0.06em] text-ink-mute h-7">
                 <span />
@@ -221,7 +223,7 @@ export default function MePage() {
                   <span className="num text-right font-semibold text-ink-mute">{theirs[kind]}</span>
                 </div>
               ))}
-              <p className="mt-2 text-[11px] text-ink-faint">편집본의 기록은 팀 단위라, 파트너의 플레이도 우리 팀에 함께 들어갑니다.</p>
+              <p className="mt-2 text-[11px] text-ink-faint">위 개인 표는 내 이름에 연결된 기록만, 아래 팀 합계는 파트너 기록까지 포함합니다. 개인 미확인 기록은 임의로 배분하지 않습니다.</p>
             </section>
           )}
 

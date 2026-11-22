@@ -1,0 +1,2893 @@
+<fcpxml version="1.14">
+  <resources>
+    <effect id="r3" name="0_점수판" />
+    <effect id="r4" name="B_14_포핸드위너" />
+    <effect id="r5" name="밸런스" />
+    <effect id="r6" name="색상 조절" />
+    <effect id="r7" name="B_21_미스샷" />
+    <effect id="r8" name="A_01_아웃" />
+    <effect id="r9" name="A_04_네트" />
+    <effect id="r10" name="B_02_폴트" />
+    <effect id="r11" name="B_01_아웃" />
+    <effect id="r12" name="A_21_미스샷" />
+    <effect id="r13" name="코트체인지_C_소프트" />
+    <effect id="r14" name="오디오 크로스페이드" />
+    <effect id="r15" name="B_04_네트" />
+    <effect id="r16" name="B_13_리턴위너" />
+    <effect id="r17" name="A_02_폴트" />
+    <effect id="r18" name="서브체인지_C_소프트" />
+    <effect id="r19" name="B_05_렛" />
+    <effect id="r20" name="B_03_더블폴트" />
+    <effect id="r21" name="B_09_서브득점" />
+    <effect id="r22" name="0_방송상황_no_ad_노애드" />
+    <effect id="r23" name="B_10_발리득점" />
+    <effect id="r24" name="A_09_서브득점" />
+    <effect id="r25" name="A_03_더블폴트" />
+    <effect id="r26" name="A_10_발리득점" />
+    <effect id="r27" name="B_06_인" />
+    <effect id="r28" name="0_경기종료_승리_A" />
+  </resources>
+  <project name="1121_1경기" uid="test-personal-records">
+    <sequence duration="3385200/6000s">
+      <spine>
+        <title ref="r3" offset="0s" start="0s" duration="83200/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r4" offset="148/15s" start="0s" duration="230400/153600s">
+          <text>
+                                    포핸드위너
+                                </text>
+          <text>
+                                    FH_WINNER
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="208/15s" start="0s" duration="113000/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    15 
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r7" offset="156/5s" start="0s" duration="230400/153600s">
+          <text>
+                                    미스샷
+                                </text>
+          <text>
+                                    UE
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="327/10s" start="0s" duration="65000/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r8" offset="831/20s" start="0s" duration="230400/153600s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="653/15s" start="0s" duration="182000/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r9" offset="2153/30s" start="0s" duration="230400/153600s">
+          <text>
+                                    네트
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="1108/15s" start="0s" duration="35900/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="4687/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="1597/20s" start="0s" duration="66700/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r11" offset="5341/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="2729/30s" start="0s" duration="30800/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="5663/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="961/10s" start="0s" duration="60500/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r12" offset="3107/30s" start="0s" duration="230400/153600s">
+          <text>
+                                    미스샷
+                                </text>
+          <text>
+                                    UE
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="6371/60s" start="0s" duration="19s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r15" offset="7421/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    네트
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="7511/60s" start="0s" duration="57800/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r15" offset="7999/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    네트
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="8089/60s" start="0s" duration="47400/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r16" offset="8473/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    리턴위너
+                                </text>
+          <text>
+                                    RETURN_WINNER
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="8563/60s" start="0s" duration="85900/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r7" offset="2333/15s" start="0s" duration="230400/153600s">
+          <text>
+                                    미스샷
+                                </text>
+          <text>
+                                    UE
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="4711/30s" start="0s" duration="22000/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r17" offset="796/5s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="1607/10s" start="0s" duration="71500/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r8" offset="10267/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="10357/60s" start="0s" duration="42900/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r11" offset="2674/15s" start="0s" duration="230400/153600s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="5393/30s" start="0s" duration="28600/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r19" offset="5491/30s" start="0s" duration="230400/153600s">
+          <text>
+                                    렛
+                                </text>
+        </title>
+        <title ref="r3" offset="2768/15s" start="0s" duration="21800/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="560/3s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="1129/6s" start="0s" duration="23200/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r20" offset="3809/20s" start="0s" duration="230400/153600s">
+          <text>
+                                    더블폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="5761/30s" start="0s" duration="154700/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r15" offset="12979/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    네트
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="13069/60s" start="0s" duration="38800/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r8" offset="13367/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="13457/60s" start="0s" duration="23000/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="13603/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="13687/60s" start="0s" duration="39900/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r21" offset="3488/15s" start="0s" duration="230400/153600s">
+          <text>
+                                    서브득점
+                                </text>
+          <text>
+                                    SERVE_POINT
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="7043/30s" start="0s" duration="26700/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="14263/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="14353/60s" start="0s" duration="79000/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r12" offset="15053/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    미스샷
+                                </text>
+          <text>
+                                    UE
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="15143/60s" start="0s" duration="22500/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="7639/30s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="3842/15s" start="0s" duration="49500/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r11" offset="15773/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="15863/60s" start="0s" duration="23s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r22" offset="15863/60s" start="0s" duration="4s">
+          <text>
+                                    마지막 한 포인트
+                                </text>
+          <text>
+                                    노애드
+                                </text>
+        </title>
+        <title ref="r23" offset="17159/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    발리위너
+                                </text>
+          <text>
+                                    VOLLEY_WINNER
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="17243/60s" start="0s" duration="110700/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="1" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r23" offset="913/3s" start="0s" duration="230400/153600s">
+          <text>
+                                    발리위너
+                                </text>
+          <text>
+                                    VOLLEY_WINNER
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="1835/6s" start="0s" duration="35800/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="1" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r24" offset="3103/10s" start="0s" duration="230400/153600s">
+          <text>
+                                    서브득점
+                                </text>
+          <text>
+                                    SERVE_POINT
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="1559/5s" start="0s" duration="58800/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="1" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r9" offset="6397/20s" start="0s" duration="230400/153600s">
+          <text>
+                                    네트
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="1608/5s" start="0s" duration="25900/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="1" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r17" offset="3893/12s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="3911/12s" start="0s" duration="23000/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="1" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r25" offset="1313/4s" start="0s" duration="230400/153600s">
+          <text>
+                                    더블폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="1319/4s" start="0s" duration="69500/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="1" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r11" offset="2039/6s" start="0s" duration="230400/153600s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="1024/3s" start="0s" duration="53900/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="1" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r26" offset="20929/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    발리위너
+                                </text>
+          <text>
+                                    VOLLEY_WINNER
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="21019/60s" start="0s" duration="36900/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="1" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    1
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r22" offset="21019/60s" start="0s" duration="4s">
+          <text>
+                                    마지막 한 포인트
+                                </text>
+          <text>
+                                    노애드
+                                </text>
+        </title>
+        <title ref="r26" offset="10649/30s" start="0s" duration="1s">
+          <text>
+                                    발리위너
+                                </text>
+          <text>
+                                    VOLLEY_WINNER
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="5347/15s" start="0s" duration="47200/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r9" offset="2177/6s" start="0s" duration="230400/153600s">
+          <text>
+                                    네트
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="1093/3s" start="0s" duration="22700/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="21997/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="22087/60s" start="0s" duration="23200/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r20" offset="22229/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    더블폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="22319/60s" start="0s" duration="22300/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="1871/5s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="3757/10s" start="0s" duration="22300/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r20" offset="4535/12s" start="0s" duration="230400/153600s">
+          <text>
+                                    더블폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="4553/12s" start="0s" duration="21000/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="4577/12s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="4595/12s" start="0s" duration="52000/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r11" offset="4681/12s" start="0s" duration="230400/153600s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="4699/12s" start="0s" duration="26300/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="5917/15s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="11879/30s" start="0s" duration="23700/6000s">
+          <param name="B팀 서브" value="1" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r20" offset="4781/12s" start="0s" duration="1s">
+          <text>
+                                    더블폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="4799/12s" start="0s" duration="136800/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r7" offset="25273/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    미스샷
+                                </text>
+          <text>
+                                    UE
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="25363/60s" start="0s" duration="63400/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r23" offset="25907/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    발리위너
+                                </text>
+          <text>
+                                    VOLLEY_WINNER
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="25997/60s" start="0s" duration="70700/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r8" offset="13307/30s" start="0s" duration="230400/153600s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="6676/15s" start="0s" duration="39500/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r9" offset="9003/20s" start="0s" duration="230400/153600s">
+          <text>
+                                    네트
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="9033/20s" start="0s" duration="25000/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r17" offset="1817/4s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="27349/60s" start="0s" duration="38400/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r24" offset="27643/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    서브득점
+                                </text>
+          <text>
+                                    SERVE_POINT
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="27733/60s" start="0s" duration="88000/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="1" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="0" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    2
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r8" offset="28493/60s" start="0s" duration="1s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="28613/60s" start="0s" duration="20000/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="28723/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="28813/60s" start="0s" duration="22900/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r20" offset="7238/15s" start="0s" duration="230400/153600s">
+          <text>
+                                    더블폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="14521/30s" start="0s" duration="60300/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    0
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r8" offset="2466/5s" start="0s" duration="5300/6000s">
+          <text>
+                                    아웃
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text />
+          <text>
+                                    NONE
+                                </text>
+        </title>
+        <title ref="r3" offset="5929/12s" start="0s" duration="23400/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r10" offset="29789/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    폴트
+                                </text>
+        </title>
+        <title ref="r3" offset="29879/60s" start="0s" duration="128500/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r27" offset="10259/20s" start="0s" duration="230400/153600s">
+          <text>
+                                    인!
+                                </text>
+        </title>
+        <title ref="r12" offset="6181/12s" start="0s" duration="230400/153600s">
+          <text>
+                                    미스샷
+                                </text>
+          <text>
+                                    UE
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="2597/5s" start="0s" duration="40300/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    30
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r21" offset="31477/60s" start="0s" duration="230400/153600s">
+          <text>
+                                    서브득점
+                                </text>
+          <text>
+                                    SERVE_POINT
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r3" offset="31567/60s" start="0s" duration="228500/6000s">
+          <param name="B팀 서브" value="0" />
+          <param name="A팀 서브" value="0" />
+          <param name="A팀2 서브" value="0" />
+          <param name="B팀2 서브" value="1" />
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    /
+                                </text>
+          <text>
+                                    20261121 안산포시즌
+                                </text>
+          <text>
+                                    15
+                                </text>
+          <text>
+                                    40
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    3
+                                </text>
+          <text>
+                                    한피디
+                                </text>
+          <text>
+                                    우유니
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text>
+                                    김주사
+                                </text>
+        </title>
+        <title ref="r23" offset="16277/30s" start="0s" duration="230400/153600s">
+          <text>
+                                    발리위너
+                                </text>
+          <text>
+                                    VOLLEY_WINNER
+                                </text>
+          <text>
+                                    손과장
+                                </text>
+          <text />
+          <text />
+        </title>
+        <title ref="r28" offset="8161/15s" start="0s" duration="4s">
+          <text>
+                                    vs 한피디 · 우유니
+                                </text>
+          <text>
+                                    4 : 3
+                                </text>
+          <text>
+                                    MATCH COMPLETE
+                                </text>
+          <text>
+                                    손과장 · 김주사 승리
+                                </text>
+        </title>
+      </spine>
+    </sequence>
+  </project>
+</fcpxml>

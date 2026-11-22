@@ -61,7 +61,7 @@ describe('parseFcpxml', () => {
     expect(r.pointLog.map((p) => p.winner)).toEqual(['A', 'A', 'A', 'A']);
     expect(r.pointLog[0]).toMatchObject({ t: 5, pointA: 1, pointB: 0, gameA: 0, gameB: 0 });
     expect(r.pointLog[3]).toMatchObject({ t: 18, pointA: 4, pointB: 0, gameA: 1, gameB: 0, gameWon: 'A' });
-    expect(tallyEvents(r.events)).toEqual({
+    expect(tallyEvents(r.events)).toMatchObject({
       A: { winner: 1, net: 0, out: 0, fault: 1, 'double-fault': 0 },
       B: { winner: 0, net: 1, out: 0, fault: 0, 'double-fault': 1 },
     });
@@ -96,5 +96,41 @@ describe('parseFcpxml', () => {
   it('점수판이 없거나 FCPXML 이 아니면 이유를 말해준다', () => {
     expect(() => parseFcpxml('<html></html>')).toThrow(FcpxmlImportError);
     expect(() => parseFcpxml(xml(event('r3', '104s')))).toThrow('점수판 자막을 찾지 못했습니다');
+  });
+});
+
+describe('1121 수정 편집본 개인 기록', () => {
+  const sample = require('fs').readFileSync(require('path').join(__dirname, '../fixtures/personal-records.fcpxml'), 'utf8') as string;
+  it('점수판 날짜, 실제 B팀 승리와 42포인트를 복원한다', () => {
+    const r = parseFcpxml(sample);
+    expect(r).toMatchObject({ date: '2026-11-21', matchNumber: 1, scoreA: 3, scoreB: 4, teamB: ['손과장', '김주사'], warnings: [] });
+    expect(r.pointLog).toHaveLength(42);
+    expect(r.events.every((e) => !!e.playerName)).toBe(true);
+    const count = (name: string, kind: string) => r.events.filter((e) => e.playerName === name && e.kind === kind).length;
+    expect(count('손과장', 'double-fault')).toBe(3);
+    expect(count('김주사', 'double-fault')).toBe(2);
+    expect(count('우유니', 'double-fault')).toBe(1);
+    expect(count('한피디', 'double-fault')).toBe(0);
+    expect(count('손과장', 'volley-winner')).toBe(4);
+    expect(count('손과장', 'forehand-winner')).toBe(1);
+    expect(count('손과장', 'return-winner')).toBe(1);
+    expect(r.events.filter((e) => e.kind === 'miss')).toHaveLength(6);
+    expect(r.events.filter((e) => e.kind === 'double-fault').every((e) => e.attribution === 'server')).toBe(true);
+  });
+  it('수정 버전은 같은 번호이고 파일명/자막 날짜 충돌은 거부한다', () => {
+    expect(parseFcpxml(sample, '20261121_01경기_안산포시즌_v02.fcpxmld').matchNumber).toBe(1);
+    expect(() => parseFcpxml(sample, '20261122_01경기_v01.fcpxml')).toThrow('날짜');
+    expect(() => parseFcpxml(sample, '20261121_02경기_v01.fcpxml')).toThrow('경기번호');
+  });
+  it('서브 표시가 없으면 이름 없는 폴트를 개인에게 추측 배분하지 않는다', () => {
+    const r = parseFcpxml(sample.replace(/<param[^>]*\/>/g, ''));
+    expect(r.events.filter((e) => e.kind === 'double-fault').every((e) => !e.playerName)).toBe(true);
+    expect(r.events.some((e) => e.attribution === 'caption')).toBe(true);
+  });
+  it('저장 검증에서도 개인 이름·ID·근거와 프로젝트 정보가 보존된다', () => {
+    const { MatchDetailSchema } = require('@/lib/schemas');
+    const r = parseFcpxml(sample);
+    const detail = { source: 'fcpxml', importedAt: '2026-11-22', projectName: r.projectName, projectUid: r.projectUid, events: r.events.map((e) => ({ ...e, playerId: `member-${e.playerName}` })) };
+    expect(MatchDetailSchema.parse(detail)).toEqual(detail);
   });
 });
