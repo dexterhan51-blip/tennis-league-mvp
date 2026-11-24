@@ -46,6 +46,14 @@ export const MatchDetailSchema = z.object({
   ),
 });
 
+export const ScheduleItemSchema = z.object({
+  id: z.string().min(1).max(100),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  time: z.string().regex(/^(\d{2}:\d{2})?$/),
+  place: z.string().trim().min(1).max(40),
+  memo: z.string().trim().max(60).optional(),
+});
+
 export const MatchSchema = z.object({
   id: z.string(),
   matchNumber: z.number().int().positive().optional(),

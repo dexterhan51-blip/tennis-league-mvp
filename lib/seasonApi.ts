@@ -3,7 +3,7 @@
 // 관리자 쓰기 경로는 lib/writeQueue.ts를 통해 오프라인 재시도가 보장된다.
 // (2026-11 Supabase에서 이전 — 함수 이름과 반환 형태는 그대로 유지)
 
-import type { FriendlyMatchRow, Match, Player, PlayerStat, SeasonRow } from '@/types';
+import type { FriendlyMatchRow, Match, Player, PlayerStat, SeasonRow, ScheduleItem } from '@/types';
 import { MatchSchema } from '@/lib/schemas';
 import { apiGet, apiPost, isDemoMode } from '@/lib/backend';
 
@@ -75,6 +75,7 @@ interface AllResponse {
   seasons: { season: SeasonRow; matches: unknown[] }[];
   friendly: FriendlyMatchRow[];
   members?: Player[];
+  schedule?: ScheduleItem[];
 }
 
 /** 전체 시즌 + 경기 + 친선경기 일괄 조회 (종합·통산 랭킹용, 요청 1번) */
@@ -82,10 +83,12 @@ export async function fetchEverything(): Promise<{
   seasons: { season: SeasonRow; matches: Match[] }[];
   friendly: FriendlyMatchRow[];
   members: Player[];
+  schedule: ScheduleItem[];
 }> {
   const res = await wrap(() => apiGet<AllResponse>('all'));
   return {
     members: res.members ?? [],
+    schedule: res.schedule ?? [],
     seasons: res.seasons.map(({ season, matches }) => ({ season, matches: parseMatches(matches) })),
     friendly: res.friendly.filter((f) => MatchSchema.safeParse(f.match).success),
   };
@@ -114,6 +117,16 @@ export async function fetchMembers(): Promise<Player[]> {
 
 export async function saveMembers(players: Player[]): Promise<void> {
   await wrap(() => apiPost({ op: 'members-set', players }));
+}
+
+// ── 다음 모임 일정 (운영진) ─────────────────────────────────
+
+export async function saveScheduleItem(item: ScheduleItem): Promise<void> {
+  await wrap(() => apiPost({ op: 'schedule-upsert', item }));
+}
+
+export async function deleteScheduleItem(id: string): Promise<void> {
+  await wrap(() => apiPost({ op: 'schedule-delete', id }));
 }
 
 // ── 시즌 쓰기 (관리자) ───────────────────────────────────────

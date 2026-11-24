@@ -1,16 +1,15 @@
 "use client";
 
-import TodayView from "@/components/home/TodayView";
+import ClubHome from "@/components/home/ClubHome";
 import { FullError, FullLoading } from "@/components/ui/DataState";
 import { useAuth } from "@/contexts/AuthContext";
 import { useClubData } from "@/hooks/useClubData";
-import { currentScope } from "@/lib/clubView";
 import { DEMO_MY_PLAYER_ID } from "@/lib/demoData";
 
-// 오늘(홈) — 진행 중 시즌이 있으면 그 시즌, 없으면 올해 전체 경기 기준으로 내 순위를 보여준다.
-// 기록·관리 기능은 하단 「운영」 탭(/admin)에 모여 있다.
+// 첫 화면 — 클럽 소식(최근 경기 띠·지난 모임·다음 모임·기간 상위 3·기록 리더·이전 모임).
+// 내 순위·개인 기록은 「나」 탭, 기록·관리는 운영진의 「운영」 탭.
 export default function Home() {
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   const { data, status, isDemo } = useClubData(true);
 
   if (status === "loading") return <FullLoading />;
@@ -19,11 +18,6 @@ export default function Home() {
   }
 
   return (
-    <TodayView
-      scope={currentScope(data)}
-      myPlayerId={isDemo ? DEMO_MY_PLAYER_ID : profile.player_id}
-      displayName={isDemo ? "한씨" : profile.name}
-      isDemo={isDemo}
-    />
+    <ClubHome data={data} myPlayerId={isDemo ? DEMO_MY_PLAYER_ID : profile.player_id} isAdmin={isAdmin} isDemo={isDemo} />
   );
 }

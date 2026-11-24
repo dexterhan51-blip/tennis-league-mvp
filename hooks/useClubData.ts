@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { apiGet, isDemoMode } from '@/lib/backend';
 import { fetchEverything } from '@/lib/seasonApi';
-import { DEMO_MATCHES, DEMO_PLAYERS, DEMO_SEASON } from '@/lib/demoData';
+import { DEMO_MATCHES, DEMO_PLAYERS, DEMO_SCHEDULE, DEMO_SEASON } from '@/lib/demoData';
 import type { ClubData } from '@/lib/clubView';
 
 const DEMO_DATA: ClubData = {
   seasons: [{ season: DEMO_SEASON, matches: DEMO_MATCHES }],
   friendly: [],
   members: DEMO_PLAYERS,
+  schedule: DEMO_SCHEDULE,
 };
 
 const POLL_MS = 10_000;

@@ -11,8 +11,12 @@ export interface TourLeagueSource {
   matches: Match[];
 }
 
-function filterByYear(matches: Match[], year?: number): Match[] {
+/** 연도(숫자) 또는 날짜 범위(from 포함·to 미포함, 'YYYY-MM-DD') */
+export type TourFilter = number | { from: string; to: string };
+
+function filterByYear(matches: Match[], year?: TourFilter): Match[] {
   if (year === undefined) return matches;
+  if (typeof year === 'object') return matches.filter((m) => (m.date || '') >= year.from && (m.date || '') < year.to);
   const prefix = `${year}-`;
   return matches.filter((m) => (m.date || '').startsWith(prefix));
 }
@@ -37,12 +41,12 @@ function emptyEntry(playerId: string, name: string, gender: Gender): TourRanking
 
 /**
  * 투어 종합 랭킹 계산.
- * @param year undefined면 통산, 지정하면 해당 연도 경기(date 기준)만 집계
+ * @param year undefined면 통산, 숫자면 그 해, {from,to}면 그 기간 경기(date 기준)만 집계
  */
 export function calculateTourRanking(
   leagues: TourLeagueSource[],
   friendly: FriendlyMatchRow[],
-  year?: number
+  year?: TourFilter
 ): TourRankingEntry[] {
   const entries = new Map<string, TourRankingEntry>();
 

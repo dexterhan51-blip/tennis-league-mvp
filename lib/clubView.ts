@@ -1,14 +1,17 @@
 // 클럽 전체 데이터(시즌 + 그날그날 경기 + 회원 명단)를 화면이 쓰기 좋은 모양으로 바꾸는 순수 함수.
-// 요즘은 시즌 없이 그날 모인 사람끼리 치고 기록하므로, 진행 중 시즌이 없으면 "올해 전체 경기"를 한 묶음으로 본다.
+// 요즘은 시즌 없이 그날 모인 사람끼리 치고 기록하므로, 진행 중 시즌이 없으면 두 달 단위 기간(2026년 11월부터)으로 본다.
 
-import type { FriendlyMatchRow, Match, Player, SeasonRow } from '@/types';
+import type { FriendlyMatchRow, Match, Player, ScheduleItem, SeasonRow } from '@/types';
 import { isGuestPlayer, isNamedGuest } from '@/utils/tennisLogic';
 import { teamMembers } from '@/utils/playerInsights';
+import { inPeriod, listPeriods } from './period';
 
 export interface ClubData {
   seasons: { season: SeasonRow; matches: Match[] }[];
   friendly: FriendlyMatchRow[];
   members: Player[];
+  /** 다음 모임 일정 (운영진이 적어 둔 목록, 날짜순) */
+  schedule?: ScheduleItem[];
 }
 
 /** 탈퇴 회원 표시용 이름 — 경기 기록에는 남지만 순위·개인 기록 대상은 아니다 */
@@ -63,8 +66,8 @@ export function photoMap(data: ClubData): Map<string, string | undefined> {
 }
 
 export interface Scope {
-  kind: 'season' | 'year';
-  /** 화면 위 작은 머리글 (예: '시즌 6', '2026 전체') */
+  kind: 'season' | 'period' | 'all';
+  /** 화면 위 작은 머리글 (예: '시즌 6', '2026년 11~12월', '통산') */
   label: string;
   /** 큰 제목으로 쓸 이름 */
   name: string;
@@ -72,8 +75,13 @@ export interface Scope {
   matches: Match[];
 }
 
-/** 지금 보여 줄 기본 묶음: 진행 중 시즌이 있으면 그 시즌, 없으면 경기가 있는 가장 최근 해 전체 */
-export function currentScope(data: ClubData): Scope | null {
+/**
+ * 지금 보여 줄 기본 묶음
+ * 1. 진행 중 시즌이 있으면 그 시즌
+ * 2. 없으면 오늘이 속한 두 달 기간. 그 기간에 아직 경기가 없으면 경기가 있는 가장 최근 기간
+ * 3. 기간에 든 경기가 하나도 없으면 통산
+ */
+export function currentScope(data: ClubData, today?: string): Scope | null {
   const live = data.seasons.find((s) => s.season.status === 'live');
   if (live) {
     return {
@@ -85,9 +93,12 @@ export function currentScope(data: ClubData): Scope | null {
     };
   }
   const all = countableMatches(data);
-  const years = [...new Set(all.map((m) => (m.date || '').slice(0, 4)).filter((y) => /^\d{4}$/.test(y)))].sort();
-  const year = years[years.length - 1];
-  if (!year) return null;
-  const matches = all.filter((m) => (m.date || '').startsWith(`${year}-`));
-  return { kind: 'year', label: `${year} 전체`, name: `${year}년 전체 경기`, players: rankedPlayers(data, matches), matches };
+  if (all.length === 0) return null;
+  for (const period of listPeriods(all.map((m) => m.date), today)) {
+    const matches = all.filter((m) => inPeriod(m.date, period));
+    if (matches.length > 0) {
+      return { kind: 'period', label: period.label, name: `${period.label} 기록`, players: rankedPlayers(data, matches), matches };
+    }
+  }
+  return { kind: 'all', label: '통산', name: '통산 기록', players: rankedPlayers(data, all), matches: all };
 }

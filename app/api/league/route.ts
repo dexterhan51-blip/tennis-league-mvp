@@ -6,7 +6,7 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { MatchSchema, PlayersArraySchema, PlayerStatSchema } from '@/lib/schemas';
+import { MatchSchema, PlayersArraySchema, PlayerStatSchema, ScheduleItemSchema } from '@/lib/schemas';
 import * as store from '@/lib/server/store';
 import type { Match, PlayerStat } from '@/types';
 
@@ -43,6 +43,8 @@ export async function GET(req: NextRequest) {
         return json(await store.getAll());
       case 'match':
         return json({ found: await store.findMatch(id) });
+      case 'schedule':
+        return json({ schedule: await store.listSchedule() });
       case 'members':
         return json({ members: await store.getMembers() });
       case 'friendly':
@@ -92,6 +94,8 @@ const Op = z.discriminatedUnion('op', [
   z.object({ op: z.literal('friendly-upsert'), match: MatchSchema }),
   z.object({ op: z.literal('friendly-delete'), matchId: id }),
   z.object({ op: z.literal('members-set'), players: PlayersArraySchema }),
+  z.object({ op: z.literal('schedule-upsert'), item: ScheduleItemSchema }),
+  z.object({ op: z.literal('schedule-delete'), id }),
 ]);
 
 export async function POST(req: NextRequest) {
@@ -143,6 +147,12 @@ export async function POST(req: NextRequest) {
         break;
       case 'members-set':
         await store.setMembers(body.players);
+        break;
+      case 'schedule-upsert':
+        await store.upsertSchedule(body.item);
+        break;
+      case 'schedule-delete':
+        await store.deleteSchedule(body.id);
         break;
     }
     return json({ ok: true });

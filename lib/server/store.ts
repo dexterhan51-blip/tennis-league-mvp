@@ -7,10 +7,11 @@
 //   lf:mi             HASH  경기 id → 시즌 id               (경기 id만으로 지울 때 찾는 색인)
 //   lf:friendly       HASH  경기 id → { id, match_date, match }(JSON)
 //   lf:members        글     클럽 회원 명단 Player[](JSON) — 시즌과 무관한 현재 회원
+//   lf:schedule       HASH  일정 id → ScheduleItem(JSON)     다음 모임 일정
 //   lf:rev            수     무엇이든 바뀔 때마다 +1          (화면이 새로 읽을지 판단하는 값)
 
 import { randomUUID } from 'node:crypto';
-import type { FriendlyMatchRow, Match, Player, PlayerStat, SeasonRow } from '@/types';
+import type { FriendlyMatchRow, Match, Player, PlayerStat, ScheduleItem, SeasonRow } from '@/types';
 
 const K = {
   seasons: 'lf:seasons',
@@ -18,6 +19,7 @@ const K = {
   matchIndex: 'lf:mi',
   friendly: 'lf:friendly',
   members: 'lf:members',
+  schedule: 'lf:schedule',
   rev: 'lf:rev',
   fail: (ip: string) => `lf:fail:${ip}`,
 };
@@ -127,11 +129,29 @@ export async function setMembers(players: Player[]): Promise<void> {
   await redis([['SET', K.members, JSON.stringify(players)], ['INCR', K.rev]]);
 }
 
+function sortSchedule(items: ScheduleItem[]): ScheduleItem[] {
+  return items.sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
+}
+
+export async function listSchedule(): Promise<ScheduleItem[]> {
+  const [values] = await redis([['HVALS', K.schedule]]);
+  return sortSchedule(parseAll<ScheduleItem>(values));
+}
+
+export async function upsertSchedule(item: ScheduleItem): Promise<void> {
+  await redis([['HSET', K.schedule, item.id, JSON.stringify(item)], ['INCR', K.rev]]);
+}
+
+export async function deleteSchedule(id: string): Promise<void> {
+  await redis([['HDEL', K.schedule, id], ['INCR', K.rev]]);
+}
+
 /** 전체 시즌 + 경기 + 친선경기 + 회원 명단 (종합·통산 랭킹용) */
 export async function getAll(): Promise<{
   seasons: { season: SeasonRow; matches: Match[] }[];
   friendly: FriendlyMatchRow[];
   members: Player[];
+  schedule: ScheduleItem[];
   rev: number;
 }> {
   const seasons = (await listSeasons()).sort((a, b) => a.season_no - b.season_no);
@@ -140,6 +160,7 @@ export async function getAll(): Promise<{
     ['HVALS', K.friendly],
     ['GET', K.rev],
     ['GET', K.members],
+    ['HVALS', K.schedule],
   ]);
   let members: Player[] = [];
   try {
@@ -150,6 +171,7 @@ export async function getAll(): Promise<{
   }
   return {
     members,
+    schedule: sortSchedule(parseAll<ScheduleItem>(results[seasons.length + 3])),
     seasons: seasons.map((season, i) => ({ season, matches: sortMatches(parseAll<StoredMatch>(results[i])) })),
     friendly: sortFriendly(parseAll<FriendlyMatchRow>(results[seasons.length])),
     rev: Number(results[seasons.length + 1]) || 0,

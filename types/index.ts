@@ -88,6 +88,15 @@ export interface PlayerStat {
 }
 
 /** 서버 friendly_matches 테이블 행 (리그 밖 친선경기) */
+/** 다음 모임 일정 (운영진이 적어 두는 목록) */
+export interface ScheduleItem {
+  id: string;
+  date: string;   // 'YYYY-MM-DD'
+  time: string;   // 'HH:MM' (모르면 빈 문자열)
+  place: string;
+  memo?: string;
+}
+
 export interface FriendlyMatchRow {
   id: string;
   match_date: string; // 'YYYY-MM-DD'

@@ -167,11 +167,11 @@ export default function MePage() {
           )}
         </section>
       ) : myMatches.length === 0 ? (
-        <p className="mt-6 text-sm text-ink-mute">{scope?.kind === 'season' ? '이번 시즌에' : '올해'} 아직 뛴 경기가 없어요.</p>
+        <p className="mt-6 text-sm text-ink-mute">{scope?.kind === 'season' ? '이번 시즌에' : scope ? `${scope.label}에` : ''} 아직 뛴 경기가 없어요.</p>
       ) : (
         <>
           <section className="mt-[22px]">
-            <div className="mb-2.5"><Eyebrow>{scope?.kind === 'season' ? '이번 시즌 순위 흐름' : '올해 순위 흐름'}</Eyebrow></div>
+            <div className="mb-2.5"><Eyebrow>{scope?.kind === 'season' ? '이번 시즌 순위 흐름' : `${scope?.label ?? ''} 순위 흐름`}</Eyebrow></div>
             <RankChart timeline={timeline} size={table.length} />
           </section>
 

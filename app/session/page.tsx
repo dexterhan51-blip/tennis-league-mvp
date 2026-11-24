@@ -474,7 +474,7 @@ function SessionContent() {
       </section>
 
       <p className="mt-6 text-[11px] text-ink-faint leading-relaxed">
-        여기서 기록한 경기는 시즌과 상관없이 개인 기록과 올해 순위에 쌓입니다. 이 날 참가자{' '}
+        여기서 기록한 경기는 시즌과 상관없이 개인 기록과 두 달 기간 순위·통산에 쌓입니다. 이 날 참가자{' '}
         {[...new Set(dayMatches.flatMap((m) => [...teamMembers(m.teamA), ...teamMembers(m.teamB)].map((p) => p.name)))].length}명.
       </p>
     </main>

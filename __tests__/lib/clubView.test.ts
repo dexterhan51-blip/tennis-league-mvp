@@ -41,11 +41,23 @@ describe('clubView', () => {
     expect(all.every((m) => !m.isFriendly)).toBe(true);
   });
 
-  it('진행 중 시즌이 없으면 가장 최근 해의 전체 경기를 한 묶음으로 본다', () => {
-    const scope = currentScope(data('archived'));
-    expect(scope).toMatchObject({ kind: 'year', label: '2026 전체' });
-    expect(scope?.matches).toHaveLength(2);
-    // 참석 1점 + 승리 1점: a 2점, d 2점(1승 1패), c 2점(1승 1패), b 1점. 게스트·탈퇴 회원은 순위에 없다
+  it('기간(2026년 11월~)에 든 경기가 없으면 통산으로 본다', () => {
+    const scope = currentScope(data('archived'), '2026-11-24');
+    expect(scope).toMatchObject({ kind: 'all', label: '통산' });
+    expect(scope?.matches).toHaveLength(3);
+  });
+
+  it('진행 중 시즌이 없으면 두 달 기간으로 본다 — 지금 기간이 비었으면 경기가 있는 최근 기간', () => {
+    const nov = match('2026-11-21', [a, c], [guest, d], 4, 1);
+    const novFormer = match('2026-11-21', [b, c], [former, d], 2, 4);
+    const withNov: ClubData = {
+      ...data('archived'),
+      friendly: [...data('archived').friendly, { id: nov.id, match_date: nov.date, match: nov }, { id: novFormer.id, match_date: novFormer.date, match: novFormer }],
+    };
+    const scope = currentScope(withNov, '2027-01-03');
+    expect(scope).toMatchObject({ kind: 'period', label: '2026년 11~12월' });
+    expect(scope?.matches.map((m) => m.date)).toEqual(['2026-11-21', '2026-11-21']);
+    // 참석 1점 + 승리 1점: a 2점, c 2점(1승 1패), d 2점(1승 1패), b 1점. 게스트·탈퇴 회원은 순위에 없다
     const table = calculateRanking(scope!.players, scope!.matches);
     expect(table.map((s) => s.playerId).sort()).toEqual(['a', 'b', 'c', 'd']);
     expect(table.find((s) => s.playerId === 'a')?.totalPoints).toBe(2);

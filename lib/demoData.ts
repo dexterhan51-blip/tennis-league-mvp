@@ -1,7 +1,7 @@
 // 예시 데이터 — Supabase 환경변수가 없는 로컬 개발 환경에서만 쓰인다 (화면 확인용).
 // 서버가 설정된 실제 앱에서는 절대 섞이지 않는다. 이름은 전부 가상 인물.
 
-import type { Match, Player, SeasonRow } from '@/types';
+import type { Match, Player, SeasonRow, ScheduleItem } from '@/types';
 
 const MEN = ['한씨', '회장님', '손과장', '박대리', '최프로'];
 const WOMEN = ['김주사', '공주', '이대리', '정사원', '윤인턴'];
@@ -59,6 +59,19 @@ function buildMatches(): Match[] {
 }
 
 export const DEMO_MATCHES: Match[] = buildMatches();
+
+/** 예시 일정 — 화면 확인용 (오늘 기준 다음 주말들) */
+function demoDate(daysFromToday: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + daysFromToday);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+export const DEMO_SCHEDULE: ScheduleItem[] = [
+  { id: 'demo-s1', date: demoDate(4), time: '14:00', place: '평촌 3번 코트', memo: '2면' },
+  { id: 'demo-s2', date: demoDate(11), time: '19:00', place: '의왕 실내 코트' },
+];
 
 export const DEMO_SEASON: SeasonRow = {
   id: 'demo-season',

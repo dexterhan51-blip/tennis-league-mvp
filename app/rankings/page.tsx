@@ -10,15 +10,15 @@ import { PlayerAvatar } from '@/components/live/PlayerAvatar';
 import { calculateRanking } from '@/utils/tennisLogic';
 import { recentForm, type MatchOutcome } from '@/utils/playerInsights';
 import { useAuth } from '@/contexts/AuthContext';
-import { calculateTourRanking, collectYears, collectAllPlayers, TourLeagueSource } from '@/utils/tourRanking';
+import { calculateTourRanking, collectAllPlayers, TourLeagueSource } from '@/utils/tourRanking';
+import { inPeriod, listPeriods, type Period } from '@/lib/period';
 import { fetchEverything } from '@/lib/seasonApi';
 import TourPlayerModal from '@/components/rankings/TourPlayerModal';
 import AdminGuestConverter from '@/components/rankings/AdminGuestConverter';
 import type { FriendlyMatchRow, Gender, Match, SeasonRow, TourRankingEntry } from '@/types';
 
-type YearFilter = number | 'all';
-/** 'season' = 진행 중 시즌, 숫자 = 그 해 종합(시즌+친선), 'all' = 통산 */
-type Scope = 'season' | YearFilter;
+/** 'season' = 진행 중 시즌, 'YYYY-MM' = 두 달 기간(시즌+그날 경기), 'all' = 통산 */
+type Scope = 'season' | 'all' | string;
 type GenderFilter = 'ALL' | Gender;
 
 /** 표 한 줄 — 시즌 순위와 종합 순위를 같은 모양으로 그리기 위한 공통 형태 */
@@ -101,30 +101,32 @@ export default function RankingsPage() {
     loadData();
   }, [loadData]);
 
-  const years = useMemo(() => (leagues ? collectYears(leagues, friendly) : []), [leagues, friendly]);
+  // 두 달 기간 탭: 2026년 11월부터 오늘이 속한 기간까지 (최신 먼저)
+  const periods = useMemo(() => {
+    if (!leagues) return [];
+    const dates = [...leagues.flatMap((l) => l.matches.map((m) => m.date)), ...friendly.map((f) => f.match_date)];
+    return listPeriods(dates);
+  }, [leagues, friendly]);
 
   const liveSeason = useMemo(() => seasons.find((s) => s.status === 'live') ?? null, [seasons]);
 
-  // 기본 탭: 진행 중 시즌이 있으면 시즌, 없으면 최신 연도, 그것도 없으면 통산
-  const activeScope: Scope = scope ?? (liveSeason ? 'season' : years[0] ?? 'all');
-  const activeYear: YearFilter = activeScope === 'season' ? 'all' : activeScope;
+  // 기본 탭: 진행 중 시즌이 있으면 시즌, 없으면 지금 기간, 기간이 없으면 통산
+  const activeScope: Scope = scope ?? (liveSeason ? 'season' : periods[0]?.key ?? 'all');
+  const activePeriod: Period | null = periods.find((p) => p.key === activeScope) ?? null;
+  const range = activePeriod ? { from: activePeriod.from, to: activePeriod.to } : undefined;
 
   const entries = useMemo(
-    () =>
-      leagues
-        ? calculateTourRanking(leagues, friendly, activeYear === 'all' ? undefined : activeYear)
-        : [],
-    [leagues, friendly, activeYear]
+    () => (leagues ? calculateTourRanking(leagues, friendly, range) : []),
+    // range 는 activePeriod 에서 나오므로 그것만 지켜본다
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [leagues, friendly, activePeriod]
   );
 
   const pool = useMemo(() => (leagues ? collectAllPlayers(leagues, friendly) : []), [leagues, friendly]);
 
   const friendlyForModal = useMemo(
-    () =>
-      activeYear === 'all'
-        ? friendly
-        : friendly.filter((f) => (f.match_date || '').startsWith(`${activeYear}-`)),
-    [friendly, activeYear]
+    () => (activePeriod ? friendly.filter((f) => inPeriod(f.match_date, activePeriod)) : friendly),
+    [friendly, activePeriod]
   );
 
   const photoOf = useMemo(() => new Map(pool.map((p) => [p.id, p.photo])), [pool]);
@@ -162,12 +164,11 @@ export default function RankingsPage() {
       ];
     }
 
-    const prefix = activeYear === 'all' ? '' : `${activeYear}-`;
     const scoped: Match[] = [
       ...leagues.flatMap((l) => l.matches),
       ...friendly.map((f) => f.match).filter(Boolean),
     ]
-      .filter((m) => (m.date || '').startsWith(prefix))
+      .filter((m) => !activePeriod || inPeriod(m.date, activePeriod))
       .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     return entries.map((e, i) => ({
       playerId: e.playerId,
@@ -182,7 +183,7 @@ export default function RankingsPage() {
       form: recentForm(scoped.map((m) => ({ ...m, isFriendly: false })), e.playerId),
       tour: e,
     }));
-  }, [leagues, liveSeason, activeScope, activeYear, entries, friendly]);
+  }, [leagues, liveSeason, activeScope, activePeriod, entries, friendly]);
 
   const visibleRows = gender === 'ALL' ? rows : rows.filter((r) => r.gender === gender);
   const archived = seasons.filter((s) => s.status === 'archived').sort((a, b) => b.season_no - a.season_no);
@@ -192,7 +193,7 @@ export default function RankingsPage() {
 
   const scopeTabs: { key: Scope; label: string }[] = [
     ...(liveSeason ? [{ key: 'season' as Scope, label: `시즌 ${liveSeason.season_no}` }] : []),
-    ...years.map((y) => ({ key: y as Scope, label: `${y} 종합` })),
+    ...periods.map((p) => ({ key: p.key as Scope, label: p.label })),
     { key: 'all', label: '통산' },
   ];
 
@@ -317,7 +318,9 @@ export default function RankingsPage() {
             점수 = 참석 1점(하루 1회) + 승리 1점.
             {activeScope === 'season'
               ? ' ▲▼는 직전 경기일 대비 순위 변화입니다.'
-              : ' 종합·통산은 각 시즌과 친선경기 점수를 합산합니다.'}
+              : activeScope === 'all'
+                ? ' 통산은 시즌 1~5와 그날 모임 경기를 모두 합산합니다.'
+                : ' 두 달마다 새로 셉니다(2026년 11월부터). 그 전 기록은 통산에 있습니다.'}
           </p>
 
           {archived.length > 0 && (

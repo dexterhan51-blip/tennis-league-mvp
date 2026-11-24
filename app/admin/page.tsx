@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import {
+  CalendarDays,
   ChevronRight,
   FileUp,
   FolderOpen,
@@ -21,6 +22,12 @@ interface AdminLink {
 }
 
 const GROUPS: { title: string; links: AdminLink[] }[] = [
+  {
+    title: '모임',
+    links: [
+      { href: '/schedule', icon: <CalendarDays className="w-5 h-5" />, label: '다음 모임 일정', hint: '날짜 · 시간 · 장소를 적으면 첫 화면에 보입니다' },
+    ],
+  },
   {
     title: '기록',
     links: [

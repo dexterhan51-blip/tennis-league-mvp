@@ -26,7 +26,7 @@ const tabs: TabItem[] = [
     href: '/admin',
     icon: <Wrench className="w-[22px] h-[22px]" />,
     label: '운영',
-    matchPaths: ['/admin', '/session', '/import', '/league', '/players'],
+    matchPaths: ['/admin', '/session', '/import', '/schedule', '/league', '/players'],
     adminOnly: true,
   },
 ];

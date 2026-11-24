@@ -22,7 +22,7 @@ import type { Match, Player } from '@/types';
 function LiveDashboardContent() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
-  return id ? <LiveDashboardView seasonId={id} /> : <AllMatchesView />;
+  return id ? <LiveDashboardView seasonId={id} /> : <AllMatchesView initialDate={searchParams.get('date')} />;
 }
 
 interface DayViewProps {
@@ -37,10 +37,12 @@ interface DayViewProps {
   matches: Match[];
   connected: boolean | null;
   finalRanking?: React.ReactNode;
+  /** 처음 보여 줄 날짜 (첫 화면에서 모임을 눌러 들어온 경우) */
+  initialDate?: string | null;
 }
 
 // 기본 화면: 시즌 경기와 그날그날 경기를 가리지 않고 날짜별로 본다
-function AllMatchesView() {
+function AllMatchesView({ initialDate }: { initialDate: string | null }) {
   const { data, status, isDemo } = useClubData(true);
   const { profile, isAdmin } = useAuth();
   if (status === 'loading') return <FullLoading />;
@@ -57,6 +59,7 @@ function AllMatchesView() {
       photoOf={photoMap(data)}
       matches={matches}
       connected={isDemo ? null : true}
+      initialDate={initialDate}
     />
   );
 }
@@ -140,9 +143,9 @@ function LiveDashboardView({ seasonId }: { seasonId: string | null }) {
   );
 }
 
-function DayView({ eyebrow, archived, isDemo, isAdmin, myPlayerId, players, photoOf, matches, connected, finalRanking }: DayViewProps) {
+function DayView({ eyebrow, archived, isDemo, isAdmin, myPlayerId, players, photoOf, matches, connected, finalRanking, initialDate }: DayViewProps) {
   const dates = [...new Set(matches.map((m) => m.date))].sort();
-  const [picked, setPicked] = useState<string | null>(null);
+  const [picked, setPicked] = useState<string | null>(initialDate ?? null);
   // 고른 날이 없으면(또는 그날 경기가 지워졌으면) 가장 최근 경기일
   const effectiveDate = picked && dates.includes(picked) ? picked : dates[dates.length - 1] ?? '';
   const dayMatches = matches.filter((m) => m.date === effectiveDate);
